@@ -1,0 +1,172 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/forms';
+
+@theme {
+	--color-light: hsl(0 0% 90%);
+	--color-dark: #212427;
+
+	/** Theme surface colors */
+	--color-surface-a0: #121212;
+	--color-surface-a10: #282828;
+	--color-surface-a20: #3f3f3f;
+	--color-surface-a30: #575757;
+	--color-surface-a40: #717171;
+	--color-surface-a50: #8b8b8b;
+
+	/** Theme primary colors */
+	--color-primary-a0: #72edea;
+	--color-primary-a10: #86efec;
+	--color-primary-a20: #98f2ef;
+	--color-primary-a30: #a9f4f1;
+	--color-primary-a40: #b9f6f3;
+	--color-primary-a50: #c8f8f6;
+
+	/* ERROR */
+	--color-error-light: #ef5350;
+	--color-error: #d32f2f;
+	--color-error-dark: #c62828;
+
+	/* WARNING */
+	--color-warning-light: #ff9800;
+	--color-warning: #ed6c02;
+	--color-warning-dark: #e65100;
+
+	/* INFO */
+	--color-info-light: #03a9f4;
+	--color-info: #0288d1;
+	--color-info-dark: #01579b;
+
+	/* SUCCESS */
+	/* --color-success-light: #4caf50;
+	--color-success: #2e7d32;
+	--color-success-dark: #1b5e20; */
+	--color-success: oklch(72.3% 0.219 149.579);
+}
+
+:root {
+	color-scheme: light dark;
+	@apply text-dark dark:bg-surface-a0 dark:text-light;
+}
+
+@utility flex-center {
+	@apply flex items-center justify-center;
+}
+
+@utility border-default {
+	@apply border border-dark dark:border-light;
+}
+
+@utility text-secondary {
+	@apply text-zinc-400 dark:text-zinc-400;
+}
+
+.number-input-no-spin {
+	-webkit-appearance: none;
+	margin: 0;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+@layer components {
+	/* prettier-ignore */
+	.input-group-item {
+		@apply first:border-s 
+        focus:z-10 relative z-0 -ms-px 
+        flex input-default 
+        items-center justify-center 
+        border-s-0 first:ms-0 focus:border-s focus:ring-2 focus:ring-offset-1;
+	}
+}
+
+/* prettier-ignore */
+@utility input-default {
+	@apply border-default bg-transparent px-2 py-1 text-inherit 
+	focus:ring-primary-a0
+	dark:hover:bg-surface-a10
+	hover:bg-gray-100
+	disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@utility color-level-1 {
+	@apply dark:border-surface-a20 dark:bg-surface-a10 dark:hover:bg-surface-a20;
+}
+
+@utility color-level-2 {
+	@apply dark:border-surface-a30 dark:bg-surface-a20 dark:hover:bg-surface-a30;
+}
+
+@utility input-color-level-2 {
+	@apply color-level-2;
+}
+
+@utility color-level-3 {
+	@apply dark:border-surface-a40 dark:bg-surface-a30 dark:hover:bg-surface-a40;
+}
+
+@utility color-level-4 {
+	@apply dark:border-surface-a50 dark:bg-surface-a40 dark:hover:bg-surface-a50;
+}
+
+@utility abs-center {
+	@apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
+@utility abs-center-y {
+	@apply absolute top-1/2 -translate-y-1/2;
+}
+
+@utility abs-center-x {
+	@apply absolute left-1/2 -translate-x-1/2;
+}
+
+@keyframes fadeInRight {
+	0% {
+		transform: translateX(-2%);
+		opacity: 0;
+	}
+	100% {
+		transform: translateX(0%);
+		opacity: 1;
+	}
+}
+
+@keyframes lockin {
+	0% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-1%);
+	}
+	50% {
+		transform: translateX(+1%);
+	}
+	75% {
+		transform: translateX(-1%);
+	}
+	100% {
+		transform: translateX(0);
+	}
+}
+
+@utility lockin-animation {
+	animation: 0.4s lockin ease-in-out;
+}
+
+@utility fadeInRight-animation {
+	animation: 1s fadeInRight;
+}
+
+/* prettier-ignore */
+@utility button-default {
+	@apply border-default bg-transparent px-4 py-2 text-inherit 
+	dark:hover:bg-surface-a10 dark:active:bg-surface-a20
+	hover:bg-gray-100
+	disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+@layer base {
+	button:not([disabled]),
+	[role='button']:not([disabled]) {
+		cursor: pointer;
+	}
+}
