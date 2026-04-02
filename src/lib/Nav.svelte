@@ -1,4 +1,5 @@
 <script>
+	import { resolve } from '$app/paths';
 	import { cn } from './utils/styling';
 
 	let { className = '' } = $props();
@@ -11,7 +12,7 @@
 	)}
 >
 	<a href="/">Home</a>
-	<a href="/encryption">Encryption</a>
-	<a href="/decryption">Decryption</a>
-	<a href="/padding-oracle-attack">Padding Oracle Attack</a>
+	<a href={resolve('/encryption')}>Encryption</a>
+	<a href={resolve('/decryption')}>Decryption</a>
+	<a href={resolve('/padding-oracle-attack')}>Padding Oracle Attack</a>
 </nav>

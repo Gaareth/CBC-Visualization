@@ -8,6 +8,7 @@
 	import FloatingInput from './FloatingInput.svelte';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	const padder = new PKCS7Padder();
 
@@ -103,8 +104,8 @@
 		wrapperClass="w-4xl h-fit"
 		title="CBC Decryption"
 		slides={[explain, toAttack]}
-		back={() => goto('/encryption')}
-		next={() => goto('/padding-oracle-attack')}
+		back={() => goto(resolve('/encryption'))}
+		next={() => goto(resolve('/padding-oracle-attack'))}
 		slideWrapperClass="my-auto"
 	></ExplainWrapper>
 

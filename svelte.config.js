@@ -1,7 +1,7 @@
 import adapter from '@sveltejs/adapter-static';
 import { relative, sep } from 'node:path';
 
-const dev = process.argv.includes('dev');
+const dev = process.env.NODE_ENV === 'development';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
@@ -22,7 +22,7 @@ const config = {
 			fallback: '404.html'
 		}),
 		paths: {
-			base: dev ? '' : '/CBC-Visualization' // repo name here
+			base: dev ? '' : '/CBC-Visualization' 
 		}
 	}
 };
