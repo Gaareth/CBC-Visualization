@@ -1,5 +1,15 @@
 @import 'tailwindcss';
 @plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+
+@source inline('border-red-500');
+@source inline('border-r-red-500');
+
+@source inline('border-green-400');
+@source inline('border-r-green-400');
+
+@source inline('border-blue-400');
+@source inline('border-r-blue-400');
 
 @theme {
 	--color-light: hsl(0 0% 90%);
@@ -81,10 +91,10 @@
 /* prettier-ignore */
 @utility input-default {
 	@apply border-default bg-transparent px-2 py-1 text-inherit 
-	focus:ring-primary-a0
+	focus:ring-primary-a0!
 	dark:hover:bg-surface-a10
 	hover:bg-gray-100
-	disabled:cursor-not-allowed disabled:opacity-50;
+	disabled:cursor-not-allowed disabled:border-surface-a30 disabled:hover:bg-transparent;
 }
 
 @utility color-level-1 {
@@ -169,4 +179,23 @@
 	[role='button']:not([disabled]) {
 		cursor: pointer;
 	}
+}
+
+@media (prefers-reduced-motion) {
+	::view-transition-group(*),
+	::view-transition-old(*),
+	::view-transition-new(*) {
+		animation: none !important;
+	}
+}
+
+progress::-moz-progress-bar {
+	background: var(--color-primary-a0);
+}
+progress::-webkit-progress-value {
+	background: var(--color-primary-a0);
+}
+
+progress {
+	color: var(--color-primary-a0);
 }

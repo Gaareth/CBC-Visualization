@@ -20,6 +20,10 @@
 	// half of line    				half of xor   				 half of line
 	+ arrowThickness/2          + xorDiameter/2 			+ arrowThickness/2
 
+	const ivWidth = blockWidth;
+	const leftSize = ivWidth + gap + arrowWidth + gap + xorDiameter / 2;
+	const leftPadding = leftSize - blockWidth / 2;
+
 	export const STYLE_CONSTANTS = {
 		blockSize,
 		arrowWidth,
@@ -32,7 +36,8 @@
 		toMidLength,
 		xorDiameter,
 		functionHeight,
-		toXorLength
+		toXorLength,
+		leftPadding
 	};
 </script>
 
@@ -53,6 +58,8 @@
 		encryptionMode?: boolean;
 		targetRotation?: number;
 
+		addInitPadding?: boolean; // whether to add extra padding space on the left for the IV and its arrow
+
 		padder?: Padder;
 
 		onChangePlaintext?: (bytes: (number | undefined)[]) => void;
@@ -60,6 +67,7 @@
 		onChangeIV?: (bytes: (number | undefined)[]) => void;
 
 		PlainTextBlock?: Snippet<[index: number]>;
+		IVBlock?: Snippet<[index: number]>;
 		FnOutputBlock?: Snippet<[index: number]>;
 		VerticalBar?: Snippet;
 	}
@@ -73,12 +81,14 @@
 		encryptionMode = true,
 		targetRotation = encryptionMode ? 90 : 270,
 		padder,
+		addInitPadding = false,
 
 		onChangePlaintext,
 		onChangeCiphertext,
 		onChangeIV,
 
 		PlainTextBlock,
+		IVBlock,
 		FnOutputBlock,
 		VerticalBar
 	}: CBCBlockProps = $props();
@@ -136,7 +146,10 @@
 	</div>
 {/snippet}
 
-<div class={cn('flex flex-col items-center', flippedClass)} style={`gap: ${gap}px;`}>
+<div
+	class={cn('flex flex-col items-center', flippedClass)}
+	style={`gap: ${gap}px; padding-left: ${addInitPadding ? leftPadding : 0}px;`}
+>
 	{#if PlainTextBlock}
 		<div class={flippedClass}>
 			{@render PlainTextBlock(index)}
@@ -151,6 +164,7 @@
 				error={paddingResult && extractPaddingError(paddingResult)}
 				reserveSpaceForError={true}
 				title={`Plaintext Block ${index} (P_${index})`}
+				textPosBelow={!encryptionMode}
 			/>
 		</div>
 	{/if}
@@ -163,14 +177,23 @@
 			style={`right: calc(100% + ${gap}px + ${xorDiameter / 2}px);`}
 		>
 			{#if initializationVector}
-				<p class={cn(flippedClass)}>IV</p>
-				<Block
-					bytes={initializationVector}
-					className={cn(flippedClass)}
-					{byteWidth}
-					onChange={onChangeIV}
-					allowEdit={true}
-				/>
+				{#if IVBlock}
+					<div class={flippedClass}>
+						{@render IVBlock(index)}
+					</div>
+				{:else}
+					<div class={flippedClass}>
+						<Block
+							bytes={initializationVector}
+							{byteWidth}
+							onChange={onChangeIV}
+							allowEdit={true}
+							reserveSpaceForError={true}
+							title="Initialization Vector (IV)"
+							classNameTextAbove="absolute -top-7 w-full"
+						/>
+					</div>
+				{/if}
 			{/if}
 
 			<Arrow

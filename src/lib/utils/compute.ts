@@ -23,3 +23,35 @@ export function getRandomByteExcept(exceptions: number[] = []): number {
 	let options = Array.from({ length: 256 }, (_, i) => i).filter((i) => !exceptions.includes(i));
 	return options[Math.floor(Math.random() * options.length)];
 }
+
+export function displayByte(
+	b: number | null | undefined,
+	displayAs: 'hex' | 'ascii' | 'decimal',
+	prependHexPrefix = false
+): string {
+	if (b == null) {
+		return '?';
+	}
+
+	switch (displayAs) {
+		case 'hex':
+			let hex = b.toString(16).toUpperCase().padStart(2, '0');
+			return prependHexPrefix ? `0x${hex}` : hex;
+		case 'ascii':
+			return String.fromCharCode(b);
+		case 'decimal':
+			return b.toString(10);
+		default:
+			return b.toString(16).toUpperCase().padStart(2, '0');
+	}
+}
+
+/** FNV-1a 32-bit hash — small, fast, no crypto needed for a storage key */
+export function fnv1a_hash(str: string): string {
+	let h = 0x811c9dc5;
+	for (let i = 0; i < str.length; i++) {
+		h ^= str.charCodeAt(i);
+		h = (h + ((h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24))) >>> 0;
+	}
+	return h.toString(16).padStart(8, '0');
+}

@@ -11,6 +11,7 @@
 		encryptionMode?: boolean;
 		onIVChange?: (bytes: (number | undefined)[]) => void;
 		padder?: Padder;
+		addInitPadding?: boolean;
 	}
 
 	let {
@@ -19,7 +20,8 @@
 		onIVChange,
 
 		encryptionMode = true,
-		padder
+		padder,
+		addInitPadding = false
 	}: Props = $props();
 
 	const initializationVector = $derived(ciphertextBlocks[0]);
@@ -29,8 +31,6 @@
 	export function rotateArrows() {
 		targetRotation += 180;
 	}
-
-
 
 	const isLastBlock = $derived((i: number) => i === plaintextBlocks.length - 1);
 </script>
@@ -43,7 +43,7 @@
 			index={i}
 			plaintextBlock={plaintextBlocks[i]}
 			ciphertextBlock={ciphertextBlocks[i + 1]}
-			initializationVector={i === 0 ? initializationVector : undefined}
+			initializationVector={i === 0 ? ciphertextBlocks[0] : undefined}
 			isLastBlock={isLastBlock(i)}
 			onChangeCiphertext={(bytes) => (ciphertextBlocks[i + 1] = bytes)}
 			onChangePlaintext={(bytes) => {
@@ -55,6 +55,7 @@
 				onIVChange?.(bytes);
 			}}
 			{padder}
+			addInitPadding={addInitPadding && i === 0}
 		/>
 	{/each}
 </div>

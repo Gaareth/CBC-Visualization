@@ -26,13 +26,6 @@ export const autoGate = {
 	wait: async () => {} // resolves immediately
 };
 
-// export function autoRunGate(gate: ReturnType<typeof createGate>, delay = 300) {
-// 	const id = setInterval(() => {
-// 		gate.step();
-// 	}, delay);
-
-// 	return () => clearInterval(id);
-// }
 
 export function autoRunGate(
 	gate: ReturnType<typeof createGate>,
@@ -59,3 +52,5 @@ export function autoRunGate(
 		clearTimeout(timeoutId);
 	};
 }
+
+

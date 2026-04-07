@@ -1,9 +1,15 @@
 <script lang="ts">
 	import { STYLE_CONSTANTS } from './CBCBlock.svelte';
+	import { settingsState } from './stores/settings.svelte';
+	import { displayByte } from './utils/compute';
+	import { watch } from './utils/reactivity.svelte';
 	import { cn } from './utils/styling';
+	import { SvelteSet } from 'svelte/reactivity';
 
 	interface Props {
 		title?: string;
+		textPosBelow?: boolean;
+		classNameTextAbove?: string;
 		bytes: (number | undefined)[];
 		byteWidth?: number; // in pixels
 		byteHeight?: number; // in pixels
@@ -18,10 +24,14 @@
 		displayAs?: 'hex' | 'ascii' | 'decimal';
 		onChange?: (bytes: (number | undefined)[]) => void;
 		allowEdit?: boolean;
+		highlightChanges?: boolean;
+		inputClassNames?: Record<number, string>;
 	}
 
 	let {
 		title,
+		textPosBelow = false,
+		classNameTextAbove = '',
 		bytes,
 		className = '',
 		byteWidth = STYLE_CONSTANTS.byteWidth,
@@ -29,27 +39,16 @@
 		error,
 		reserveSpaceForError = false,
 		success,
-		displayAs = 'hex',
+		displayAs = settingsState.displayBytesAs,
 		onChange,
-		allowEdit = false
+		allowEdit = false,
+		highlightChanges = true,
+		inputClassNames
 	}: Props = $props();
 
 	let displayBytes: string[] = $derived(
 		bytes.map((b) => {
-			if (b == null) {
-				return '?';
-			}
-
-			switch (displayAs) {
-				case 'hex':
-					return b.toString(16).toUpperCase().padStart(2, '0');
-				case 'ascii':
-					return String.fromCharCode(b);
-				case 'decimal':
-					return b.toString(10);
-				default:
-					return b.toString(16).toUpperCase().padStart(2, '0');
-			}
+			return displayByte(b, displayAs);
 		})
 	);
 
@@ -127,18 +126,54 @@
 			updateBytes(index, newValue);
 		}
 	}
+
+	let flashIndices = new SvelteSet();
+
+	let previous = $state(null as (number | undefined)[] | null);
+
+	watch(
+		() => [...bytes],
+		(prev) => {
+			previous = prev as (number | undefined)[];
+			if (!highlightChanges || !previous) return;
+
+			for (let i = 0; i < bytes.length; i++) {
+				const currentByte = bytes[i];
+				const previousByte = previous[i];
+
+				if (previousByte !== undefined && currentByte !== previousByte) {
+					flashIndices.add(i);
+
+					setTimeout(() => {
+						flashIndices.delete(i);
+					}, 300); // adjust delay
+				}
+			}
+		}
+	);
 </script>
 
-<div class={cn('flex flex-col text-center', className)}>
+<div class={cn('relative flex flex-col gap-2 text-center', className)}>
+	<!-- <p>{previous}</p>
+	<p>{[...flashIndices]}</p> -->
 	<!-- {#if error}
 		<p class="text-error">{error.message}</p>
 	{/if} -->
+
+	{#if !textPosBelow && reserveSpaceForError}
+		<div class={cn('h-5', classNameTextAbove)}>
+			{#if title}
+				<p>{title}</p>
+			{/if}
+
+			{#if error}
+				<p class="text-error">{error.message}</p>
+			{/if}
+		</div>
+	{/if}
+
 	<div class="flex">
 		{#each bytes as byte, i}
-			<!-- <div class="flex h-8 w-8 items-center justify-center border-default border-e-0 last:border-e">
-				{byte.toString(16).padStart(2, '0')}
-			</div> -->
-
 			<input
 				disabled={!allowEdit}
 				onkeydown={(e) => onkeypress(e, i)}
@@ -148,7 +183,10 @@
 					'input-group-item number-input-no-spin text-center',
 					error?.indices.includes(i + 1) ? 'border-e-0' : '',
 					error?.indices.includes(i) ? 'border-s border-error' : '',
-					success ? 'border-success' : ''
+					success ? 'border-success' : '',
+					flashIndices.has(i) ? 'z-10 opacity-100! ring-2 ring-primary-a0 ring-offset-1' : '',
+					'transition-all duration-300 ease-out',
+					inputClassNames?.[i] || ''
 				)}
 				value={displayBytes[i]}
 				style:width={`${byteWidth}px`}
@@ -158,7 +196,7 @@
 		{/each}
 	</div>
 
-	{#if reserveSpaceForError}
+	{#if textPosBelow && reserveSpaceForError}
 		<div class="h-5">
 			{#if title}
 				<p>{title}</p>

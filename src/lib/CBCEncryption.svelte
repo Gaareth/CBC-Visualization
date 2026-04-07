@@ -7,6 +7,8 @@
 	import { PKCS7Padder } from './logic/padding';
 	import FloatingInput from './FloatingInput.svelte';
 	import { fade } from 'svelte/transition';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	const padder = new PKCS7Padder();
 
@@ -99,6 +101,7 @@
 		title="CBC Encryption"
 		slides={[explain, todecrypt]}
 		slideWrapperClass="my-auto"
+		next={() => goto(resolve('/decryption'))}
 	></ExplainWrapper>
 
 	<CBC bind:plaintextBlocks {ciphertextBlocks} encryptionMode={true} bind:this={cbc} {onIVChange} />

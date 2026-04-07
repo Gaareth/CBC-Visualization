@@ -9,6 +9,8 @@
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import Block from './Block.svelte';
+	import { updateBlock } from './utils/reactivity.svelte';
 
 	const padder = new PKCS7Padder();
 
@@ -36,14 +38,23 @@
 		plaintext = target.value;
 	}
 
+
+
 	function modifyIV() {
-		ciphertextBlocks[0][initializationVector.length - 1] =
-			(ciphertextBlocks[0][initializationVector.length - 1] + 1) % 256;
+		const lastIndex = initializationVector.length - 1;
+
+		ciphertextBlocks = updateBlock(ciphertextBlocks, 0, (block) => {
+			block[lastIndex] = (block[lastIndex] + 1) % 256;
+		});
 	}
 
 	function createPaddingError() {
-		ciphertextBlocks[ciphertextBlocks.length - 2][initializationVector.length - 1] =
-			(ciphertextBlocks[ciphertextBlocks.length - 2][initializationVector.length - 1] + 1) % 256;
+		const blockIndex = ciphertextBlocks.length - 2;
+		const lastIndex = initializationVector.length - 1;
+
+		ciphertextBlocks = updateBlock(ciphertextBlocks, blockIndex, (block) => {
+			block[lastIndex] = (block[lastIndex] + 1) % 256;
+		});
 	}
 </script>
 
@@ -115,7 +126,7 @@
 		encryptionMode={false}
 		bind:this={cbc}
 		onIVChange={(bytes) => {
-			ciphertextBlocks[0] = bytes.map((b) => b ?? 0) as number[];
+			// ciphertextBlocks[0] = bytes.map((b) => b ?? 0) as number[];
 		}}
 		{padder}
 	/>

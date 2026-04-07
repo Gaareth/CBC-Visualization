@@ -16,3 +16,9 @@
 	<a href={resolve('/decryption')}>Decryption</a>
 	<a href={resolve('/padding-oracle-attack')}>Padding Oracle Attack</a>
 </nav>
+
+<style>
+	nav {
+		view-transition-name: nav-wrapper;
+	}
+</style>

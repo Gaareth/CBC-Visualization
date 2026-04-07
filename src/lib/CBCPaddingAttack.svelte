@@ -73,13 +73,7 @@
 		showSuccess = true;
 	}
 
-	async function recoverPaddingLength() {
-		showSuccess = false;
-		await findPaddingLengthWithOracle(ciphertextBlocks, paddingOracle);
-		showSuccess = true;
-
-		resetCiphertext();
-	}
+	
 
 	let lastBlockPaddingValidationResult = $derived(
 		padder.validatePadding(decryptedplaintextBlocks[decryptedplaintextBlocks.length - 1])
@@ -167,7 +161,9 @@
 				},
 
 				onByteStart: (i) => {
-					if (i == 1) {
+					if (i == 2) {
+						console.log('A');
+
 						stopAutoByte();
 						stopAutoGuess();
 						return;
@@ -180,8 +176,6 @@
 		attackInProgress = false;
 		showSuccess = true;
 	}
-
-	
 
 	let isLastBlock = $derived((i: number) => i === decryptedplaintextBlocks.length - 1);
 </script>

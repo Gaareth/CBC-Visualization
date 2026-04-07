@@ -4,6 +4,7 @@
 	import ArrowNext from './icons/ArrowNext.svelte';
 	import ArrowBack from './icons/ArrowBack.svelte';
 	import { fade } from 'svelte/transition';
+	import Card from './Card.svelte';
 
 	interface Props {
 		children?: Snippet;
@@ -50,7 +51,7 @@
 	const navBtnClass = cn(`button-default color-level-1 rounded-full p-0.5`);
 </script>
 
-<div out:fade={{ duration: 150 }} in:fade={{ duration: 300 }} class="relative mx-auto">
+<div class="relative mx-auto explain-wrapper">
 	{#if index > 0 || back}
 		<div class="abs-center-y right-full mx-2 flex-center">
 			<button type="button" onclick={previousSlide} class={navBtnClass}>
@@ -59,18 +60,10 @@
 		</div>
 	{/if}
 
-	{#if title}
-		<span class="absolute -top-1.5 left-4 z-10 px-1 text-xs font-medium dark:bg-surface-a10">
-			{title}
-		</span>
-	{/if}
 
-	<div
-		class={cn(
-			'relative flex h-[200px] max-w-7xl flex-col border-default bg-gray-50 p-5 pb-5 shadow-lg',
-			'dark:border-surface-a30 dark:bg-surface-a10',
-			wrapperClass
-		)}
+	<Card
+		className={wrapperClass}
+		{title}
 	>
 		{#if slides.length > 0}
 			<div class="relative w-full flex-1 overflow-hidden">
@@ -88,7 +81,7 @@
 		{/if}
 
 		<div class="relative w-full flex-1">{@render children?.()}</div>
-	</div>
+	</Card>
 
 	<div class="absolute top-0 right-0 flex gap-1 p-2">
 		{#each { length: slides.length }, i}
@@ -104,3 +97,9 @@
 		</div>
 	{/if}
 </div>
+
+<!-- <style>
+	.explain-wrapper {
+		view-transition-name: explain-wrapper;
+	}
+</style> -->
