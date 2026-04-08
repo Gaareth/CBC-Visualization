@@ -1,9 +1,9 @@
 <script lang="ts">
-	import Card from './Card.svelte';
-	import ExplainWrapper from './ExplainWrapper.svelte';
-	import { findPaddingLengthWithOracle, type PaddingOracle } from './logic/paddingOracle';
-	import { createGate, autoRunGate, delay } from './utils/generic';
-	import { updateInnerIndex } from './utils/reactivity.svelte';
+	import Card from '../shared/Card.svelte';
+	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
+	import { findPaddingLengthWithOracle, type PaddingOracle } from '../../logic/paddingOracle';
+	import { createGate, autoRunGate, delay } from '../../utils/generic';
+	import { updateInnerIndex } from '../../utils/reactivity.svelte';
 
 	interface Props {
 		paddingValidation:
@@ -133,4 +133,4 @@
 	</div>
 {/snippet}
 
-<ExplainWrapper title="Interactive Example" wrapperClass="mt-4" slides={[auto]}></ExplainWrapper>
+<ExplainWrapper title="Interactive Example - Finding Padding Length" wrapperClass="mt-4" slides={[auto]}></ExplainWrapper>

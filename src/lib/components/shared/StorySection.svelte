@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { getSectionContext } from './contexts/scrollStoryContext';
+	import { getSectionContext } from '../../contexts/scrollStoryContext';
 
 	type Snippet = () => any;
 

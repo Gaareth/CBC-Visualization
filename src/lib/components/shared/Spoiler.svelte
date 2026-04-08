@@ -1,8 +1,8 @@
 <!-- Spoiler.svelte -->
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
-	import { cn, SURFACE_LEVEL_BG_COLORS } from './utils/styling';
-	import { fnv1a_hash } from './utils/compute';
+	import { cn, SURFACE_LEVEL_BG_COLORS } from '../../utils/styling';
+	import { fnv1a_hash } from '../../utils/compute';
 
 	interface Props {
 		label?: string;

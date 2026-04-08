@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { rotatedBoundingBox } from './utils/compute';
-	import { cn } from './utils/styling';
+	import { rotatedBoundingBox } from '../../utils/compute';
+	import { cn } from '../../utils/styling';
 
 	export interface ArrowProps {
 		/** Total arrow length in px */

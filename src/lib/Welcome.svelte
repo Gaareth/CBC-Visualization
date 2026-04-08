@@ -1,7 +1,7 @@
 <script>
 	import { fade } from 'svelte/transition';
 	import { typewriter } from './actions/typewriter';
-	import ExplainWrapper from './ExplainWrapper.svelte';
+	import ExplainWrapper from './components/shared/ExplainWrapper.svelte';
 	import Nav from './Nav.svelte';
 	import { receive, send } from './crossfade';
 	let { onstart } = $props();
@@ -25,7 +25,7 @@
 
 		<div class="flex-center h-full">
 			<button
-				class="button-default border-2 border-primary-a0 text-xl hover:dark:bg-surface-a20"
+				class="button-default border-2 border-primary-a0! text-xl hover:bg-surface-a20! bg-surface-a10"
 				onclick={onstart}
 			>
 				Lets go!

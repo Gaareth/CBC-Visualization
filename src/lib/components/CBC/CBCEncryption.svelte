@@ -1,11 +1,11 @@
 <script lang="ts">
-	import CBC from '$lib/CBC.svelte';
+	import CBC from '$lib/components/CBC/CBC.svelte';
 	import type { SvelteComponent } from 'svelte';
-	import { oneTimePad, stringToArray } from './logic/crypto-utils';
-	import { cbcEncrypt, cbcEncryptBlocks } from './logic/cbc';
-	import ExplainWrapper from './ExplainWrapper.svelte';
-	import { PKCS7Padder } from './logic/padding';
-	import FloatingInput from './FloatingInput.svelte';
+	import { oneTimePad, stringToArray } from '../../logic/crypto-utils';
+	import { cbcEncrypt, cbcEncryptBlocks } from '../../logic/cbc';
+	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
+	import { PKCS7Padder } from '../../logic/padding';
+	import FloatingInput from '../ui/FloatingInput.svelte';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';

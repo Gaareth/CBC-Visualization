@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Block from '$lib/Block.svelte';
-	import CBCBlock, { STYLE_CONSTANTS } from '$lib/CBCBlock.svelte';
+	import Block from '$lib/components/shared/Block.svelte';
+	import CBCBlock, { STYLE_CONSTANTS } from '$lib/components/CBC/CBCBlock.svelte';
 	import { cbcEncrypt, cbcDecrypt } from '$lib/logic/cbc';
 	import { oneTimePad, stringToArray } from '$lib/logic/crypto-utils';
 	import { PKCS7Padder } from '$lib/logic/padding';
 	import type { PaddingOracle } from '$lib/logic/paddingOracle';
-	import PaddingLengthFinder from '$lib/PaddingLengthFinder.svelte';
-	import StorySection from '$lib/StorySection.svelte';
+	import PaddingLengthFinder from '$lib/components/CBCInteractions/PaddingLengthFinder.svelte';
+	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { cloneBlocks } from '$lib/utils/reactivity.svelte';
 	import { cn } from '$lib/utils/styling';
 

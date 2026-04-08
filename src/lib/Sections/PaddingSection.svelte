@@ -1,14 +1,14 @@
 <script lang="ts">
-	import Card from '$lib/Card.svelte';
-	import CBC from '$lib/CBC.svelte';
-	import { STYLE_CONSTANTS } from '$lib/CBCBlock.svelte';
+	import Card from '$lib/components/shared/Card.svelte';
+	import CBC from '$lib/components/CBC/CBC.svelte';
+	import { STYLE_CONSTANTS } from '$lib/components/CBC/CBCBlock.svelte';
 	import { getSectionContext } from '$lib/contexts/scrollStoryContext';
-	import FloatingInput from '$lib/FloatingInput.svelte';
+	import FloatingInput from '$lib/components/ui/FloatingInput.svelte';
 	import { cbcEncryptBlocks } from '$lib/logic/cbc';
 	import { stringToArray, oneTimePad } from '$lib/logic/crypto-utils';
 	import { PKCS7Padder } from '$lib/logic/padding';
-	import NumberInput from '$lib/NumberInput.svelte';
-	import StorySection from '$lib/StorySection.svelte';
+	import NumberInput from '$lib/components/ui/NumberInput.svelte';
+	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { cn } from '$lib/utils/styling';
 
 	const id = 'padding';
@@ -84,7 +84,7 @@
 			determine the padding length and remove it correctly.
 		</p>
 
-		<Card title="Interactive Example">
+		<Card title="Interactive Example - Understanding Padding">
 			<div class="not-prose flex w-full flex-col gap-1">
 				<p>Try it out!</p>
 				<div class="flex w-full gap-1">

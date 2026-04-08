@@ -1,5 +1,5 @@
 <script>
-	import CBCPaddingAttack from '$lib/CBCPaddingAttack.svelte';
+	import CBCPaddingAttack from '$lib/components/CBC/CBCPaddingAttack.svelte';
 </script>
 
 <CBCPaddingAttack />

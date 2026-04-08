@@ -3,8 +3,9 @@
 	import favicon from '$lib/assets/favicon.svg';
 	import Nav from '$lib/Nav.svelte';
 	import { page } from '$app/state';
-	import { receive, send } from '$lib/crossfade';
 	import { onNavigate } from '$app/navigation';
+	import { ModeWatcher } from 'mode-watcher';
+	import { Toaster } from '$lib/components/ui/sonner';
 
 	let { children } = $props();
 
@@ -21,6 +22,9 @@
 		});
 	});
 </script>
+
+<ModeWatcher />
+<Toaster position="top-center"/>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />

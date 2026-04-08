@@ -1,15 +1,15 @@
 <script lang="ts">
-	import Block from '$lib/Block.svelte';
-	import Card from '$lib/Card.svelte';
-	import CBC from '$lib/CBC.svelte';
-	import CBCDecryption from '$lib/CBCDecryption.svelte';
-	import ExplainWrapper from '$lib/ExplainWrapper.svelte';
+	import Block from '$lib/components/shared/Block.svelte';
+	import Card from '$lib/components/shared/Card.svelte';
+	import CBC from '$lib/components/CBC/CBC.svelte';
+	import CBCDecryption from '$lib/components/CBC/CBCDecryption.svelte';
+	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
 
 	import { cbcDecrypt, cbcEncrypt, cbcEncryptBlocks } from '$lib/logic/cbc';
 	import { stringToArray, oneTimePad } from '$lib/logic/crypto-utils';
 
 	import { PKCS7Padder } from '$lib/logic/padding';
-	import StorySection from '$lib/StorySection.svelte';
+	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { updateBlock } from '$lib/utils/reactivity.svelte';
 	import { cn } from '$lib/utils/styling';
 	import hljs from 'highlight.js/lib/core';
@@ -92,8 +92,9 @@
 		</details>
 
 		<ExplainWrapper
-			title="Interactive Example"
+			title="Interactive Example - Simulating Padding Error"
 			wrapperClass="mt-4"
+			slidesWrapperClass="items-center"
 			slides={[example, simulateButton]}
 		></ExplainWrapper>
 	{/snippet}

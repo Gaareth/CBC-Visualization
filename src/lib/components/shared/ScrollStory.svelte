@@ -5,8 +5,8 @@
 		setSectionContext,
 		type SectionContextValue,
 		type SectionRegistration
-	} from './contexts/scrollStoryContext';
-	import { cn } from './utils/styling';
+	} from '../../contexts/scrollStoryContext';
+	import { cn } from '../../utils/styling';
 
 	let { children } = $props();
 

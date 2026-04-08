@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn } from './utils/styling';
+	import { cn } from '../../utils/styling';
 
 	interface Props {
 		value?: number;

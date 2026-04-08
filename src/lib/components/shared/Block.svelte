@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { STYLE_CONSTANTS } from './CBCBlock.svelte';
-	import { settingsState } from './stores/settings.svelte';
-	import { displayByte } from './utils/compute';
-	import { watch } from './utils/reactivity.svelte';
-	import { cn } from './utils/styling';
+	import { STYLE_CONSTANTS } from '../CBC/CBCBlock.svelte';
+	import { settingsState } from '../../stores/settings.svelte';
+	import { displayByte } from '../../utils/compute';
+	import { watch } from '../../utils/reactivity.svelte';
+	import { cn } from '../../utils/styling';
 	import { SvelteSet } from 'svelte/reactivity';
 
 	interface Props {
@@ -132,7 +132,13 @@
 	let previous = $state(null as (number | undefined)[] | null);
 
 	watch(
-		() => [...bytes],
+		() => {
+			if (bytes != null) {
+				[...bytes]
+			} else {
+				[]
+			}
+		},
 		(prev) => {
 			previous = prev as (number | undefined)[];
 			if (!highlightChanges || !previous) return;

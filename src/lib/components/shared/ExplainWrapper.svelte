@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import { cn } from './utils/styling';
-	import ArrowNext from './icons/ArrowNext.svelte';
-	import ArrowBack from './icons/ArrowBack.svelte';
+	import { cn } from '../../utils/styling';
+	import ArrowNext from '../../icons/ArrowNext.svelte';
+	import ArrowBack from '../../icons/ArrowBack.svelte';
 	import { fade } from 'svelte/transition';
 	import Card from './Card.svelte';
 
@@ -11,6 +11,7 @@
 		slides?: Snippet[];
 		wrapperClass?: string;
 		slideWrapperClass?: string;
+		slidesWrapperClass?: string;
 		title?: string;
 		next?: () => void;
 		back?: () => void;
@@ -22,6 +23,7 @@
 		slides = [],
 		wrapperClass = '',
 		slideWrapperClass = '',
+		slidesWrapperClass = '',
 		title,
 		next,
 		back,
@@ -51,7 +53,7 @@
 	const navBtnClass = cn(`button-default color-level-1 rounded-full p-0.5`);
 </script>
 
-<div class="relative mx-auto explain-wrapper">
+<div class="explain-wrapper relative mx-auto">
 	{#if index > 0 || back}
 		<div class="abs-center-y right-full mx-2 flex-center">
 			<button type="button" onclick={previousSlide} class={navBtnClass}>
@@ -60,15 +62,14 @@
 		</div>
 	{/if}
 
-
-	<Card
-		className={wrapperClass}
-		{title}
-	>
+	<Card className={wrapperClass} {title}>
 		{#if slides.length > 0}
 			<div class="relative w-full flex-1 overflow-hidden">
 				<div
-					class="flex h-full transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)]"
+					class={cn(
+						'flex h-full transition-transform duration-500 ease-[cubic-bezier(.22,1,.36,1)]',
+						slidesWrapperClass
+					)}
 					style="transform: translateX(-{index * 100}%);"
 				>
 					{#each slides as slide, i}
@@ -83,11 +84,13 @@
 		<div class="relative w-full flex-1">{@render children?.()}</div>
 	</Card>
 
-	<div class="absolute top-0 right-0 flex gap-1 p-2">
-		{#each { length: slides.length }, i}
-			<div class={cn('rounded-full p-1', i == index ? 'color-level-3' : 'color-level-2')}></div>
-		{/each}
-	</div>
+	{#if slides.length >= 2}
+		<div class="absolute top-0 right-0 flex gap-1 p-2">
+			{#each { length: slides.length }, i}
+				<div class={cn('rounded-full p-1', i == index ? 'color-level-3' : 'color-level-2')}></div>
+			{/each}
+		</div>
+	{/if}
 
 	{#if index < slides.length - 1 || next}
 		<div class="abs-center-y left-full mx-2 flex-center">

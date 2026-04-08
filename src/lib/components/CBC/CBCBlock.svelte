@@ -43,11 +43,11 @@
 
 <script lang="ts">
 	import { Tween } from 'svelte/motion';
-	import Arrow from './Arrow.svelte';
-	import Block from './Block.svelte';
-	import { cn } from './utils/styling';
+	import Arrow from '../shared/Arrow.svelte';
+	import Block from '../shared/Block.svelte';
+	import { cn } from '../../utils/styling';
 	import type { Snippet } from 'svelte';
-	import type { Padder } from './logic/padding';
+	import type { Padder } from '../../logic/padding';
 
 	interface CBCBlockProps {
 		index: number;

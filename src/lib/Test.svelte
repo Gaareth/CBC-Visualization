@@ -1,10 +1,10 @@
 <script>
 	import { crossfade } from 'svelte/transition';
-	import ExplainWrapper from './ExplainWrapper.svelte';
+	import ExplainWrapper from './components/shared/ExplainWrapper.svelte';
 	import { quintOut } from 'svelte/easing';
 	import { receive, send } from './crossfade';
 	import { tick } from 'svelte';
-	import Block from './Block.svelte';
+	import Block from './components/shared/Block.svelte';
 
 	let { started = $bindable() } = $props();
 

@@ -1,20 +1,20 @@
 <script lang="ts">
-	import CBC from '$lib/CBC.svelte';
+	import CBC from '$lib/components/CBC/CBC.svelte';
 	import { cbcDecrypt, cbcEncrypt } from '$lib/logic/cbc';
 	import type { SvelteComponent } from 'svelte';
-	import { oneTimePad, stringToArray, xorBlocks } from './logic/crypto-utils';
-	import { PKCS7Padder } from './logic/padding';
+	import { oneTimePad, stringToArray, xorBlocks } from '../../logic/crypto-utils';
+	import { PKCS7Padder } from '../../logic/padding';
 	import { autoRunGate, createGate, delay } from '$lib/utils/generic';
-	import Block from './Block.svelte';
-	import { cn } from './utils/styling';
+	import Block from '../shared/Block.svelte';
+	import { cn } from '../../utils/styling';
 	import {
 		findPaddingLengthWithOracle,
 		recoverPlaintextWithOracle,
 		recoverSingleBlock,
 		type PaddingOracle
-	} from './logic/paddingOracle';
+	} from '../../logic/paddingOracle';
 	import CBCBlock, { STYLE_CONSTANTS } from './CBCBlock.svelte';
-	import ExplainWrapper from './ExplainWrapper.svelte';
+	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
 
 	// let key = [0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08];
 	let key = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -298,6 +298,7 @@
 						success={showSuccess}
 						reserveSpaceForError={true}
 						title={`Plaintext Block ${index} (P_${index})`}
+						textPosBelow={true}
 					/>
 				{/snippet}
 

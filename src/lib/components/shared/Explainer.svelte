@@ -1,14 +1,15 @@
 <script>
 	import Card from './Card.svelte';
-	import CBCBlock from './CBCBlock.svelte';
-	import CBCDecryption from './CBCDecryption.svelte';
-	import CBCEncryption from './CBCEncryption.svelte';
-	import PaddingLengthFinder from './PaddingLengthFinder.svelte';
+	import CBCBlock from '../CBC/CBCBlock.svelte';
+	import CBCDecryption from '../CBC/CBCDecryption.svelte';
+	import CBCEncryption from '../CBC/CBCEncryption.svelte';
+	import PaddingLengthFinder from '../CBCInteractions/PaddingLengthFinder.svelte';
 	import ScrollStory from './ScrollStory.svelte';
-	import FindingAByteSection from './Sections/FindingAByteSection.svelte';
-	import FindingLengthSection from './Sections/FindingLengthSection.svelte';
-	import PaddingOracleSection from './Sections/PaddingOracleSection.svelte';
-	import PaddingSection from './Sections/PaddingSection.svelte';
+	import EdgeCaseSection from '../../Sections/EdgeCaseSection.svelte';
+	import FindingAByteSection from '../../Sections/FindingAByteSection.svelte';
+	import FindingLengthSection from '../../Sections/FindingLengthSection.svelte';
+	import PaddingOracleSection from '../../Sections/PaddingOracleSection.svelte';
+	import PaddingSection from '../../Sections/PaddingSection.svelte';
 	import StorySection from './StorySection.svelte';
 </script>
 
@@ -37,6 +38,7 @@
 
 	<FindingLengthSection />
 	<FindingAByteSection />
+	<EdgeCaseSection />
 </ScrollStory>
 
 <!-- <ScrollStory sections={[PaddingSection, PaddingOracleSection]}>

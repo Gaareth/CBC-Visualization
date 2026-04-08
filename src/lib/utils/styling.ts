@@ -13,12 +13,17 @@ export function dedent(str: string) {
 	return lines.map((l) => l.slice(indent)).join('\n');
 }
 
-
 export const SURFACE_LEVEL_BG_COLORS = [
 	'bg-transparent',
 	'dark:bg-surface-a10 bg-gray-50 dark:hover:bg-surface-a20 hover:bg-gray-100',
 	'dark:bg-surface-a20 bg-gray-100 dark:hover:bg-surface-a30 hover:bg-gray-200',
 	'dark:bg-surface-a30 bg-gray-200 dark:hover:bg-surface-a40 hover:bg-gray-300',
 	'dark:bg-surface-a40 bg-gray-300 dark:hover:bg-surface-a50 hover:bg-gray-400',
-	'dark:bg-surface-a50 bg-gray-400 dark:hover:bg-surface-a60 hover:bg-gray-500',
+	'dark:bg-surface-a50 bg-gray-400 dark:hover:bg-surface-a60 hover:bg-gray-500'
 ];
+
+export const BLOCK_COLORS = {
+	fnOutput: 'red-500',
+	ciphertext: 'green-400',
+	plaintext: 'blue-400'
+};

@@ -1,8 +1,8 @@
 <script lang="ts">
-	import { cn } from './utils/styling';
+	import { cn } from '../../utils/styling';
 	import CBCBlock from './CBCBlock.svelte';
 	import { STYLE_CONSTANTS } from './CBCBlock.svelte';
-	import type { Padder } from './logic/padding';
+	import type { Padder } from '../../logic/padding';
 
 	interface Props {
 		plaintextBlocks: (number | undefined)[][];

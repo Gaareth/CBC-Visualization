@@ -1,5 +1,5 @@
 <script>
-	import PaddingAttackerExplainer from '$lib/PaddingAttackerExplainer.svelte';
+	import Explainer from '$lib/components/shared/Explainer.svelte';
 </script>
 
-<PaddingAttackerExplainer />
+<Explainer />

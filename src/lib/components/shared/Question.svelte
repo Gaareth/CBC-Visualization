@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
 	import Card from './Card.svelte';
-	import { cn } from './utils/styling';
+	import { cn } from '../../utils/styling';
 	import { fade } from 'svelte/transition';
 
 	interface Props {
