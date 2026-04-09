@@ -1,13 +1,12 @@
 <script lang="ts">
 	import Block from '$lib/components/shared/Block.svelte';
-	import CBCBlock, { STYLE_CONSTANTS } from '$lib/components/CBC/CBCBlock.svelte';
+	import CBCBlock from '$lib/components/CBC/CBCBlock.svelte';
 	import { cbcEncrypt, cbcDecrypt } from '$lib/logic/cbc';
 	import { oneTimePad, stringToArray } from '$lib/logic/crypto-utils';
 	import { PKCS7Padder } from '$lib/logic/padding';
 	import type { PaddingOracle } from '$lib/logic/paddingOracle';
 	import PaddingLengthFinder from '$lib/components/CBCInteractions/PaddingLengthFinder.svelte';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
-	import { cloneBlocks } from '$lib/utils/reactivity.svelte';
 	import { cn } from '$lib/utils/styling';
 
 	let showSuccess = $state(false);
@@ -77,12 +76,10 @@
 			{blockSize}
 			{paddingValidation}
 		/>
-
-		
 	{/snippet}
 
 	{#snippet visualSnippet()}
-        <h2 class="text-2xl text-center mb-10 font-bold">Finding the Padding Length</h2>
+		<h2 class="mb-10 text-center text-2xl font-bold">Finding the Padding Length</h2>
 		<div class={cn('not-prose flex w-fit justify-end')}>
 			<CBCBlock
 				addInitPadding={true}
@@ -104,7 +101,7 @@
 						success={showSuccess}
 						reserveSpaceForError={true}
 						title={`Plaintext Block ${index} (P_${index})`}
-                        textPosBelow={true}
+						textPosBelow={true}
 					/>
 				{/snippet}
 			</CBCBlock>

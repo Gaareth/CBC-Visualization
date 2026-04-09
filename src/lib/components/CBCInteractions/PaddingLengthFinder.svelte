@@ -69,7 +69,7 @@
 <p>Try it out yourself! or use the interactive example below:</p>
 
 {#snippet auto()}
-	<div class="mb-4 not-prose">
+	<div class="not-prose mb-4">
 		<p>
 			Valid padding:
 
@@ -91,7 +91,7 @@
 		{/if}
 	</div>
 
-	<div class="flex w-full gap-1 justify-center">
+	<div class="flex w-full justify-center gap-1">
 		{#if runningIndex == null}
 			<button
 				type="button"
@@ -133,4 +133,8 @@
 	</div>
 {/snippet}
 
-<ExplainWrapper title="Interactive Example - Finding Padding Length" wrapperClass="mt-4" slides={[auto]}></ExplainWrapper>
+<ExplainWrapper
+	title="Interactive Example - Finding Padding Length"
+	wrapperClass="mt-4"
+	slides={[auto]}
+></ExplainWrapper>

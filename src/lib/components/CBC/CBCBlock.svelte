@@ -1,46 +1,3 @@
-<script module>
-	const blockSize = 8;
-	const arrowWidth = 75;
-	const arrowThickness = 3;
-	const arrowHeadWidth = 15;
-
-	const byteWidth = 10 * 4;
-	const byteHeight = 32;
-	const blockWidth = blockSize * byteWidth;
-	const gap = 6;
-
-	const gapToNext = blockWidth / 5;
-	const toMidLength = blockWidth / 2 + gapToNext / 2;
-	const xorDiameter = 20;
-	const functionHeight = 40;
-
-	// prettier-ignore
-	//                  from middle arrow      fn
-	const toXorLength = arrowWidth / 2 + gap + functionHeight + gap + arrowWidth + gap 
-	// half of line    				half of xor   				 half of line
-	+ arrowThickness/2          + xorDiameter/2 			+ arrowThickness/2
-
-	const ivWidth = blockWidth;
-	const leftSize = ivWidth + gap + arrowWidth + gap + xorDiameter / 2;
-	const leftPadding = leftSize - blockWidth / 2;
-
-	export const STYLE_CONSTANTS = {
-		blockSize,
-		arrowWidth,
-		arrowThickness,
-		byteWidth,
-		byteHeight,
-		blockWidth,
-		gap,
-		gapToNext,
-		toMidLength,
-		xorDiameter,
-		functionHeight,
-		toXorLength,
-		leftPadding
-	};
-</script>
-
 <script lang="ts">
 	import { Tween } from 'svelte/motion';
 	import Arrow from '../shared/Arrow.svelte';
@@ -48,6 +5,23 @@
 	import { cn } from '../../utils/styling';
 	import type { Snippet } from 'svelte';
 	import type { Padder } from '../../logic/padding';
+	import {
+		CBC_LAYOUT,
+		getLeftPadding,
+		getToMidLength,
+		getBlockWidth,
+		getToXorLength
+	} from '$lib/stores/cbcConstants.svelte';
+
+	const {
+		gap,
+		arrowWidth,
+		arrowThickness,
+		arrowHeadWidth,
+		functionHeight,
+		xorDiameter,
+		byteWidth
+	} = CBC_LAYOUT;
 
 	interface CBCBlockProps {
 		index: number;
@@ -93,6 +67,8 @@
 		VerticalBar
 	}: CBCBlockProps = $props();
 
+	// let byteWidth = $derived(settingsState.byteWidth);
+
 	// let targetRotation = $derived(encryptionMode ? 90 : 270);
 
 	// svelte-ignore state_referenced_locally. Seem to work? Wrapping in derived, means animation no work
@@ -127,7 +103,7 @@
 
 {#snippet xor()}
 	<div
-		class={cn('relative rounded-4xl border-default', flippedClass)}
+		class={cn('relative rounded-full border-default', flippedClass)}
 		style={`width: ${xorDiameter}px; height: ${xorDiameter}px;`}
 	>
 		<div class="absolute top-1/2 h-px w-full -translate-y-1/2 bg-dark dark:bg-light"></div>
@@ -148,7 +124,7 @@
 
 <div
 	class={cn('flex flex-col items-center', flippedClass)}
-	style={`gap: ${gap}px; padding-left: ${addInitPadding ? leftPadding : 0}px;`}
+	style={`gap: ${gap}px; padding-left: ${addInitPadding ? getLeftPadding() : 0}px;`}
 >
 	{#if PlainTextBlock}
 		<div class={flippedClass}>
@@ -198,7 +174,7 @@
 
 			<Arrow
 				rotation={0}
-				length={initializationVector ? arrowWidth : toMidLength - gap - xorDiameter / 2}
+				length={initializationVector ? arrowWidth : getToMidLength() - gap - xorDiameter / 2}
 			/>
 		</div>
 		<div>
@@ -217,7 +193,7 @@
 
 	<div
 		class={cn('flex-center border-default', flippedClass)}
-		style={`width: ${blockWidth}px;`}
+		style={`width: ${getBlockWidth()}px;`}
 		style:height={`${functionHeight}px;`}
 	>
 		{#if encryptionMode}
@@ -235,7 +211,7 @@
 			<div class="absolute top-1/2 -translate-y-1/2" style:left={`calc(50% + ${gap}px)`}>
 				<div
 					class="bg-dark dark:bg-light"
-					style={`width: ${toMidLength - gap}px;`}
+					style={`width: ${getToMidLength() - gap}px;`}
 					style:height={`${arrowThickness}px;`}
 				></div>
 
@@ -244,7 +220,7 @@
 				{:else}
 					<div
 						class="absolute bottom-0 bg-dark dark:bg-light"
-						style={`height: ${toXorLength}px;`}
+						style={`height: ${getToXorLength()}px;`}
 						style:width={`${arrowThickness}px;`}
 						style:right={`-${arrowThickness / 2}px`}
 					></div>

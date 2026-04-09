@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { cn } from '../../utils/styling';
+	import HoldableButton from './HoldableButton.svelte';
 
 	interface Props {
 		value?: number;
@@ -9,6 +10,7 @@
 		className?: string;
 		onChange?: (value: number) => void;
 		surfaceLevel?: number;
+		[key: string]: any; // for any additional props like id, etc.
 	}
 
 	let {
@@ -18,7 +20,8 @@
 		step = 1,
 		className = '',
 		surfaceLevel = 0,
-		onChange
+		onChange,
+		...restProps
 	}: Props = $props();
 
 	function increment() {
@@ -56,14 +59,15 @@
 </script>
 
 <div class={cn('flex', className)}>
-	<button
+	<HoldableButton
 		type="button"
-		onclick={decrement}
+		onClick={decrement}
+		onHoldTick={decrement}
 		class={cn('w-full input-default px-2', surfaceClass)}
 		disabled={value <= min}
 	>
 		-
-	</button>
+	</HoldableButton>
 	<input
 		{value}
 		type="number"
@@ -72,15 +76,17 @@
 		{max}
 		{step}
 		class={cn('z-10 w-full input-default border-s-0 border-e-0 px-2 text-center', surfaceClass)}
+		{...restProps}
 	/>
-	<button
+	<HoldableButton
 		type="button"
 		onclick={increment}
+		onHoldTick={increment}
 		class={cn('w-full input-default px-2', surfaceClass)}
 		disabled={value >= max}
 	>
 		+
-	</button>
+	</HoldableButton>
 </div>
 
 <style>
@@ -93,5 +99,6 @@
 
 	input[type='number'] {
 		-moz-appearance: textfield; /* Firefox */
+		appearance: textfield;
 	}
 </style>

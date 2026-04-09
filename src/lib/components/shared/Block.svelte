@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { STYLE_CONSTANTS } from '../CBC/CBCBlock.svelte';
+	import { CBC_LAYOUT } from '$lib/stores/cbcConstants.svelte';
 	import { settingsState } from '../../stores/settings.svelte';
 	import { displayByte } from '../../utils/compute';
 	import { watch } from '../../utils/reactivity.svelte';
@@ -34,17 +34,22 @@
 		classNameTextAbove = '',
 		bytes,
 		className = '',
-		byteWidth = STYLE_CONSTANTS.byteWidth,
-		byteHeight = STYLE_CONSTANTS.byteHeight,
+		byteWidth = CBC_LAYOUT.byteWidth,
+		byteHeight = CBC_LAYOUT.byteHeight,
 		error,
 		reserveSpaceForError = false,
 		success,
-		displayAs = settingsState.displayBytesAs,
+		displayAs: displayAsProp,
 		onChange,
 		allowEdit = false,
 		highlightChanges = true,
 		inputClassNames
 	}: Props = $props();
+
+	let displayAs = $derived.by(() => {
+		if (displayAsProp) return displayAsProp;
+		return settingsState.displayBytesAs;
+	});
 
 	let displayBytes: string[] = $derived(
 		bytes.map((b) => {
@@ -134,9 +139,9 @@
 	watch(
 		() => {
 			if (bytes != null) {
-				[...bytes]
+				[...bytes];
 			} else {
-				[]
+				[];
 			}
 		},
 		(prev) => {

@@ -38,8 +38,6 @@
 		plaintext = target.value;
 	}
 
-
-
 	function modifyIV() {
 		const lastIndex = initializationVector.length - 1;
 

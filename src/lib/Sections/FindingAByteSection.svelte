@@ -1,27 +1,19 @@
 <script lang="ts">
 	import Block from '$lib/components/shared/Block.svelte';
 	import Card from '$lib/components/shared/Card.svelte';
-	import CBCBlock, { STYLE_CONSTANTS } from '$lib/components/CBC/CBCBlock.svelte';
+	import CBCBlock from '$lib/components/CBC/CBCBlock.svelte';
 	import Divider from '$lib/components/shared/Divider.svelte';
 	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
 	import { cbcEncrypt, cbcDecrypt } from '$lib/logic/cbc';
 	import { oneTimePad, stringToArray } from '$lib/logic/crypto-utils';
 	import { PKCS7Padder } from '$lib/logic/padding';
-	import {
-		recoverPlaintextWithOracle,
-		recoverSingleByte,
-		type PaddingOracle
-	} from '$lib/logic/paddingOracle';
-	import PaddingLengthFinder from '$lib/components/CBCInteractions/PaddingLengthFinder.svelte';
+	import { type PaddingOracle } from '$lib/logic/paddingOracle';
 	import Question from '$lib/components/shared/Question.svelte';
 	import { settingsState } from '$lib/stores/settings.svelte';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { displayByte } from '$lib/utils/compute';
-	import { createGate, autoRunGate, autoGate } from '$lib/utils/generic';
 	import { BLOCK_COLORS, cn } from '$lib/utils/styling';
-	import Spoiler from '$lib/components/shared/Spoiler.svelte';
-	import { Switch } from '$lib/components/ui/switch';
-	import { toast } from 'svelte-sonner';
+
 	import ByteRecoverer from '$lib/components/CBCInteractions/ByteRecoverer.svelte';
 
 	let showSuccess = $state(false);
@@ -231,7 +223,8 @@
 			</p>
 		</div>
 
-		<ExplainWrapper slides={[example]} title="Interactive Example - Recovering a Byte"></ExplainWrapper>
+		<ExplainWrapper slides={[example]} title="Interactive Example - Recovering a Byte"
+		></ExplainWrapper>
 
 		<!-- <p>
 			How do we extend this to recover more bytes? You can then modify the last two bytes of the IV to get information about the

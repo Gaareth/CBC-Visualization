@@ -13,8 +13,9 @@
 		recoverSingleBlock,
 		type PaddingOracle
 	} from '../../logic/paddingOracle';
-	import CBCBlock, { STYLE_CONSTANTS } from './CBCBlock.svelte';
+	import CBCBlock from './CBCBlock.svelte';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
+	import { CBC_LAYOUT, getGapToNext, getToXorLength } from '$lib/stores/cbcConstants.svelte';
 
 	// let key = [0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08];
 	let key = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -72,8 +73,6 @@
 		attackInProgress = false;
 		showSuccess = true;
 	}
-
-	
 
 	let lastBlockPaddingValidationResult = $derived(
 		padder.validatePadding(decryptedplaintextBlocks[decryptedplaintextBlocks.length - 1])
@@ -276,7 +275,7 @@
 		}}
 	></ExplainWrapper>
 
-	<div class={cn('flex justify-center')} style={`gap: ${STYLE_CONSTANTS.gapToNext}px;`}>
+	<div class={cn('flex justify-center')} style={`gap: ${getGapToNext()}px;`}>
 		{#each { length: decryptedplaintextBlocks.length } as _, i}
 			<CBCBlock
 				encryptionMode={false}
@@ -309,9 +308,9 @@
 				{#snippet VerticalBar()}
 					<div
 						class="absolute bottom-0 bg-dark dark:bg-light"
-						style={`height: ${STYLE_CONSTANTS.toXorLength + STYLE_CONSTANTS.arrowWidth + STYLE_CONSTANTS.gap + 32 + STYLE_CONSTANTS.gap}px;`}
-						style:width={`${STYLE_CONSTANTS.arrowThickness}px;`}
-						style:right={`-${STYLE_CONSTANTS.arrowThickness / 2}px`}
+						style={`height: ${getToXorLength() + CBC_LAYOUT.arrowWidth + CBC_LAYOUT.gap + 32 + CBC_LAYOUT.gap}px;`}
+						style:width={`${CBC_LAYOUT.arrowThickness}px;`}
+						style:right={`-${CBC_LAYOUT.arrowThickness / 2}px`}
 					></div>
 				{/snippet}
 			</CBCBlock>

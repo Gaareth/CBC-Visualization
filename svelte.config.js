@@ -22,7 +22,7 @@ const config = {
 			fallback: '404.html'
 		}),
 		paths: {
-			base: dev ? '' : '/CBC-Visualization' 
+			base: dev ? '' : '/CBC-Visualization'
 		}
 	}
 };

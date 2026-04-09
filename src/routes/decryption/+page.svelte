@@ -1,5 +1,5 @@
 <script>
-	import CBCDecryption from "$lib/components/CBC/CBCDecryption.svelte";
-
+	import CBCDecryption from '$lib/components/CBC/CBCDecryption.svelte';
 </script>
+
 <CBCDecryption />

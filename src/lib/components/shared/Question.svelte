@@ -30,12 +30,12 @@
 <Card title="Question" className={cn('flex flex-col', className)}>
 	{@render question()}
 
-    <hr class="border-surface-a20 my-4!"/>
+	<hr class="my-4! border-surface-a20" />
 
 	{#if showReveal}
 		<div in:fade>
-            {@render reveal()}
-        </div>
+			{@render reveal()}
+		</div>
 	{:else}
 		<button class={cn('px-4 py-2 transition')} onclick={revealAnswer}> Reveal answer </button>
 	{/if}

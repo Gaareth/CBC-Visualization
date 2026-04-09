@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Card from '$lib/components/shared/Card.svelte';
 	import CBC from '$lib/components/CBC/CBC.svelte';
-	import { STYLE_CONSTANTS } from '$lib/components/CBC/CBCBlock.svelte';
 	import { getSectionContext } from '$lib/contexts/scrollStoryContext';
 	import FloatingInput from '$lib/components/ui/FloatingInput.svelte';
 	import { cbcEncryptBlocks } from '$lib/logic/cbc';
@@ -10,6 +9,7 @@
 	import NumberInput from '$lib/components/ui/NumberInput.svelte';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { cn } from '$lib/utils/styling';
+	import { CBC_LAYOUT, getBlockWidth, getLeftPadding } from '$lib/stores/cbcConstants.svelte';
 
 	const id = 'padding';
 
@@ -48,10 +48,9 @@
 		// }
 
 		const numBlocks = plaintextBlocks.length;
-		let diagramWidth =
-			numBlocks * (STYLE_CONSTANTS.blockWidth + STYLE_CONSTANTS.gap) - STYLE_CONSTANTS.gap;
+		let diagramWidth = numBlocks * (getBlockWidth() + CBC_LAYOUT.gap) - CBC_LAYOUT.gap;
 
-		diagramWidth += STYLE_CONSTANTS.leftPadding;
+		diagramWidth += getLeftPadding();
 
 		console.log(
 			'diagram width:',

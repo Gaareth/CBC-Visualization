@@ -45,7 +45,7 @@
 		{type}
 		{required}
 		{disabled}
-		oninput={oninput}
+		{oninput}
 		bind:value
 		onfocus={() => (focused = true)}
 		onblur={() => (focused = false)}

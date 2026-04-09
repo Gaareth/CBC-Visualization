@@ -1,4 +1,4 @@
-import { untrack } from "svelte";
+import { untrack } from 'svelte';
 
 /// https://github.com/sveltejs/svelte/discussions/14220
 // export function watch(
@@ -16,33 +16,37 @@ import { untrack } from "svelte";
 // }
 
 export function watch(getter: () => unknown, callback: (previous: unknown) => void) {
-    let prev = getter();
+	let prev = getter();
 
-    $effect(() => {
-        const val = getter();
-        untrack(() => {
-            callback(prev);
-            prev = val;
-        });
-    });
+	$effect(() => {
+		const val = getter();
+		untrack(() => {
+			callback(prev);
+			prev = val;
+		});
+	});
 }
 
 export function usePrevious(getter: () => unknown) {
-    let current = $state(getter());
-    let previous = $state(null as unknown);
+	let current = $state(getter());
+	let previous = $state(null as unknown);
 
-    $effect(() => {
-        const val = getter();
-        untrack(() => {
-            previous = current;
-            current = val;
-        });
-    });
+	$effect(() => {
+		const val = getter();
+		untrack(() => {
+			previous = current;
+			current = val;
+		});
+	});
 
-    return {
-        get current() { return current; },
-        get previous() { return previous; }
-    };
+	return {
+		get current() {
+			return current;
+		},
+		get previous() {
+			return previous;
+		}
+	};
 }
 
 export function updateBlock(
@@ -59,18 +63,17 @@ export function cloneBlocks(blocks: number[][]): number[][] {
 	return blocks.map((block) => [...block]);
 }
 
-
 export function updateInnerIndex(
-  blocks: number[][],
-  blockIndex: number,
-  byteIndex: number,
-  newValue: number
+	blocks: number[][],
+	blockIndex: number,
+	byteIndex: number,
+	newValue: number
 ): number[][] {
-  const newBlocks = [...blocks];              // new outer array
-  const newBlock  = [...newBlocks[blockIndex]]; // new inner array
+	const newBlocks = [...blocks]; // new outer array
+	const newBlock = [...newBlocks[blockIndex]]; // new inner array
 
-  newBlock[byteIndex] = newValue;
-  newBlocks[blockIndex] = newBlock;
+	newBlock[byteIndex] = newValue;
+	newBlocks[blockIndex] = newBlock;
 
-  return newBlocks;
+	return newBlocks;
 }

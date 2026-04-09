@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { cn } from '../../utils/styling';
 	import CBCBlock from './CBCBlock.svelte';
-	import { STYLE_CONSTANTS } from './CBCBlock.svelte';
 	import type { Padder } from '../../logic/padding';
+	import { getGapToNext } from '$lib/stores/cbcConstants.svelte';
 
 	interface Props {
 		plaintextBlocks: (number | undefined)[][];
@@ -35,7 +35,7 @@
 	const isLastBlock = $derived((i: number) => i === plaintextBlocks.length - 1);
 </script>
 
-<div class={cn('flex justify-center')} style={`gap: ${STYLE_CONSTANTS.gapToNext}px;`}>
+<div class={cn('flex justify-center')} style={`gap: ${getGapToNext()}px;`}>
 	{#each { length: plaintextBlocks.length } as _, i}
 		<CBCBlock
 			{encryptionMode}

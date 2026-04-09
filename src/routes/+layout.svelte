@@ -25,7 +25,7 @@
 </script>
 
 <ModeWatcher />
-<Toaster position="top-center"/>
+<Toaster position="top-center" />
 <Settings />
 
 <svelte:head>
@@ -33,7 +33,7 @@
 </svelte:head>
 
 {#if showNav}
-		<Nav className="mx-auto w-3xl my-5"/>
+	<Nav className="mx-auto w-3xl my-5" />
 {/if}
 
 {@render children()}
