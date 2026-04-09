@@ -95,7 +95,7 @@
 	</div>
 {/snippet}
 
-<div class="flex flex-col gap-10 -z-10">
+<div class="flex flex-col gap-10">
 	<ExplainWrapper
 		wrapperClass="w-4xl h-fit"
 		title="CBC Encryption"

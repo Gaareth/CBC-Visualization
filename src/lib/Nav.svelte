@@ -72,11 +72,12 @@
 <style>
 	nav {
 		view-transition-name: nav-wrapper;
+		position: relative;
+		z-index: 10;
 	}
 
 	.dropdown {
 		position: relative;
-		z-index: 9999;
 	}
 
 	.dropdown:hover .dropdown-content {
@@ -92,6 +93,5 @@
 		left: 50%;
 		min-width: 200px;
 		padding: 12px 16px;
-		z-index: 9999;
 	}
 </style>
