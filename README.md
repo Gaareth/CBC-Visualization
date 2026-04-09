@@ -10,6 +10,7 @@
 - refactor
 - block cipher modes explanation
 - further reading
+- favicon
 
 ## Development
 
