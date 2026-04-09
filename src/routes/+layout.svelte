@@ -6,6 +6,7 @@
 	import { onNavigate } from '$app/navigation';
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '$lib/components/ui/sonner';
+	import Settings from '$lib/components/Settings.svelte';
 
 	let { children } = $props();
 
@@ -25,6 +26,7 @@
 
 <ModeWatcher />
 <Toaster position="top-center"/>
+<Settings />
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
