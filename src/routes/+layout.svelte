@@ -8,10 +8,11 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import Settings from '$lib/components/Settings.svelte';
 	import MobileWarning from '$lib/components/MobileWarning.svelte';
+	import { resolve } from '$app/paths';
 
 	let { children } = $props();
 
-	const showNav = $derived(page.url.pathname !== '/');
+	const showNav = $derived(page.url.pathname !== resolve('/'));
 
 	onNavigate((navigation) => {
 		if (!document.startViewTransition) return;
