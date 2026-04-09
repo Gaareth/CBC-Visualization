@@ -53,7 +53,7 @@
 	const navBtnClass = cn(`button-default color-level-1 rounded-full p-0.5`);
 </script>
 
-<div class="explain-wrapper relative mx-auto">
+<div class="explain-wrapper relative mx-auto -z-10">
 	{#if index > 0 || back}
 		<div class="abs-center-y right-full mx-2 flex-center">
 			<button type="button" onclick={previousSlide} class={navBtnClass}>

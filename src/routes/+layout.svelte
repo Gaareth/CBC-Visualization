@@ -7,6 +7,7 @@
 	import { ModeWatcher } from 'mode-watcher';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import Settings from '$lib/components/Settings.svelte';
+	import MobileWarning from '$lib/components/MobileWarning.svelte';
 
 	let { children } = $props();
 
@@ -35,5 +36,7 @@
 {#if showNav}
 	<Nav className="mx-auto w-3xl my-5" />
 {/if}
+
+<MobileWarning />
 
 {@render children()}

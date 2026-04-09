@@ -1,10 +1,9 @@
 <script lang="ts">
-	import { Button, buttonVariants } from '$lib/components/ui/button/index.js';
+	import { buttonVariants } from '$lib/components/ui/button/index.js';
 	import * as Dialog from '$lib/components/ui/dialog/index.js';
-	// import { Settings } from 'lucide-svelte';
 	import Settings from '@lucide/svelte/icons/settings';
 	import Switch from '$lib/components/ui/switch/switch.svelte';
-	import { mode, setMode, toggleMode, userPrefersMode } from 'mode-watcher';
+	import { mode, toggleMode } from 'mode-watcher';
 	import {
 		BLOCK_CIPHERS,
 		DISPLAY_BYTES_AS,
@@ -89,7 +88,7 @@
 				<Dialog.Header>
 					<Dialog.Title>Settings</Dialog.Title>
 					<Dialog.Description>
-						Make changes to the settings here. Click save when you are done.
+						Make changes to the settings here. Auto saves.
 					</Dialog.Description>
 				</Dialog.Header>
 				<!-- <hr class="bg-surface-a30" /> -->

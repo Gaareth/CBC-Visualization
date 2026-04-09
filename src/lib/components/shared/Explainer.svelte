@@ -39,6 +39,9 @@
 	<FindingLengthSection />
 	<FindingAByteSection />
 	<EdgeCaseSection />
+
+	<h3>Exploitation - Recovering Bytes</h3>
+	<!-- todo: Add content for this section -->
 </ScrollStory>
 
 <!-- <ScrollStory sections={[PaddingSection, PaddingOracleSection]}>

@@ -95,7 +95,7 @@
 </script>
 
 <div
-	class="relative mx-auto my-10 grid max-w-[1400px] grid-cols-2 gap-13 p-5"
+	class="relative mx-auto my-10 grid max-w-[1400px] grid-cols-2 gap-13 p-5 -z-10"
 	bind:this={storyWrapperEl}
 >
 	<!-- TOC (SSR stable now) -->

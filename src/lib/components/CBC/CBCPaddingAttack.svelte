@@ -56,7 +56,7 @@
 		showSuccess = false;
 		attackInProgress = true;
 
-		const stopAutoGuess = autoRunGate(guessGate, () => 5);
+		const stopAutoGuess = autoRunGate(guessGate, () => 10);
 
 		await recoverPlaintextWithOracle(ciphertextBlocks, paddingOracle, {
 			outGuessedDecBlocks: guessedOutputBlocks,
@@ -110,8 +110,9 @@
 	);
 
 	let guessedPlaintextBlocks: number[][] = $state(
-		Array.from({ length: numBlocks }, () => new Array(blockSize).fill(undefined))
+		Array.from({ length: numBlocks }, () => new Array(blockSize).fill(0))
 	);
+	console.log(guessedPlaintextBlocks);
 
 	function resetCiphertext() {
 		ciphertextBlocks = cbcEncrypt(
@@ -190,9 +191,9 @@
 		<div class="mx-auto w-fit">
 			<p>Recovered Plaintext:</p>
 			<div class={cn('flex gap-1', { 'lockin-animation': showSuccess })}>
-				{#each { length: guessedPlaintextBlocks.length } as _, i}
+				{#each { length: guessedPlaintextBlocks.length-1 } as _, i}
 					<Block
-						bytes={guessedPlaintextBlocks[i + 1]}
+						bytes={guessedPlaintextBlocks[i+1]}
 						title={`Guessed Plaintext Block ${i}`}
 						success={showSuccess}
 					/>

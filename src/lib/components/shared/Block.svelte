@@ -42,9 +42,14 @@
 		displayAs: displayAsProp,
 		onChange,
 		allowEdit = false,
-		highlightChanges = true,
+		highlightChanges: highlightChangesProp,
 		inputClassNames
 	}: Props = $props();
+
+	let highlightChanges = $derived.by(() => {
+		if (highlightChangesProp !== undefined) return highlightChangesProp;
+		return settingsState.highlightChanges;
+	});
 
 	let displayAs = $derived.by(() => {
 		if (displayAsProp) return displayAsProp;
@@ -137,13 +142,14 @@
 	let previous = $state(null as (number | undefined)[] | null);
 
 	watch(
-		() => {
-			if (bytes != null) {
-				[...bytes];
-			} else {
-				[];
-			}
-		},
+		// () => {
+		// 	if (bytes != null) {
+		// 		[...bytes];
+		// 	} else {
+		// 		[];
+		// 	}
+		// },
+		() => [...bytes],
 		(prev) => {
 			previous = prev as (number | undefined)[];
 			if (!highlightChanges || !previous) return;

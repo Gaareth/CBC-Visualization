@@ -22,6 +22,40 @@ export const SURFACE_LEVEL_BG_COLORS = [
 	'dark:bg-surface-a50 bg-gray-400 dark:hover:bg-surface-a60 hover:bg-gray-500'
 ];
 
+export const SURFACE_LEVEL_BG_COLORS_NO_HOVER = [
+	'bg-transparent',
+	'bg-surface-a10',
+	'bg-surface-a20',
+	'bg-surface-a30',
+	'bg-surface-a40',
+	'bg-surface-a50'
+];
+
+export const SURFACE_LEVEL_BG_COLORS_ONLY_HOVER = [
+	'hover:bg-transparent',
+	'hover:bg-surface-a10',
+	'hover:bg-surface-a20',
+	'hover:bg-surface-a30',
+	'hover:bg-surface-a40',
+	'hover:bg-surface-a50'
+];
+
+export const SURFACE_LEVEL_BORDER_COLORS = [
+	'border-surface-a10 hover:border-surface-a20',
+	'border-surface-a20 hover:border-surface-a30',
+	'border-surface-a30 hover:border-surface-a40 ',
+	'border-surface-a40 hover:border-surface-a50',
+	'border-surface-a50 hover:border-surface-a60 '
+];
+
+export const SURFACE_LEVEL_BORDER_COLORS_NO_HOVER = [
+	'border-surface-a10',
+	'border-surface-a20',
+	'border-surface-a30',
+	'border-surface-a40',
+	'border-surface-a50'
+];
+
 export const BLOCK_COLORS = {
 	fnOutput: 'red-500',
 	ciphertext: 'green-400',
