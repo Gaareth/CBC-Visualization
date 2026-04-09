@@ -7,7 +7,9 @@
 - block cipher functions
 - padding schemes
 - mobile support
-- reactor
+- refactor
+- block cipher modes explanation
+- further reading
 
 ## Development
 

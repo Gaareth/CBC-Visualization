@@ -7,7 +7,7 @@
 	let { onstart } = $props();
 </script>
 
-<ExplainWrapper wrapperClass="w-3xl h-[325px]">
+<ExplainWrapper wrapperClass="w-3xl h-[375px]">
 	<div class="mb-7" in:receive={{ key: 'nav' }} out:send={{ key: 'nav' }}>
 		<Nav surfaceLevel={2} />
 	</div>
@@ -25,9 +25,12 @@
 		<p class="text-secondary motion-safe:fadeInRight-animation">
 			You will find short interactive examples, visualizing CBC, and a longer interactive
 			explanation and tool to demonstrate the padding oracle attack.
+
+			<br />
+			You can skip directly to the parts relevant for you, or you can take the tour:
 		</p>
 
-		<div class="mt-2 flex-center h-full">
+		<div class="mt-4 flex-center h-full">
 			<button
 				class="button-default border-2 border-primary-a0! bg-surface-a10 text-xl hover:bg-surface-a20!"
 				onclick={onstart}

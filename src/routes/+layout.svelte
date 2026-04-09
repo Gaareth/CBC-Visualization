@@ -35,7 +35,7 @@
 </svelte:head>
 
 {#if showNav}
-	<Nav className="mx-auto w-3xl my-5" />
+	<Nav className="mx-1 sm:mx-auto sm:w-3xl my-5" />
 {/if}
 
 <MobileWarning />
