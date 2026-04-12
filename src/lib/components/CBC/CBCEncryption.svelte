@@ -60,7 +60,7 @@
 					className="input-color-level-2!"
 					wrapperClass="w-fit"
 				/>
-				<p class="text-sm text-secondary">Or directly change the individual plaintext bytes.</p>
+				<p class="text-sm text-muted-foreground">Or directly change the individual plaintext bytes.</p>
 			</div>
 		</div>
 	</div>

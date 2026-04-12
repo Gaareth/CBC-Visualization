@@ -22,8 +22,21 @@
 
 	<PaddingOracleSection /> -->
 
-<ScrollStory>
+<ScrollStory
+	titles={[
+		'What is Padding?',
+		'What is a Padding Oracle?',
+		'Exploiting - Finding the padding length',
+		'Exploiting - Recovering a single byte',
+		'Edge cases'
+	]}
+>
 	<h1>Padding Oracle Attack Explained</h1>
+	<p>
+		The following sections will gradually explain the concept of padding oracles using 
+		<span class="text-gradient-primary font-bold animate-gradient-text">interactive visualizations</span> 
+		and how they reveal information about the plaintext.
+	</p>
 
 	<PaddingSection />
 	<PaddingOracleSection />

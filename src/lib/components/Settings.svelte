@@ -14,6 +14,7 @@
 	import * as Select from '$lib/components/ui/select/index.js';
 	import NumberInput from './ui/NumberInput.svelte';
 	import { CBC_LAYOUT } from '$lib/stores/cbcConstants.svelte';
+	import { cn } from '$lib/utils';
 
 	let isDarkMode = $state(mode.current === 'dark');
 </script>
@@ -75,21 +76,22 @@
 	</Select.Root>
 {/snippet}
 
-<div class="fixed right-5 bottom-5">
+<div class="fixed right-5 bottom-5 z-9999">
 	<Dialog.Root>
 		<form>
 			<Dialog.Trigger
 				type="button"
-				class={buttonVariants({ variant: 'outline', class: 'rounded-full' })}
+				class={cn(
+					buttonVariants({ variant: 'outline', class: 'rounded-full' }),
+					'backdrop-blur-3xl'
+				)}
 			>
 				<Settings />
 			</Dialog.Trigger>
-			<Dialog.Content class="sm:max-w-[425px]">
+			<Dialog.Content class="sm:max-w-[425px] bg-popover/60 backdrop-blur-3xl">
 				<Dialog.Header>
 					<Dialog.Title>Settings</Dialog.Title>
-					<Dialog.Description>
-						Make changes to the settings here. Auto saves.
-					</Dialog.Description>
+					<Dialog.Description>Make changes to the settings here. Auto saves.</Dialog.Description>
 				</Dialog.Header>
 				<!-- <hr class="bg-surface-a30" /> -->
 
@@ -119,8 +121,8 @@
 					{@render cipherSelect()}
 				</div>
 
-				<Dialog.Footer class="flex items-center justify-between! gap-1">
-					<p class="text-end text-sm text-secondary">This form saves automatically</p>
+				<Dialog.Footer class="flex flex-row! items-center justify-between! gap-1">
+					<p class="text-end text-sm text-muted-foreground">This form saves automatically</p>
 
 					<Dialog.Close type="button" class={buttonVariants({ variant: 'outline' })}>
 						Close

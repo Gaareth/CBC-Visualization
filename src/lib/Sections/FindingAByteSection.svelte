@@ -87,7 +87,7 @@
 	<div class="not-prose flex w-full flex-col gap-1">
 		<p>Try it out: Modify the IV until you get valid padding</p>
 
-		<Divider className="my-4 text-secondary text-base" text="or automatically" />
+		<Divider className="my-4 text-muted-foreground text-base" text="or automatically" />
 
 		<ByteRecoverer
 			skipEdgeCheck={true}
@@ -100,10 +100,8 @@
 	</div>
 {/snippet}
 
-<StorySection id="exploiting-finding-byte-length">
+<StorySection title="Exploiting - Recovering a single byte" headingLevel={3}>
 	{#snippet children()}
-		<h3>Exploiting - Recovering a single byte</h3>
-
 		<p>
 			Even worse, a padding oracle can be used to gain information about the decrypted plaintext and
 			even further to completely recover it
@@ -111,7 +109,7 @@
 
 		<Card title="Question" className="text-center">Can you think of a way to exploit this?</Card>
 
-		<!-- <p class="text-secondary m-0!">First set the IV to zero</p> -->
+		<!-- <p class="text-muted-foreground m-0!">First set the IV to zero</p> -->
 		<p>
 			You can make predictable changes to the
 			<span class={`text-${BLOCK_COLORS.plaintext}`}>last byte of the decrypted plaintext</span>

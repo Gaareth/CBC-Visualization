@@ -22,7 +22,7 @@
 		<p class="text-xl motion-safe:fadeInRight-animation">
 			to this Chained Block Cipher (CBC) demo + padding oracle visualization.
 		</p>
-		<p class="text-secondary motion-safe:fadeInRight-animation">
+		<p class="text-muted-foreground motion-safe:fadeInRight-animation">
 			You will find short interactive examples, visualizing CBC, and a longer interactive
 			explanation and tool to demonstrate the padding oracle attack.
 

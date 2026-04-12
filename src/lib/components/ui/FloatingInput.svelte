@@ -82,6 +82,6 @@
 	{#if error}
 		<p id="{id}-error" class="mt-1.5 text-xs text-error">{error}</p>
 	{:else if hint}
-		<p id="{id}-hint" class="mt-1.5 text-xs text-secondary">{hint}</p>
+		<p id="{id}-hint" class="mt-1.5 text-xs text-muted-foreground">{hint}</p>
 	{/if}
 </div>

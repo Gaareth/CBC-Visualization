@@ -8,7 +8,12 @@
 	} from '../../contexts/scrollStoryContext';
 	import { cn } from '../../utils/styling';
 
-	let { children } = $props();
+	interface Props {
+		children?: () => any;
+		titles?: string[];
+	}
+
+	let { children, titles }: Props = $props();
 
 	let registrations: SectionRegistration[] = $state([]);
 	let activeId = $state<string>();
@@ -95,24 +100,25 @@
 </script>
 
 <div
-	class="relative mx-auto my-10 grid max-w-[1400px] grid-cols-2 gap-13 p-5"
+	class="relative mx-auto my-10 grid max-w-[1400px] grid-cols-1 lg:grid-cols-2 gap-13 p-5"
 	bind:this={storyWrapperEl}
 >
-	<!-- TOC (SSR stable now) -->
-	<!-- <aside class="sticky top-7 h-fit w-full lg:w-40">
-    <Card class="px-5">
-      <p>Contents</p>
-      <ol class="space-y-1">
-        {#each registrations as s}
-          <li>
-            <a href={'#' + s.id} class:font-bold={s.id === activeId}>
-              {s.title}
-            </a>
-          </li>
-        {/each}
-      </ol>
-    </Card>
-  </aside> -->
+	<aside class="static lg:absolute top-7 left-0 w-full lg:-translate-x-full lg:w-60 h-full">
+		<div class="sticky top-7">
+			<Card className="px-3 py-5 not-dark:bg-white" title="Contents">
+				<!-- <p>Contents</p> -->
+				<ol class="list-inside list-decimal space-y-3 text-sm">
+					{#each titles as title (title)}
+						<li>
+							<a href={'#' + title} class:font-bold={title === activeId}>
+								{title}
+							</a>
+						</li>
+					{/each}
+				</ol>
+			</Card>
+		</div>
+	</aside>
 
 	<article
 		bind:this={contentEl}
@@ -127,7 +133,7 @@
 	<!-- in:fade={{ duration: 200 }} out:fade={{ duration: 150 }} -->
 	<!-- RIGHT COLUMN -->
 	{#if !ctxt.shouldWrap}
-		<div class="sticky top-10 h-fit">
+		<div class="sticky top-10 h-fit hidden lg:block">
 			{#key activeId}
 				<div>
 					{@render registrations.find((s) => s.id === activeId)?.visualSnippet?.()}

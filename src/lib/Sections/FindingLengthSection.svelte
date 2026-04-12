@@ -64,10 +64,8 @@
 	}
 </script>
 
-<StorySection id="exploiting-finding-padding-length">
+<StorySection title="Exploiting - Finding the padding length" headingLevel={3}>
 	{#snippet children()}
-		<h3>Exploiting - Finding the padding length</h3>
-
 		<PaddingLengthFinder
 			bind:showSuccess
 			{resetCiphertext}

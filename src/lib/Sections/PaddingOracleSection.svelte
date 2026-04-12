@@ -55,7 +55,7 @@
 		<button type="button" class="button-default input-color-level-2" onclick={createPaddingError}>
 			Simulate Padding Error
 		</button>
-		<p class="text-sm text-secondary">
+		<p class="text-sm text-muted-foreground">
 			by modifying the last byte of the penultimate ciphertext block
 		</p>
 	</div>
@@ -75,10 +75,8 @@
 	</div>
 {/snippet}
 
-<StorySection id="oracle">
+<StorySection title="What is a Padding Oracle?" headingLevel={2}>
 	{#snippet children()}
-		<h2>What is a Padding Oracle?</h2>
-
 		<p>
 			If you have a server, that answers you whether a given (and possibly modified) ciphertext has
 			invalid padding, you have a padding oracle. This can be exploited to recover the plaintext of

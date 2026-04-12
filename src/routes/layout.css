@@ -191,7 +191,7 @@
 }
 
 @utility text-secondary {
-	@apply text-zinc-400 dark:text-zinc-400;
+	@apply text-black dark:text-zinc-400;
 }
 
 .number-input-no-spin {
@@ -336,3 +336,31 @@ progress {
 /*---break--- */
 
 /*---break--- */
+
+html {
+	scroll-behavior: smooth;
+}
+
+@utility text-gradient-primary {
+	background: linear-gradient(135deg, #72edea 0%, #4fd6ff 35%, #7aa2ff 70%, #b98cff 100%);
+
+	-webkit-background-clip: text;
+	background-clip: text;
+
+	color: transparent;
+
+	background-size: 300% 300%;
+}
+
+@utility animate-gradient-text {
+	animation: gradientTextMove 10s ease-in-out infinite;
+}
+
+@keyframes gradientTextMove {
+	from {
+		background-position: 100% 0%;
+	}
+	to {
+		background-position: 0% 0%;
+	}
+}

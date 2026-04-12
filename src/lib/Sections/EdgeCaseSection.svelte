@@ -140,9 +140,8 @@
 	</div>
 {/snippet}
 
-<StorySection id="exploiting-edge-cases">
+<StorySection title="Edge cases" headingLevel={3}>
 	{#snippet children()}
-		<h3>Edge cases</h3>
 		<p>
 			A valid padding result probably indicates that you set the last byte of the decrypted
 			plaintext to 0x01. However, there are some edge cases to consider.

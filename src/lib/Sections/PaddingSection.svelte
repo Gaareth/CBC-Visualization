@@ -11,7 +11,7 @@
 	import { cn } from '$lib/utils/styling';
 	import { CBC_LAYOUT, getBlockWidth, getLeftPadding } from '$lib/stores/cbcConstants.svelte';
 
-	const id = 'padding';
+	const title = "What is Padding?";
 
 	const padder = new PKCS7Padder();
 
@@ -39,13 +39,7 @@
 
 	$effect(() => {
 		if (!ctxt.ctxt) return;
-		if (ctxt.ctxt.activeId !== id) return;
-
-		// if (plaintextBlocks.length >= 2) {
-		// 	ctxt.ctxt.shouldWrap = true;
-		// } else {
-		// 	ctxt.ctxt.shouldWrap = false;
-		// }
+		if (ctxt.ctxt.activeId !== title) return;
 
 		const numBlocks = plaintextBlocks.length;
 		let diagramWidth = numBlocks * (getBlockWidth() + CBC_LAYOUT.gap) - CBC_LAYOUT.gap;
@@ -67,9 +61,8 @@
 	});
 </script>
 
-<StorySection {id}>
+<StorySection {title}>
 	{#snippet children()}
-		<h2>What is Padding?</h2>
 		<p>
 			Block ciphers operate on fixed-size blocks. When the plaintext doesn't fit perfectly into
 			blocks, we need to add some extra bytes to fill the last block. This process is called
@@ -106,7 +99,7 @@
 						wrapperClass="w-1/2"
 					/>
 				</div>
-				<p class="text-sm text-secondary">
+				<p class="text-sm text-muted-foreground">
 					Change the plaintext length to see how padding works! Or choose a different plaintext.
 				</p>
 			</div>
