@@ -3,6 +3,7 @@
 	import Card from './Card.svelte';
 	import { cn } from '../../utils/styling';
 	import { fade } from 'svelte/transition';
+	import Divider from './Divider.svelte';
 
 	interface Props {
 		id: string;
@@ -30,7 +31,7 @@
 <Card title="Question" className={cn('flex flex-col', className)}>
 	{@render question()}
 
-	<hr class="my-4! border-surface-2" />
+	<Divider className="my-4" surfaceLevel={1}/>
 
 	{#if showReveal}
 		<div in:fade>
