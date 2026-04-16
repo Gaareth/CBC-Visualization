@@ -1,0 +1,71 @@
+
+@utility flex-center {
+	@apply flex items-center justify-center;
+}
+
+@utility border-default {
+	@apply border border-surface-1;
+}
+/* 
+@utility text-secondary {
+	@apply text-black dark:text-zinc-400;
+} */
+
+@utility number-input-no-spin {
+	-webkit-appearance: none;
+	margin: 0;
+	-moz-appearance: textfield;
+	appearance: textfield;
+}
+
+
+
+/* prettier-ignore */
+@utility input-default {
+	@apply border-default bg-transparent px-2 py-1 text-inherit 
+	focus:ring
+	focus:z-20
+	focus:ring-primary-0!
+	hover:bg-surface-1
+	disabled:cursor-not-allowed disabled:hover:bg-transparent;
+}
+
+
+@utility abs-center {
+	@apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
+}
+
+@utility abs-center-y {
+	@apply absolute top-1/2 -translate-y-1/2;
+}
+
+@utility abs-center-x {
+	@apply absolute left-1/2 -translate-x-1/2;
+}
+
+
+
+/* prettier-ignore */
+@utility button-default {
+	@apply border-default bg-transparent px-4 py-2 text-inherit 
+	hover:bg-surface-1 active:bg-surface-2
+	disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+
+/*---break--- */
+
+/*---break--- */
+
+
+@utility text-gradient-primary {
+	background: linear-gradient(135deg, #72edea 0%, #4fd6ff 35%, #7aa2ff 70%, #b98cff 100%);
+
+	-webkit-background-clip: text;
+	background-clip: text;
+
+	color: transparent;
+
+	background-size: 300% 300%;
+}
+

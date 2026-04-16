@@ -3,7 +3,6 @@
 @import 'shadcn-svelte/tailwind.css';
 @import '@fontsource-variable/inter';
 
-@import '../lib/styles/theme.css';
 
 /*---break--- */
 @custom-variant dark (&:is(.dark *));
@@ -22,25 +21,10 @@
 @source inline('border-r-blue-400');
 
 
-
-@utility flex-center {
-	@apply flex items-center justify-center;
-}
-
-@utility border-default {
-	@apply border border-surface-1;
-}
-/* 
-@utility text-secondary {
-	@apply text-black dark:text-zinc-400;
-} */
-
-.number-input-no-spin {
-	-webkit-appearance: none;
-	margin: 0;
-	-moz-appearance: textfield;
-	appearance: textfield;
-}
+@import '../lib/styles/theme.css';
+@import '../lib/styles/base.css';
+@import '../lib/styles/utilities.css';
+@import '../lib/styles/animations.css';
 
 @layer components {
 	/* prettier-ignore */
@@ -51,138 +35,5 @@
         items-center justify-center 
         border-s-0! first:ms-0 focus:border-s! focus:ring-2 focus:ring-offset-1;
 	}
-}
-
-/* prettier-ignore */
-@utility input-default {
-	@apply border-default bg-transparent px-2 py-1 text-inherit 
-	focus:ring
-	focus:z-20
-	focus:ring-primary-0!
-	hover:bg-surface-1
-	disabled:cursor-not-allowed disabled:hover:bg-transparent;
-}
-
-
-@utility abs-center {
-	@apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
-}
-
-@utility abs-center-y {
-	@apply absolute top-1/2 -translate-y-1/2;
-}
-
-@utility abs-center-x {
-	@apply absolute left-1/2 -translate-x-1/2;
-}
-
-@keyframes fadeInRight {
-	0% {
-		transform: translateX(-2%);
-		opacity: 0;
-	}
-	100% {
-		transform: translateX(0%);
-		opacity: 1;
-	}
-}
-
-@keyframes lockin {
-	0% {
-		transform: translateX(0);
-	}
-	25% {
-		transform: translateX(-1%);
-	}
-	50% {
-		transform: translateX(+1%);
-	}
-	75% {
-		transform: translateX(-1%);
-	}
-	100% {
-		transform: translateX(0);
-	}
-}
-
-@utility lockin-animation {
-	animation: 0.4s lockin ease-in-out;
-}
-
-@utility fadeInRight-animation {
-	animation: 1s fadeInRight;
-}
-
-/* prettier-ignore */
-@utility button-default {
-	@apply border-default bg-transparent px-4 py-2 text-inherit 
-	hover:bg-surface-1 active:bg-surface-2
-	disabled:cursor-not-allowed disabled:opacity-50;
-}
-
-@layer base {
-	button:not([disabled]),
-	[role='button']:not([disabled]) {
-		cursor: pointer;
-	}
-	* {
-		@apply border-border outline-ring/50;
-	}
-	body {
-		@apply bg-background text-foreground;
-	}
-	html {
-		@apply font-sans;
-	}
-}
-
-@media (prefers-reduced-motion) {
-	::view-transition-group(*),
-	::view-transition-old(*),
-	::view-transition-new(*) {
-		animation: none !important;
-	}
-}
-
-progress::-moz-progress-bar {
-	background: var(--color-primary-0);
-}
-progress::-webkit-progress-value {
-	background: var(--color-primary-0);
-}
-
-progress {
-	color: var(--color-primary-0);
-}
-
-/*---break--- */
-
-/*---break--- */
-
-html {
-	scroll-behavior: smooth;
-}
-
-@utility text-gradient-primary {
-	background: linear-gradient(135deg, #72edea 0%, #4fd6ff 35%, #7aa2ff 70%, #b98cff 100%);
-
-	-webkit-background-clip: text;
-	background-clip: text;
-
-	color: transparent;
-
-	background-size: 300% 300%;
-}
-
-@utility animate-gradient-text {
-	animation: gradientTextMove 10s ease-in-out infinite;
-}
-
-@keyframes gradientTextMove {
-	from {
-		background-position: 100% 0%;
-	}
-	to {
-		background-position: 0% 0%;
-	}
+	
 }

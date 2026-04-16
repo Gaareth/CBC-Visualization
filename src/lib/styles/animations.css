@@ -1,0 +1,49 @@
+@keyframes fadeInRight {
+	0% {
+		transform: translateX(-2%);
+		opacity: 0;
+	}
+	100% {
+		transform: translateX(0%);
+		opacity: 1;
+	}
+}
+
+@keyframes lockin {
+	0% {
+		transform: translateX(0);
+	}
+	25% {
+		transform: translateX(-1%);
+	}
+	50% {
+		transform: translateX(+1%);
+	}
+	75% {
+		transform: translateX(-1%);
+	}
+	100% {
+		transform: translateX(0);
+	}
+}
+
+@utility lockin-animation {
+	animation: 0.4s lockin ease-in-out;
+}
+
+@utility fadeInRight-animation {
+	animation: 1s fadeInRight;
+}
+
+@utility animate-gradient-text {
+	animation: gradientTextMove 10s ease-in-out infinite;
+}
+
+@keyframes gradientTextMove {
+	from {
+		background-position: 100% 0%;
+	}
+	to {
+		background-position: 0% 0%;
+	}
+}
