@@ -3,7 +3,7 @@
 	import { settingsState } from '../../stores/settings.svelte';
 	import { displayByte } from '../../utils/compute';
 	import { watch } from '../../utils/reactivity.svelte';
-	import { cn } from '../../utils/styling';
+	import { cn, inputLayer, type SurfaceLevel } from '../../utils/styling';
 	import { SvelteSet } from 'svelte/reactivity';
 
 	interface Props {
@@ -26,6 +26,7 @@
 		allowEdit?: boolean;
 		highlightChanges?: boolean;
 		inputClassNames?: Record<number, string>;
+		surfaceLevel?: SurfaceLevel;
 	}
 
 	let {
@@ -43,7 +44,8 @@
 		onChange,
 		allowEdit = false,
 		highlightChanges: highlightChangesProp,
-		inputClassNames
+		inputClassNames,
+		surfaceLevel = 1
 	}: Props = $props();
 
 	let highlightChanges = $derived.by(() => {
@@ -201,9 +203,10 @@
 					error?.indices.includes(i + 1) ? 'border-e-0' : '',
 					error?.indices.includes(i) ? 'border-s border-error' : '',
 					success ? 'border-success' : '',
-					flashIndices.has(i) ? 'z-10 opacity-100! ring-2 ring-primary-a0 ring-offset-1' : '',
+					flashIndices.has(i) ? 'z-10 opacity-100! ring-2 ring-primary-0 ring-offset-1' : '',
 					'transition-all duration-300 ease-out',
-					inputClassNames?.[i] || ''
+					inputClassNames?.[i] || '',
+					inputLayer[surfaceLevel]
 				)}
 				value={displayBytes[i]}
 				style:width={`${byteWidth}px`}

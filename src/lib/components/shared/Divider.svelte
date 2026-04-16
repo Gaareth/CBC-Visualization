@@ -1,18 +1,19 @@
 <script lang="ts">
-	import { cn } from '../../utils/styling';
+	import { borderLayer, cn, type BgSurfaceLevel, type SurfaceLevel } from '../../utils/styling';
 
 	interface Props {
 		text?: string;
 		className?: string;
 		children?: () => any;
 		hideText?: boolean;
+		surfaceLevel?: BgSurfaceLevel; // surface level of the background the divider is on
 	}
 
-	let { text, className, children, hideText }: Props = $props();
+	let { text, className, children, hideText, surfaceLevel = 0 }: Props = $props();
 </script>
 
 <div class={cn('flex flex-row items-center gap-2', className, hideText && 'gap-0')}>
-	<div class="line"></div>
+	<div class={cn('flex-1 border-s-0! border-l-0! border-r-0!', borderLayer[surfaceLevel])}></div>
 	{#if !hideText}
 		{#if children}
 			{@render children?.()}
@@ -20,12 +21,5 @@
 			{text}
 		{/if}
 	{/if}
-	<div class="line"></div>
+	<div class={cn('flex-1 border-s-0! border-l-0! border-r-0!', borderLayer[surfaceLevel])}></div>
 </div>
-
-<style>
-	.line {
-		flex: 1;
-		border-bottom: 1px solid var(--color-surface-a20);
-	}
-</style>

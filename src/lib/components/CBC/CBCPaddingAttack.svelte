@@ -183,7 +183,7 @@
 {#snippet autoRun()}
 	<div class="flex flex-col gap-1">
 		<div class="flex-center">
-			<button class="button-default color-level-2" onclick={async () => await recoverPlaintext()}>
+			<button class="button-default input-layer-2" onclick={async () => await recoverPlaintext()}>
 				Recover Plaintext
 			</button>
 		</div>
@@ -244,15 +244,15 @@
 
 		<div class="col-span-2 flex justify-center gap-1">
 			<div class="flex w-fit flex-col gap-1">
-				<button type="button" class="button-default input-color-level-2" onclick={zeroIV}>
+				<button type="button" class="button-default input-layer-2" onclick={zeroIV}>
 					Set IV to zero
 				</button>
 
-				<button type="button" class="button-default input-color-level-2" onclick={findValidPadding}>
+				<button type="button" class="button-default input-layer-2" onclick={findValidPadding}>
 					Find valid padding
 				</button>
 
-				<!-- <button type="button" class="button-default input-color-level-2" onclick={calculatePlaintext}>
+				<!-- <button type="button" class="button-default input-layer-2" onclick={calculatePlaintext}>
 					Recover plaintext
 				</button> -->
 			</div>

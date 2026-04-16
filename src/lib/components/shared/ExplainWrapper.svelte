@@ -50,7 +50,7 @@
 		}
 	};
 
-	const navBtnClass = cn(`button-default color-level-1 rounded-full p-0.5`);
+	const navBtnClass = cn(`button-default input-layer-1 rounded-full p-0.5`);
 </script>
 
 <div class="explain-wrapper relative mx-auto">
@@ -87,7 +87,12 @@
 	{#if slides.length >= 2}
 		<div class="absolute top-0 right-0 flex gap-1 p-2">
 			{#each { length: slides.length }, i}
-				<div class={cn('rounded-full p-1', i == index ? 'color-level-3' : 'color-level-2')}></div>
+				<div
+					class={cn(
+						'rounded-full p-1',
+						i == index ? 'bg-surface-3 not-dark:bg-chart-2' : 'bg-surface-2 not-dark:bg-chart-1'
+					)}
+				></div>
 			{/each}
 		</div>
 	{/if}

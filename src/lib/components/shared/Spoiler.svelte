@@ -1,14 +1,14 @@
 <!-- Spoiler.svelte -->
 <script lang="ts">
 	import { onMount, type Snippet } from 'svelte';
-	import { cn, SURFACE_LEVEL_BG_COLORS } from '../../utils/styling';
+	import { bgSurface, cn, hoverBgSurface, type SurfaceLevel } from '../../utils/styling';
 	import { fnv1a_hash } from '../../utils/compute';
 
 	interface Props {
 		label?: string;
 		revealed?: boolean;
 		children: Snippet;
-		surfaceLevel?: number;
+		surfaceLevel?: SurfaceLevel;
 		remember?: boolean;
 	}
 
@@ -16,7 +16,7 @@
 		label = 'Spoiler',
 		revealed = $bindable(false),
 		children,
-		surfaceLevel = 0,
+		surfaceLevel = 1,
 		remember = false
 	}: Props = $props();
 
@@ -77,7 +77,12 @@
 	onkeydown={handleKeydown}
 >
 	<span
-		class={cn('content', SURFACE_LEVEL_BG_COLORS[surfaceLevel])}
+		class={cn(
+			'content',
+			"not-dark:bg-gray-200 not-dark:hover:bg-gray-300",
+			hoverBgSurface[(surfaceLevel + 1) as SurfaceLevel],
+			bgSurface[surfaceLevel]
+		)}
 		aria-hidden={!revealed}
 		bind:this={contentEl}
 	>

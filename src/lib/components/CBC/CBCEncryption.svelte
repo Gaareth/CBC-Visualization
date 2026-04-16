@@ -57,8 +57,8 @@
 					label="Plaintext"
 					value={plaintext}
 					{oninput}
-					className="input-color-level-2!"
 					wrapperClass="w-fit"
+					surfaceLevel={2}
 				/>
 				<p class="text-sm text-muted-foreground">Or directly change the individual plaintext bytes.</p>
 			</div>
@@ -82,11 +82,11 @@
 		<div class="flex-center flex flex-col justify-center gap-1">
 			<div class="flex flex-col gap-1">
 				<p class="text-left">Try it out!</p>
-				<button type="button" class="button-default input-color-level-2" onclick={rotateArrows}>
+				<button type="button" class="button-default input-layer-2" onclick={rotateArrows}>
 					{arrowsRotated ? 'Back to Encryption View' : 'Switch to Decryption View'}
 				</button>
 				{#if arrowsRotated}
-					<a type="button" class="button-default input-color-level-2" href="/decryption">
+					<a type="button" class="button-default input-layer-2" href="/decryption">
 						Flip diagram to continue to decryption
 					</a>
 				{/if}

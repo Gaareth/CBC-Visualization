@@ -95,20 +95,20 @@
 		{#if runningIndex == null}
 			<button
 				type="button"
-				class="button-default input-color-level-2"
+				class="button-default input-layer-2"
 				onclick={recoverPaddingLength}
 			>
 				Find padding length
 			</button>
 		{:else}
-			<button type="button" class="button-default input-color-level-2" onclick={reset}>
+			<button type="button" class="button-default input-layer-2" onclick={reset}>
 				Reset
 			</button>
 
 			<button
 				disabled={runningIndex >= blockSize || !paddingValidation?.valid}
 				type="button"
-				class="button-default input-color-level-2"
+				class="button-default input-layer-2"
 				onclick={() => {
 					if (runningIndex != null) {
 						paddingLengthGate.step();
@@ -122,7 +122,7 @@
 			<button
 				disabled={runningIndex >= blockSize || !paddingValidation?.valid}
 				type="button"
-				class="button-default input-color-level-2"
+				class="button-default input-layer-2"
 				onclick={() => {
 					paddingLengthAutoRunStopper = autoRunGate(paddingLengthGate, () => 750);
 				}}

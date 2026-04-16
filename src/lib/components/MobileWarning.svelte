@@ -22,10 +22,10 @@
 
 {#if showMobileWarning}
 	<div class="fixed inset-0 z-9999 flex items-center justify-center bg-black/70 p-4 md:hidden">
-		<div class="relative rounded-lg bg-surface-a20 p-6 text-center">
+		<div class="relative rounded-lg bg-surface-1 p-6 text-center">
 			<button
 				onclick={closeOverlay}
-				class="absolute top-2 right-2 text-lg font-bold text-white"
+				class="absolute top-2 right-2 text-lg font-bold text-foreground"
 				aria-label="Close"
 			>
 				<XIcon />

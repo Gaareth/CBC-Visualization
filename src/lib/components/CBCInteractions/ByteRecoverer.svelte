@@ -76,13 +76,13 @@
 	{/if}
 
 	<div class="flex flex-wrap gap-1">
-		<button type="button" class="button-default input-color-level-2" onclick={resetCiphertext}>
+		<button type="button" class="button-default input-layer-2" onclick={resetCiphertext}>
 			Reset
 		</button>
 
 		<button
 			type="button"
-			class="flex-1 button-default input-color-level-2"
+			class="flex-1 button-default input-layer-2"
 			onclick={findValidPadding}
 		>
 			Automatically find valid padding
@@ -92,7 +92,7 @@
 	<div>
 		<p>Progress: {attackProgress * 255} / 255</p>
 
-		<progress class="w-full input-color-level-2" value={attackProgress} max={1}> </progress>
+		<progress class="w-full input-layer-2" value={attackProgress} max={1}> </progress>
 
 		{#if showSuccess}
 			<p class="lockin-animation font-bold">
@@ -119,6 +119,6 @@
 </div>
 {#if skipEdgeCheck}
 	<div class="text-xs text-warning">
-		Dislaimer: This does not check edge cases. See next interactive example for that.
+		Disclaimer: This does not check edge cases. See next interactive example for that.
 	</div>
 {/if}

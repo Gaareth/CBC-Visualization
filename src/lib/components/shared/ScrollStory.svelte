@@ -105,7 +105,7 @@
 >
 	<aside class="static lg:absolute top-7 left-0 w-full lg:-translate-x-full lg:w-60 h-full">
 		<div class="sticky top-7">
-			<Card className="px-3 py-5 not-dark:bg-white" title="Contents">
+			<Card className="px-3 py-5" title="Contents" > 
 				<!-- <p>Contents</p> -->
 				<ol class="list-inside list-decimal space-y-3 text-sm">
 					{#each titles as title (title)}

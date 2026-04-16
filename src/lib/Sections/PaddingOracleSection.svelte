@@ -52,7 +52,7 @@
 {#snippet simulateButton()}
 	<div class="not-prose flex w-full flex-col gap-1">
 		<p>Try it out!</p>
-		<button type="button" class="button-default input-color-level-2" onclick={createPaddingError}>
+		<button type="button" class="button-default input-layer-2" onclick={createPaddingError}>
 			Simulate Padding Error
 		</button>
 		<p class="text-sm text-muted-foreground">

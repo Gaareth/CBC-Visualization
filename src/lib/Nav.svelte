@@ -1,29 +1,29 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import {
+	bgSurface,
 		cn,
-		SURFACE_LEVEL_BG_COLORS,
-		SURFACE_LEVEL_BG_COLORS_NO_HOVER,
-		SURFACE_LEVEL_BG_COLORS_ONLY_HOVER,
-		SURFACE_LEVEL_BORDER_COLORS,
-		SURFACE_LEVEL_BORDER_COLORS_NO_HOVER
+		hoverBgSurface,
+		surfaceOutline,
+		type SurfaceLevel,
+
 	} from './utils/styling';
 
-	let { className = '', surfaceLevel = 1 } = $props();
+	let { className = '', surfaceLevel = 1 }: { className?: string; surfaceLevel?: SurfaceLevel } = $props();
 </script>
 
 {#snippet dropdownNav(title: string, items: { label: string; href: string }[])}
 	<div class="dropdown">
 		<button
 			type="button"
-			class={cn('rounded-full px-4 py-1', SURFACE_LEVEL_BG_COLORS_ONLY_HOVER[surfaceLevel + 1])}
+			class={cn('rounded-full px-4 py-1 ', hoverBgSurface[surfaceLevel+1 as keyof typeof hoverBgSurface])}
 		>
 			{title}
 		</button>
 		<!-- dropdown panel is inside same group -->
 		<div class="dropdown-content">
 			<div
-				class="flex flex-col rounded border bg-surface-a20/50 p-4 py-4
+				class="flex flex-col rounded border bg-surface-2 dark:bg-surface-2/50 p-4 py-4
 			shadow-lg backdrop-blur-md"
 			>
 				{#each items as item (item.href)}
@@ -31,8 +31,7 @@
 						href={item.href}
 						class={cn(
 							'rounded px-4 py-2 text-left',
-							'whitespace-nowrap',
-							SURFACE_LEVEL_BG_COLORS_ONLY_HOVER[surfaceLevel + 2]
+							'whitespace-nowrap hover:bg-surface-3',
 						)}
 					>
 						{item.label}
@@ -46,14 +45,13 @@
 <nav
 	class={cn(
 		'mx-4 flex justify-center gap-1 rounded-full border py-1 sm:gap-3',
-		SURFACE_LEVEL_BG_COLORS_NO_HOVER[surfaceLevel],
-		SURFACE_LEVEL_BORDER_COLORS_NO_HOVER[surfaceLevel],
+		surfaceOutline[surfaceLevel],
 		className
 	)}
 >
 	<a
 		href={resolve('/')}
-		class={cn('rounded-full px-4 py-1', SURFACE_LEVEL_BG_COLORS_ONLY_HOVER[surfaceLevel + 1])}
+		class={cn('rounded-full px-4 py-1 ', hoverBgSurface[surfaceLevel + 1 as keyof typeof hoverBgSurface])}
 	>
 		Home
 	</a>

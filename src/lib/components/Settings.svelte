@@ -22,7 +22,7 @@
 {#snippet hexSelect()}
 	<Label for="byteDisplay">Byte display format</Label>
 	<Select.Root type="single" bind:value={settingsState.displayBytesAs}>
-		<Select.Trigger class="w-[180px]" id="byteDisplay">
+		<Select.Trigger class="w-[180px]" id="byteDisplay" surfaceLevel={2}>
 			{settingsState.displayBytesAs}
 		</Select.Trigger>
 		<Select.Content>
@@ -41,7 +41,7 @@
 {#snippet paddingSelect()}
 	<Label for="paddingScheme">Padding Scheme</Label>
 	<Select.Root type="single" bind:value={settingsState.paddingScheme}>
-		<Select.Trigger class="w-[180px]" id="paddingScheme">
+		<Select.Trigger class="w-[180px]" id="paddingScheme" surfaceLevel={2}>
 			{settingsState.paddingScheme}
 		</Select.Trigger>
 		<Select.Content>
@@ -60,7 +60,7 @@
 {#snippet cipherSelect()}
 	<Label for="blockCipher">Block cipher function</Label>
 	<Select.Root type="single" bind:value={settingsState.blockCipher}>
-		<Select.Trigger class="w-[180px]" id="blockCipher">
+		<Select.Trigger class="w-[180px]" id="blockCipher" surfaceLevel={2}>
 			{settingsState.blockCipher}
 		</Select.Trigger>
 		<Select.Content>
@@ -93,7 +93,7 @@
 					<Dialog.Title>Settings</Dialog.Title>
 					<Dialog.Description>Make changes to the settings here. Auto saves.</Dialog.Description>
 				</Dialog.Header>
-				<!-- <hr class="bg-surface-a30" /> -->
+				<!-- <hr class="bg-surface-3" /> -->
 
 				<div class="my-4 grid grid-cols-2 gap-4 gap-y-5">
 					<Label for="darkMode">Dark mode</Label>

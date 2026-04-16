@@ -30,7 +30,7 @@
 <Card title="Question" className={cn('flex flex-col', className)}>
 	{@render question()}
 
-	<hr class="my-4! border-surface-a20" />
+	<hr class="my-4! border-surface-2" />
 
 	{#if showReveal}
 		<div in:fade>

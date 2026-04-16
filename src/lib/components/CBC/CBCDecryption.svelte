@@ -66,7 +66,7 @@
 		<div class="flex justify-center gap-1">
 			<div class="flex w-fit flex-col gap-1">
 				<p>Try it out!</p>
-				<button type="button" class="button-default input-color-level-2" onclick={modifyIV}>
+				<button type="button" class="button-default input-layer-2" onclick={modifyIV}>
 					Change last IV byte
 				</button>
 				<p class="text-sm text-muted-foreground">Or directly change the arbitrary ciphertext/iv bytes.</p>
@@ -95,7 +95,7 @@
 
 				<button
 					type="button"
-					class="button-default input-color-level-2"
+					class="button-default input-layer-2"
 					onclick={createPaddingError}
 				>
 					Simulate Padding Error

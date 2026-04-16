@@ -87,7 +87,11 @@
 	<div class="not-prose flex w-full flex-col gap-1">
 		<p>Try it out: Modify the IV until you get valid padding</p>
 
-		<Divider className="my-4 text-muted-foreground text-base" text="or automatically" />
+		<Divider
+			className="my-4 text-muted-foreground text-base"
+			text="or automatically"
+			surfaceLevel={1}
+		/>
 
 		<ByteRecoverer
 			skipEdgeCheck={true}

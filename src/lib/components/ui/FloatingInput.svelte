@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn } from '../../utils/styling';
+	import { cn, inputLayer, surfaceOutline, type SurfaceLevel } from '../../utils/styling';
 
 	interface Props {
 		value: string;
@@ -14,9 +14,9 @@
 		wrapperClass?: string;
 		className?: string;
 		oninput?: (event: Event) => void;
+		surfaceLevel?: SurfaceLevel;
 	}
 
-	/** @type {import('svelte').Snippet | undefined} */
 	let {
 		value = $bindable(''),
 		label = 'Label',
@@ -29,7 +29,9 @@
 		hint = '',
 		wrapperClass = '',
 		className = '',
-		oninput = () => {}
+		oninput = () => {},
+		surfaceLevel = 1,
+
 	}: Props = $props();
 
 	let focused = $state(false);
@@ -54,13 +56,14 @@
 		aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
 		class={cn(
 			`peer
-            w-full input-default border bg-transparent px-4 pt-5 pb-2 text-base
+            w-full input-default px-4 pt-5 pb-2 text-base
             outline-none
             placeholder-shown:pt-3.5
             placeholder-shown:pb-3.5
             disabled:cursor-not-allowed
             disabled:opacity-50`,
 			error && 'border-red-400 focus:border-red-500 focus:ring-2 focus:ring-red-500/20',
+			inputLayer[surfaceLevel],
 			className
 		)}
 	/>

@@ -95,7 +95,7 @@
 						label="Plaintext"
 						value={plaintext}
 						{oninput}
-						className="input-color-level-2!"
+						className="input-layer-2!"
 						wrapperClass="w-1/2"
 					/>
 				</div>

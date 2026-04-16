@@ -103,7 +103,7 @@
 
 {#snippet xor()}
 	<div
-		class={cn('relative rounded-full border-default', flippedClass)}
+		class={cn('relative rounded-full border border-dark dark:border-light', flippedClass)}
 		style={`width: ${xorDiameter}px; height: ${xorDiameter}px;`}
 	>
 		<div class="absolute top-1/2 h-px w-full -translate-y-1/2 bg-dark dark:bg-light"></div>
@@ -192,7 +192,7 @@
 	{@render verticalArrow(arrowWidth)}
 
 	<div
-		class={cn('flex-center border-default', flippedClass)}
+		class={cn('flex-center border-default surface-outline-1', flippedClass)}
 		style={`width: ${getBlockWidth()}px;`}
 		style:height={`${functionHeight}px;`}
 	>

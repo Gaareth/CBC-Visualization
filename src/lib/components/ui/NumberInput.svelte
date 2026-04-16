@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn } from '../../utils/styling';
+	import { cn, inputLayer, type SurfaceLevel } from '../../utils/styling';
 	import HoldableButton from './HoldableButton.svelte';
 
 	interface Props {
@@ -9,7 +9,7 @@
 		step?: number;
 		className?: string;
 		onChange?: (value: number) => void;
-		surfaceLevel?: number;
+		surfaceLevel?: SurfaceLevel;
 		[key: string]: any; // for any additional props like id, etc.
 	}
 
@@ -19,7 +19,7 @@
 		max = Infinity,
 		step = 1,
 		className = '',
-		surfaceLevel = 0,
+		surfaceLevel = 1,
 		onChange,
 		...restProps
 	}: Props = $props();
@@ -47,15 +47,7 @@
 		}
 	}
 
-	const surfaces = {
-		0: 'bg-transparent',
-		1: 'bg-gray-50 border-default shadow-lg dark:bg-surface-a10 dark:border-surface-a20  dark:hover:bg-surface-a20',
-		2: 'bg-gray-100 border-default shadow-xl dark:bg-surface-a20 dark:border-surface-a30 dark:hover:bg-surface-a30',
-		3: 'bg-gray-200 border-default shadow-2xl dark:bg-surface-a30 dark:border-surface-a40 dark:hover:bg-surface-a40',
-		4: 'bg-white border-default shadow-2xl dark:bg-surface-a40 dark:border-surface-a50 dark:hover:bg-surface-a50'
-	} as const;
-
-	let surfaceClass = $derived(surfaces[surfaceLevel as keyof typeof surfaces] ?? surfaces[1]);
+	let surfaceClass = $derived(inputLayer[surfaceLevel]);
 </script>
 
 <div class={cn('flex', className)}>
@@ -75,7 +67,7 @@
 		{min}
 		{max}
 		{step}
-		class={cn('z-10 w-full input-default border-s-0 border-e-0 px-2 text-center', surfaceClass)}
+		class={cn('z-10 w-full input-default border-s-0! border-e-0! px-2 text-center', surfaceClass)}
 		{...restProps}
 	/>
 	<HoldableButton

@@ -113,13 +113,13 @@
 				of 0x01
 			</p>
 			<div class="col-span-2 flex-center">
-				<button type="button" class="button-default input-color-level-2" onclick={simulateEdgeCase}>
+				<button type="button" class="button-default input-layer-2" onclick={simulateEdgeCase}>
 					Simulate edge case
 				</button>
 			</div>
 		</div>
 
-		<Divider className="border-surface-a20" hideText={showRecoverer}>
+		<Divider className="text-muted-foreground" hideText={showRecoverer} surfaceLevel={1}>
 			<button class="m-0! text-sm" onclick={() => (showRecoverer = true)} out:fade>
 				or use current values
 			</button>
