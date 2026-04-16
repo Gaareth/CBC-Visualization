@@ -31,6 +31,9 @@
 	let attackProgress = $state(0);
 	let showSuccess = $state(false);
 
+	let stopAutoGuess: () => void;
+
+
 	async function findValidPadding() {
 		showSuccess = false;
 		attackProgress = 0;
@@ -42,8 +45,12 @@
 			return end + (start - end) * (1 - t);
 		};
 
+		if (stopAutoGuess) {
+			stopAutoGuess();
+		}
+
 		let guessGate = createGate();
-		const stopAutoGuess = autoRunGate(guessGate, easeOut);
+		stopAutoGuess = autoRunGate(guessGate, easeOut);
 
 		await recoverSingleByte(1, ciphertextBlocks[0], ciphertextBlocks[1], paddingOracle, {
 			guessGate,
