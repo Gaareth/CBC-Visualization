@@ -97,12 +97,21 @@
 
 				<div class="my-4 grid grid-cols-2 gap-4 gap-y-5">
 					<Label for="darkMode">Dark mode</Label>
-					<Switch id="darkMode" onclick={toggleMode} checked={isDarkMode} />
+					<Switch
+						id="darkMode"
+						onclick={toggleMode}
+						checked={isDarkMode}
+						class="will-change-transform"
+					/>
 
 					<hr class="col-span-2 my-2" />
 
 					<Label for="highlightChanges">Highlight changes</Label>
-					<Switch id="highlightChanges" bind:checked={settingsState.highlightChanges} />
+					<Switch
+						id="highlightChanges"
+						bind:checked={settingsState.highlightChanges}
+						class="will-change-transform"
+					/>
 
 					<Label for="byteWidth">Block Byte width (px)</Label>
 					<NumberInput
