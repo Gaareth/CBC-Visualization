@@ -79,7 +79,7 @@
 	<span
 		class={cn(
 			'content',
-			"not-dark:bg-gray-200 not-dark:hover:bg-gray-300",
+			'not-dark:bg-gray-200 not-dark:hover:bg-gray-300',
 			hoverBgSurface[(surfaceLevel + 1) as SurfaceLevel],
 			bgSurface[surfaceLevel]
 		)}

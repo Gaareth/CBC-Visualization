@@ -88,7 +88,7 @@
 			>
 				<Settings />
 			</Dialog.Trigger>
-			<Dialog.Content class="sm:max-w-[425px] bg-popover/60 backdrop-blur-3xl">
+			<Dialog.Content class="bg-popover/60 backdrop-blur-3xl sm:max-w-[425px]">
 				<Dialog.Header>
 					<Dialog.Title>Settings</Dialog.Title>
 					<Dialog.Description>Make changes to the settings here. Auto saves.</Dialog.Description>

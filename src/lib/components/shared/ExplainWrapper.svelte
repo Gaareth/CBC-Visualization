@@ -3,7 +3,6 @@
 	import { cn } from '../../utils/styling';
 	import ArrowNext from '../../icons/ArrowNext.svelte';
 	import ArrowBack from '../../icons/ArrowBack.svelte';
-	import { fade } from 'svelte/transition';
 	import Card from './Card.svelte';
 
 	interface Props {

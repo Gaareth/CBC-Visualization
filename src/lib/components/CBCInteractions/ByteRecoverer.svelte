@@ -33,7 +33,6 @@
 
 	let stopAutoGuess: () => void;
 
-
 	async function findValidPadding() {
 		showSuccess = false;
 		attackProgress = 0;
@@ -87,11 +86,7 @@
 			Reset
 		</button>
 
-		<button
-			type="button"
-			class="flex-1 button-default input-layer-2"
-			onclick={findValidPadding}
-		>
+		<button type="button" class="flex-1 button-default input-layer-2" onclick={findValidPadding}>
 			Automatically find valid padding
 		</button>
 	</div>

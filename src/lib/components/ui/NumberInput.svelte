@@ -55,7 +55,7 @@
 		type="button"
 		onClick={decrement}
 		onHoldTick={decrement}
-		class={cn('w-full input-default px-2', surfaceClass)}
+		class={cn('input-default w-full px-2', surfaceClass)}
 		disabled={value <= min}
 	>
 		-
@@ -67,14 +67,14 @@
 		{min}
 		{max}
 		{step}
-		class={cn('z-10 w-full input-default border-s-0! border-e-0! px-2 text-center', surfaceClass)}
+		class={cn('input-default z-10 w-full border-s-0! border-e-0! px-2 text-center', surfaceClass)}
 		{...restProps}
 	/>
 	<HoldableButton
 		type="button"
 		onclick={increment}
 		onHoldTick={increment}
-		class={cn('w-full input-default px-2', surfaceClass)}
+		class={cn('input-default w-full px-2', surfaceClass)}
 		disabled={value >= max}
 	>
 		+

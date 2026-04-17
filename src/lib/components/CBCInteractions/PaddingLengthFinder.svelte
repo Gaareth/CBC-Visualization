@@ -93,17 +93,11 @@
 
 	<div class="flex w-full justify-center gap-1">
 		{#if runningIndex == null}
-			<button
-				type="button"
-				class="button-default input-layer-2"
-				onclick={recoverPaddingLength}
-			>
+			<button type="button" class="button-default input-layer-2" onclick={recoverPaddingLength}>
 				Find padding length
 			</button>
 		{:else}
-			<button type="button" class="button-default input-layer-2" onclick={reset}>
-				Reset
-			</button>
+			<button type="button" class="button-default input-layer-2" onclick={reset}> Reset </button>
 
 			<button
 				disabled={runningIndex >= blockSize || !paddingValidation?.valid}

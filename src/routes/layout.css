@@ -3,7 +3,6 @@
 @import 'shadcn-svelte/tailwind.css';
 @import '@fontsource-variable/inter';
 
-
 /*---break--- */
 @custom-variant dark (&:is(.dark *));
 
@@ -20,7 +19,6 @@
 @source inline('border-blue-400');
 @source inline('border-r-blue-400');
 
-
 @import '../lib/styles/theme.css';
 @import '../lib/styles/base.css';
 @import '../lib/styles/utilities.css';
@@ -35,5 +33,4 @@
         items-center justify-center 
         border-s-0! first:ms-0 focus:border-s! focus:ring-2 focus:ring-offset-1;
 	}
-	
 }

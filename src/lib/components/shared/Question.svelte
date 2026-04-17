@@ -31,7 +31,7 @@
 <Card title="Question" className={cn('flex flex-col', className)}>
 	{@render question()}
 
-	<Divider className="my-4" surfaceLevel={1}/>
+	<Divider className="my-4" surfaceLevel={1} />
 
 	{#if showReveal}
 		<div in:fade>

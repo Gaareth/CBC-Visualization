@@ -191,9 +191,9 @@
 		<div class="mx-auto w-fit">
 			<p>Recovered Plaintext:</p>
 			<div class={cn('flex gap-1', { 'lockin-animation': showSuccess })}>
-				{#each { length: guessedPlaintextBlocks.length-1 } as _, i}
+				{#each { length: guessedPlaintextBlocks.length - 1 } as _, i}
 					<Block
-						bytes={guessedPlaintextBlocks[i+1]}
+						bytes={guessedPlaintextBlocks[i + 1]}
 						title={`Guessed Plaintext Block ${i}`}
 						success={showSuccess}
 					/>

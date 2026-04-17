@@ -11,7 +11,7 @@
 	import { cn } from '$lib/utils/styling';
 	import { CBC_LAYOUT, getBlockWidth, getLeftPadding } from '$lib/stores/cbcConstants.svelte';
 
-	const title = "What is Padding?";
+	const title = 'What is Padding?';
 
 	const padder = new PKCS7Padder();
 

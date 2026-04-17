@@ -13,7 +13,7 @@
 		...restProps
 	}: WithoutChild<SelectPrimitive.TriggerProps> & {
 		size?: 'sm' | 'default';
-		surfaceLevel?: SurfaceLevel
+		surfaceLevel?: SurfaceLevel;
 	} = $props();
 </script>
 

@@ -70,14 +70,9 @@
 		Only again bruteforcing the second to last iv byte until we get valid padding won't work,
 		because not only the penultimate plaintext byte needs has to be valid padding but also all the
 		following bytes. So we also need to ensure that the last plaintext byte is 0x02, before we
-		bruteforce the second to last iv byte.
-
-		How?
-		
-		
-		By modifying the last iv byte to make the last plaintext byte 0x02. Then we can bruteforce the
-		second to last iv byte until we get valid padding, which will then mean that the second to last
-		and last plaintext byte is 0x02.
+		bruteforce the second to last iv byte. How? By modifying the last iv byte to make the last
+		plaintext byte 0x02. Then we can bruteforce the second to last iv byte until we get valid
+		padding, which will then mean that the second to last and last plaintext byte is 0x02.
 	</p>
 
 	<!-- todo: Add content for this section -->

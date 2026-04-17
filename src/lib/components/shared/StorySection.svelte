@@ -39,13 +39,15 @@
 		{title}
 	</svelte:element>
 
-
 	{@render children?.()}
 
 	<!-- TODO: add individual shouldwrap -->
 	<div
 		style:width={(sectionEl?.clientWidth ?? 0) * 2 + 'px'}
-		class={cn('not-prose my-5 flex-center not-lg:w-full!', !ctxt.ctxt?.shouldWrap ? 'lg:hidden' : '')}
+		class={cn(
+			'not-prose my-5 flex-center not-lg:w-full!',
+			!ctxt.ctxt?.shouldWrap ? 'lg:hidden' : ''
+		)}
 	>
 		{@render visualSnippet?.()}
 	</div>

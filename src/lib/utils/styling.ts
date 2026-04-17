@@ -48,12 +48,12 @@ export const bgSurface = {
 } as const;
 
 export const hoverBgSurface = {
-  0: 'hover:bg-surface-0',
-  1: 'hover:bg-surface-1',
-  2: 'hover:bg-surface-2',
-  3: 'hover:bg-surface-3',
-  4: 'hover:bg-surface-4',
-  5: 'hover:bg-surface-5',
+	0: 'hover:bg-surface-0',
+	1: 'hover:bg-surface-1',
+	2: 'hover:bg-surface-2',
+	3: 'hover:bg-surface-3',
+	4: 'hover:bg-surface-4',
+	5: 'hover:bg-surface-5'
 } as const;
 
 export type SurfaceLevel = keyof typeof surfaceOutline; // 1 | 2 | 3 | 4 | 5

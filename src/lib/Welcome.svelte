@@ -7,7 +7,7 @@
 </script>
 
 <ExplainWrapper wrapperClass="w-3xl h-[375px]">
-	<div class="mb-7" in:receive={{ key: 'nav' }} out:send={{ key: 'nav' }}>
+	<div class="mb-7">
 		<Nav surfaceLevel={2} />
 	</div>
 

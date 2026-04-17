@@ -1,38 +1,32 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
-	import {
-	bgSurface,
-		cn,
-		hoverBgSurface,
-		surfaceOutline,
-		type SurfaceLevel,
+	import { cn, hoverBgSurface, surfaceOutline, type SurfaceLevel } from './utils/styling';
 
-	} from './utils/styling';
-
-	let { className = '', surfaceLevel = 1 }: { className?: string; surfaceLevel?: SurfaceLevel } = $props();
+	let { className = '', surfaceLevel = 1 }: { className?: string; surfaceLevel?: SurfaceLevel } =
+		$props();
 </script>
 
 {#snippet dropdownNav(title: string, items: { label: string; href: string }[])}
 	<div class="dropdown">
 		<button
 			type="button"
-			class={cn('rounded-full px-4 py-1 ', hoverBgSurface[surfaceLevel+1 as keyof typeof hoverBgSurface])}
+			class={cn(
+				'rounded-full px-4 py-1 ',
+				hoverBgSurface[(surfaceLevel + 1) as keyof typeof hoverBgSurface]
+			)}
 		>
 			{title}
 		</button>
 		<!-- dropdown panel is inside same group -->
 		<div class="dropdown-content">
 			<div
-				class="flex flex-col rounded border bg-surface-2 dark:bg-surface-2/50 p-4 py-4
-			shadow-lg backdrop-blur-md"
+				class="flex flex-col rounded border bg-surface-2 p-4 py-4 shadow-lg
+			backdrop-blur-md dark:bg-surface-2/50"
 			>
 				{#each items as item (item.href)}
 					<a
 						href={item.href}
-						class={cn(
-							'rounded px-4 py-2 text-left',
-							'whitespace-nowrap hover:bg-surface-3',
-						)}
+						class={cn('rounded px-4 py-2 text-left', 'whitespace-nowrap hover:bg-surface-3')}
 					>
 						{item.label}
 					</a>
@@ -51,7 +45,10 @@
 >
 	<a
 		href={resolve('/')}
-		class={cn('rounded-full px-4 py-1 ', hoverBgSurface[surfaceLevel + 1 as keyof typeof hoverBgSurface])}
+		class={cn(
+			'rounded-full px-4 py-1 ',
+			hoverBgSurface[(surfaceLevel + 1) as keyof typeof hoverBgSurface]
+		)}
 	>
 		Home
 	</a>
@@ -78,7 +75,8 @@
 		position: relative;
 	}
 
-	.dropdown:hover .dropdown-content {
+	.dropdown:hover .dropdown-content,
+	.dropdown:focus-within .dropdown-content {
 		display: block;
 	}
 
@@ -88,8 +86,10 @@
 		/* top: 0; */
 		/* transform: translateY(40%); */
 		transform: translateX(-50%);
+		top: 100%;
 		left: 50%;
 		min-width: 200px;
 		padding: 12px 16px;
+		/* z-index: 0; */
 	}
 </style>

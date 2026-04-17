@@ -1,4 +1,3 @@
-
 @utility flex-center {
 	@apply flex items-center justify-center;
 }
@@ -18,8 +17,6 @@
 	appearance: textfield;
 }
 
-
-
 /* prettier-ignore */
 @utility input-default {
 	@apply border-default bg-transparent px-2 py-1 text-inherit 
@@ -29,7 +26,6 @@
 	hover:bg-surface-1
 	disabled:cursor-not-allowed disabled:hover:bg-transparent;
 }
-
 
 @utility abs-center {
 	@apply absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2;
@@ -43,8 +39,6 @@
 	@apply absolute left-1/2 -translate-x-1/2;
 }
 
-
-
 /* prettier-ignore */
 @utility button-default {
 	@apply border-default bg-transparent px-4 py-2 text-inherit 
@@ -52,11 +46,9 @@
 	disabled:cursor-not-allowed disabled:opacity-50;
 }
 
-
 /*---break--- */
 
 /*---break--- */
-
 
 @utility text-gradient-primary {
 	background: linear-gradient(135deg, #72edea 0%, #4fd6ff 35%, #7aa2ff 70%, #b98cff 100%);
@@ -68,4 +60,3 @@
 
 	background-size: 300% 300%;
 }
-

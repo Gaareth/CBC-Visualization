@@ -100,12 +100,12 @@
 </script>
 
 <div
-	class="relative mx-auto my-10 grid max-w-[1400px] grid-cols-1 lg:grid-cols-2 gap-13 p-5"
+	class="relative mx-auto my-10 grid max-w-[1400px] grid-cols-1 gap-13 p-5 lg:grid-cols-2"
 	bind:this={storyWrapperEl}
 >
-	<aside class="static lg:absolute top-7 left-0 w-full lg:-translate-x-full lg:w-60 h-full">
+	<aside class="static top-7 left-0 h-full w-full lg:absolute lg:w-60 lg:-translate-x-full">
 		<div class="sticky top-7">
-			<Card className="px-3 py-5" title="Contents" > 
+			<Card className="px-3 py-5" title="Contents">
 				<!-- <p>Contents</p> -->
 				<ol class="list-inside list-decimal space-y-3 text-sm">
 					{#each titles as title (title)}
@@ -133,7 +133,7 @@
 	<!-- in:fade={{ duration: 200 }} out:fade={{ duration: 150 }} -->
 	<!-- RIGHT COLUMN -->
 	{#if !ctxt.shouldWrap}
-		<div class="sticky top-10 h-fit hidden lg:block">
+		<div class="sticky top-10 hidden h-fit lg:block">
 			{#key activeId}
 				<div>
 					{@render registrations.find((s) => s.id === activeId)?.visualSnippet?.()}

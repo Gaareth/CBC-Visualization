@@ -60,7 +60,9 @@
 					wrapperClass="w-fit"
 					surfaceLevel={2}
 				/>
-				<p class="text-sm text-muted-foreground">Or directly change the individual plaintext bytes.</p>
+				<p class="text-sm text-muted-foreground">
+					Or directly change the individual plaintext bytes.
+				</p>
 			</div>
 		</div>
 	</div>

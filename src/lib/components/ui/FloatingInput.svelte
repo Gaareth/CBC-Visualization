@@ -30,8 +30,7 @@
 		wrapperClass = '',
 		className = '',
 		oninput = () => {},
-		surfaceLevel = 1,
-
+		surfaceLevel = 1
 	}: Props = $props();
 
 	let focused = $state(false);
@@ -56,7 +55,7 @@
 		aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
 		class={cn(
 			`peer
-            w-full input-default px-4 pt-5 pb-2 text-base
+            input-default w-full px-4 pt-5 pb-2 text-base
             outline-none
             placeholder-shown:pt-3.5
             placeholder-shown:pb-3.5

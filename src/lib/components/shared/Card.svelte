@@ -1,9 +1,6 @@
 <script lang="ts">
 	import type { Snippet } from 'svelte';
-	import {
-		cn,
-		surfaceOutline
-	} from '../../utils/styling';
+	import { cn, surfaceOutline } from '../../utils/styling';
 
 	interface Props {
 		className?: string;
@@ -22,12 +19,16 @@
 		3: 'to-surface-3 ',
 		4: 'to-surface-4 '
 	} as const;
-
 </script>
 
-<div class={cn('relative border p-5 drop-shadow-sm', 
-	surfaceTransitions[surfaceLevel as keyof typeof surfaceTransitions], 
-	surfaceOutline[surfaceLevel as keyof typeof surfaceOutline], className)}>
+<div
+	class={cn(
+		'relative border p-5 shadow-sm',
+		surfaceTransitions[surfaceLevel as keyof typeof surfaceTransitions],
+		surfaceOutline[surfaceLevel as keyof typeof surfaceOutline],
+		className
+	)}
+>
 	{#if title}
 		<span
 			class={cn(

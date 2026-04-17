@@ -1,8 +1,7 @@
-
-
 # CBC-Visualization
 
 ## TODOS
+
 - Multiple bytes
 - block cipher functions
 - padding schemes
