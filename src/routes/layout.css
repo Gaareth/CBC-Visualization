@@ -10,14 +10,14 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
-@source inline('border-red-500');
-@source inline('border-r-red-500');
+@source inline('border-red-500!');
+@source inline('border-r-red-500!');
 
-@source inline('border-green-400');
-@source inline('border-r-green-400');
+@source inline('border-green-400!');
+@source inline('border-r-green-400!');
 
-@source inline('border-blue-400');
-@source inline('border-r-blue-400');
+@source inline('border-blue-400!');
+@source inline('border-r-blue-400!');
 
 @import '../lib/styles/theme.css';
 @import '../lib/styles/base.css';

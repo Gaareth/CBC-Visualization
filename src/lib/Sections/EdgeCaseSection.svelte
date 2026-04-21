@@ -76,8 +76,8 @@
 	inputClassNamesFN[blockSize - 1] = `border-${BLOCK_COLORS.fnOutput}`;
 
 	const numBlocks = $derived(ciphertextBlocks.length);
-	let guessedOutputBlock: number[] = $state(new Array(blockSize).fill(undefined));
-	let guessedPlaintextBlock: number[] = $state(new Array(blockSize).fill(undefined));
+	let guessedOutputBlocks: (number | undefined)[][] = $state(new Array(numBlocks).fill(new Array(blockSize).fill(undefined)));
+	let guessedPlaintextBlocks: (number | undefined)[][] = $state(new Array(numBlocks).fill(new Array(blockSize).fill(undefined)));
 
 	function extractPaddingError(result: ReturnType<typeof padder.validatePadding>) {
 		if (result.valid) {
@@ -130,10 +130,11 @@
 				<ByteRecoverer
 					{plaintextBlocks}
 					{ciphertextBlocks}
-					{guessedOutputBlock}
+					{guessedOutputBlocks}
 					{paddingOracle}
-					{guessedPlaintextBlock}
+					{guessedPlaintextBlocks}
 					{resetCiphertext}
+					showEdgeCheckSwitch={true}
 				/>
 			</div>
 		{/if}
@@ -206,7 +207,7 @@
 				onChangeCiphertext={(bytes) => (ciphertextBlocks[1] = bytes.map((b) => b ?? 0) as number[])}
 			>
 				{#snippet FnOutputBlock(index)}
-					<Block bytes={guessedOutputBlock} inputClassNames={inputClassNamesFN} />
+					<Block bytes={guessedOutputBlocks[0]} inputClassNames={inputClassNamesFN} />
 				{/snippet}
 
 				{#snippet IVBlock(index)}

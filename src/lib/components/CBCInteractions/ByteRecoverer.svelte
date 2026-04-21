@@ -1,41 +1,76 @@
 <script lang="ts">
 	import { Switch } from '$lib/components/ui/switch';
-	import { recoverSingleByte } from '../../logic/paddingOracle';
+	import { cn } from '$lib/utils';
+	import {
+		recoverPlaintextWithOracle,
+		recoverSingleByte,
+		type AttackEvent
+	} from '../../logic/paddingOracle';
 	import { settingsState } from '../../stores/settings.svelte';
 	import { displayByte } from '../../utils/compute';
 	import { createGate, autoRunGate } from '../../utils/generic';
 	import { BLOCK_COLORS } from '../../utils/styling';
+	import Block from '../shared/Block.svelte';
 
 	interface Props {
 		plaintextBlocks?: number[][];
 		ciphertextBlocks: number[][];
-		guessedOutputBlock: number[];
-		guessedPlaintextBlock: number[];
+		guessedOutputBlocks: (number | undefined)[][];
+		guessedPlaintextBlocks: (number | undefined)[][];
 		paddingOracle: (cBlocks: number[][]) => boolean;
 
 		resetCiphertext: () => void;
 		skipEdgeCheck?: boolean;
+		showEdgeCheckSwitch?: boolean;
+		multipleBytes?: boolean;
 	}
 
 	let {
 		plaintextBlocks,
 		ciphertextBlocks,
-		guessedOutputBlock,
-		guessedPlaintextBlock,
+		guessedOutputBlocks,
+		guessedPlaintextBlocks,
 		paddingOracle,
 		resetCiphertext,
-		skipEdgeCheck = false
+		skipEdgeCheck = false,
+		showEdgeCheckSwitch = false,
+
+		multipleBytes = false
 	}: Props = $props();
 
+	// svelte-ignore state_referenced_locally
+	let originalPlaintext: number[][] | undefined = $state();
+
 	let checkEdgeCases = $derived(!skipEdgeCheck);
-	let attackProgress = $state(0);
-	let showSuccess = $state(false);
+	let guessProgress = $state(0);
+
+	let attackProgress: 'idle' | 'running' | 'done' = $state('idle');
+	let showResults = $state(false);
+
+	let bytesRecovered = $state(0);
+	let currentByteIndex = $derived(bytesRecovered + 1);
+
+	let blockGate = createGate();
+	let byteGate = createGate();
+	let interactionGate = createGate();
+
+	let attackState: AttackEvent | undefined = $state();
 
 	let stopAutoGuess: () => void;
 
+	let byteRecoveredResult = $state<{
+		decByte: number;
+		guess: number;
+		guessedByte: number;
+		originalIVByte: number;
+	} | null
+	}>();
+
 	async function findValidPadding() {
-		showSuccess = false;
-		attackProgress = 0;
+		showResults = false;
+		guessProgress = 0;
+		originalPlaintext = plaintextBlocks;
+		attackProgress = 'running';
 
 		const easeOut = (i: number) => {
 			const start = 700;
@@ -51,14 +86,39 @@
 		let guessGate = createGate();
 		stopAutoGuess = autoRunGate(guessGate, easeOut);
 
-		await recoverSingleByte(1, ciphertextBlocks[0], ciphertextBlocks[1], paddingOracle, {
+		await recoverPlaintextWithOracle(ciphertextBlocks, paddingOracle, {
+			blockGate,
+			byteGate,
 			guessGate,
-			outGuessedDecBlock: guessedOutputBlock,
-			outGuessedPlaintextBlock: guessedPlaintextBlock,
+			interactionGate,
+			outGuessedDecBlocks: guessedOutputBlocks,
+			outGuessedPlaintextBlocks: guessedPlaintextBlocks,
 
 			progress: {
+				onBlockEnd: (i) => {
+					attackState = { event: 'on-block-end' };
+				},
+
+				onByteEnd: (byteIndex) => {
+					bytesRecovered = byteIndex;
+					attackState = { event: 'on-byte-end' };
+				},
+
 				onGuess: (guess) => {
-					attackProgress = guess / 255;
+					guessProgress = guess / 255;
+				},
+
+				onProgressUpdate: (event) => {
+					attackState = event;
+
+					if (event.event == 'edge-case-check-result' && event.paddingValid) {
+						guessProgress = 1;
+					}
+
+					if (event.event == 'byte-recovered-result') {
+						showResults = true;
+						guessProgress = 1;
+					}
 				}
 			},
 
@@ -66,13 +126,41 @@
 		});
 
 		stopAutoGuess();
-		showSuccess = true;
-		attackProgress = 1;
+		attackProgress = 'done';
+		showResults = true;
+	}
+
+	async function next() {
+		if (attackState?.event == 'on-block-end') {
+			blockGate.step();
+		} else if (attackState?.event == 'on-byte-end') {
+			byteGate.step();
+		} else {
+			interactionGate.step();
+		}
+	}
+
+	async function reset() {
+		showResults = false;
+		guessProgress = 0;
+		attackState = undefined;
+		attackProgress = 'idle';
+		// guessedOutputBlock.fill(undefined);
+		// guessedPlaintextBlock.fill(undefined);
+
+		guessedOutputBlocks.forEach((block) => block.fill(undefined));
+		guessedPlaintextBlocks.forEach((block) => block.fill(undefined));
+
+		resetCiphertext();
+	}
+
+	function displayByteWrapper(byte: number | undefined) {
+		return displayByte(byte, settingsState.displayBytesAs, true);
 	}
 </script>
 
 <div class="flex flex-col gap-3">
-	{#if !skipEdgeCheck}
+	{#if showEdgeCheckSwitch}
 		<label class="flex justify-between">
 			Check for edge cases
 			<div class="flex-center flex-1">
@@ -81,46 +169,137 @@
 		</label>
 	{/if}
 
+	{#if attackState?.event == 'edge-case-check'}
+		<p class="text-center">Modify the next byte to verify 0x01 was found</p>
+	{:else if attackState?.event == 'edge-case-check-result'}
+		<p class={cn('text-center', attackState.paddingValid ? 'text-green-500' : 'text-red-500')}>
+			{attackState.paddingValid
+				? 'Padding valid! 0x01 found.'
+				: 'Invalid padding! Last byte cannot be 0x01, continuing bruteforce...'}
+		</p>
+	{:else if attackState?.event == 'on-byte-recovered'}
+		<p class="text-center">
+			<span class="text-red-500">DEC[-{currentByteIndex}]</span> =
+			<span class="text-blue-400"> {displayByteWrapper(currentByteIndex)} </span>
+			XOR
+			<span class="text-green-400">modifiedIV[-{currentByteIndex}]</span>
+		</p>
+
+		<p class="text-center">
+			<span class="text-blue-400">P[-{currentByteIndex}]</span> =
+			<span class="text-green-400">originalIV[-{currentByteIndex}]</span>
+			XOR
+			<span class="text-red-500">DEC[-{currentByteIndex}]</span>
+		</p>
+	{:else if attackState?.event == 'byte-recovered-result'}
+		<p class="text-center">
+			<span class="text-red-500">{displayByteWrapper(attackState.decByte)}</span> =
+			<span class="text-blue-400"> {displayByteWrapper(currentByteIndex)} </span>
+			XOR
+			<span class="text-green-400">{displayByteWrapper(attackState.guess)}</span>
+		</p>
+
+		<p class="text-center">
+			<span class="text-blue-400">{displayByteWrapper(attackState.guessedByte)}</span> =
+			<span class="text-green-400">{displayByteWrapper(attackState.originalIVByte)}</span>
+			XOR
+			<span class="text-red-500">{displayByteWrapper(attackState.decByte)}</span>
+		</p>
+	{:else if !attackState && attackProgress == 'running'}
+		<p class="animate-pulse text-center">Bruteforcing IV til valid padding</p>
+	{/if}
+
 	<div class="flex flex-wrap gap-1">
-		<button type="button" class="button-default input-layer-2" onclick={resetCiphertext}>
+		<button
+			type="button"
+			class={cn(attackProgress == 'done' && 'flex-1', 'button-default input-layer-2')}
+			onclick={reset}
+		>
 			Reset
 		</button>
 
-		<button type="button" class="flex-1 button-default input-layer-2" onclick={findValidPadding}>
-			Automatically find valid padding
-		</button>
+		{#if !attackState}
+			<button
+				type="button"
+				class="flex-1 button-default input-layer-2"
+				onclick={findValidPadding}
+				disabled={attackProgress == 'running'}
+			>
+				Automatically find valid padding
+			</button>
+		{:else if attackProgress != 'done'}
+			<button type="button" class="flex-1 button-default input-layer-2" onclick={next}>
+				{#if attackState?.event == 'edge-case-check'}
+					Check edge case
+				{:else if attackState?.event == 'edge-case-check-result'}
+					Continue {!attackState?.paddingValid ? 'searching' : ''}
+				{:else if attackState?.event == 'on-byte-recovered'}
+					Recover DEC[-1]
+				{:else if attackState?.event == 'on-byte-end'}
+					Next byte
+				{:else if attackState?.event == 'on-block-end'}
+					Next block
+				{/if}
+			</button>
+		{/if}
 	</div>
 
 	<div>
-		<p>Progress: {attackProgress * 255} / 255</p>
-
-		<progress class="w-full input-layer-2" value={attackProgress} max={1}> </progress>
-
-		{#if showSuccess}
-			<p class="lockin-animation font-bold">
-				Recovered plaintext byte: <span class={`text-${BLOCK_COLORS.plaintext} font-bold`}>
-					{displayByte(
-						guessedPlaintextBlock[guessedPlaintextBlock.length - 1],
-						settingsState.displayBytesAs,
-						true
-					)}
-				</span>
-			</p>
-
-			{#if plaintextBlocks}
-				<p class="text-error">
-					Expected: {displayByte(
-						plaintextBlocks[plaintextBlocks.length - 1][plaintextBlocks[0].length - 1],
-						settingsState.displayBytesAs,
-						true
-					)}
-				</p>
+		<p>
+			Guess progress: {guessProgress * 255} / 255
+			{#if multipleBytes && currentByteIndex > 1}
+				| Total progres: {bytesRecovered} / {ciphertextBlocks[0].length}
 			{/if}
+		</p>
+		<progress class="w-full surface-outline-2" value={guessProgress} max={1}> </progress>
+		{#if multipleBytes && currentByteIndex > 1}
+			<progress
+				class="w-full surface-outline-2"
+				value={bytesRecovered / ciphertextBlocks[0].length}
+				max={1}
+			>
+			</progress>
+		{/if}
+
+		{#if showResults}
+			{@render ResultPanel()}
 		{/if}
 	</div>
 </div>
+
 {#if skipEdgeCheck}
 	<div class="text-xs text-warning">
 		Disclaimer: This does not check edge cases. See next interactive example for that.
 	</div>
 {/if}
+
+{#snippet ResultPanel()}
+	{#if !multipleBytes}
+		<p class="lockin-animation font-bold">
+			Recovered plaintext byte: <span class={`text-${BLOCK_COLORS.plaintext} font-bold`}>
+				{displayByteWrapper(guessedPlaintextBlocks[0][guessedPlaintextBlocks[0].length - 1])}
+			</span>
+		</p>
+
+		{#if originalPlaintext && originalPlaintext[0][originalPlaintext[0].length - 1] !== guessedPlaintextBlocks[0][guessedPlaintextBlocks.length - 1]}
+			<p class="text-error">
+				Expected: {displayByteWrapper(
+					originalPlaintext[originalPlaintext.length - 1][originalPlaintext[0].length - 1]
+				)}
+			</p>
+		{/if}
+	{:else}
+		<div class="mx-auto w-fit">
+			<p>Recovered Plaintext:</p>
+			<div class={cn('flex gap-1', { 'lockin-animation': showResults })}>
+				{#each { length: guessedPlaintextBlocks.length - 1 } as _, index (index)}
+					<Block
+						bytes={guessedPlaintextBlocks[index + 1]}
+						title={`Guessed Plaintext Block`}
+						success={showResults}
+					/>
+				{/each}
+			</div>
+		</div>
+	{/if}
+{/snippet}

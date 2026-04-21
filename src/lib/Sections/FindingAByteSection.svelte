@@ -58,16 +58,16 @@
 	}
 
 	const inputClassNamesPL: Record<number, string> = {};
-	inputClassNamesPL[blockSize - 2] = `border-r-${BLOCK_COLORS.plaintext}`;
-	inputClassNamesPL[blockSize - 1] = `border-${BLOCK_COLORS.plaintext}`;
+	inputClassNamesPL[blockSize - 2] = `border-r-${BLOCK_COLORS.plaintext}!`;
+	inputClassNamesPL[blockSize - 1] = `border-${BLOCK_COLORS.plaintext}!`;
 
 	const inputClassNamesIV: Record<number, string> = {};
-	inputClassNamesIV[blockSize - 2] = `border-r-${BLOCK_COLORS.ciphertext}`;
-	inputClassNamesIV[blockSize - 1] = `border-${BLOCK_COLORS.ciphertext}`;
+	inputClassNamesIV[blockSize - 2] = `border-r-${BLOCK_COLORS.ciphertext}!`;
+	inputClassNamesIV[blockSize - 1] = `border-${BLOCK_COLORS.ciphertext}!`;
 
 	const inputClassNamesFN: Record<number, string> = {};
-	inputClassNamesFN[blockSize - 2] = `border-r-${BLOCK_COLORS.fnOutput}`;
-	inputClassNamesFN[blockSize - 1] = `border-${BLOCK_COLORS.fnOutput}`;
+	inputClassNamesFN[blockSize - 2] = `border-r-${BLOCK_COLORS.fnOutput}!`;
+	inputClassNamesFN[blockSize - 1] = `border-${BLOCK_COLORS.fnOutput}!`;
 
 	let guessedOutputBlock: number[] = $state(new Array(blockSize).fill(undefined));
 	let guessedPlaintextBlock: number[] = $state(new Array(blockSize).fill(undefined));
@@ -95,6 +95,7 @@
 
 		<ByteRecoverer
 			skipEdgeCheck={true}
+			showEdgeCheckSwitch={false}
 			{ciphertextBlocks}
 			{guessedOutputBlock}
 			{paddingOracle}
@@ -188,8 +189,10 @@
 			<p class="mb-0!">
 				and then the
 				<span class={`text-${BLOCK_COLORS.plaintext}`}>last byte of the original plaintext</span>
-				by xoring with the original
-				<span class={`text-${BLOCK_COLORS.ciphertext}`}>last byte of the IV</span>:
+				by xoring with the
+				<span class={`text-${BLOCK_COLORS.ciphertext}`}>
+					last byte of the <span class="font-bold">original</span> IV
+				</span>:
 			</p>
 
 			<p class="text-center">
@@ -228,9 +231,12 @@
 		<ExplainWrapper slides={[example]} title="Interactive Example - Recovering a Byte"
 		></ExplainWrapper>
 
-		<!-- <p>
-			How do we extend this to recover more bytes? You can then modify the last two bytes of the IV to get information about the
-		</p> -->
+		<p>
+			Learn about edge cases and <a
+				href="#Exploiting - Recovering Bytes"
+				class="no-underline hover:underline">recovering the full plaintext</a
+			> in the next sections.
+		</p>
 	{/snippet}
 
 	{#snippet visualSnippet()}
