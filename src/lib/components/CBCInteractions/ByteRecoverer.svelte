@@ -4,7 +4,8 @@
 	import {
 		recoverPlaintextWithOracle,
 		recoverSingleByte,
-		type AttackEvent
+		type AttackEvent,
+		type ByteRecoveredResult
 	} from '../../logic/paddingOracle';
 	import { settingsState } from '../../stores/settings.svelte';
 	import { displayByte } from '../../utils/compute';
@@ -43,6 +44,7 @@
 
 	let checkEdgeCases = $derived(!skipEdgeCheck);
 	let guessProgress = $state(0);
+	let isGuessing = $state(false);
 
 	let attackProgress: 'idle' | 'running' | 'done' = $state('idle');
 	let showResults = $state(false);
@@ -58,13 +60,7 @@
 
 	let stopAutoGuess: () => void;
 
-	let byteRecoveredResult = $state<{
-		decByte: number;
-		guess: number;
-		guessedByte: number;
-		originalIVByte: number;
-	} | null
-	}>();
+	let byteRecoveredResult: ByteRecoveredResult['data'] | undefined = $state();
 
 	async function findValidPadding() {
 		showResults = false;
@@ -95,6 +91,10 @@
 			outGuessedPlaintextBlocks: guessedPlaintextBlocks,
 
 			progress: {
+				onByteStart: () => {
+					attackState = { event: 'on-byte-start' };
+				},
+
 				onBlockEnd: (i) => {
 					attackState = { event: 'on-block-end' };
 				},
@@ -102,22 +102,29 @@
 				onByteEnd: (byteIndex) => {
 					bytesRecovered = byteIndex;
 					attackState = { event: 'on-byte-end' };
+					guessProgress = 1;
 				},
 
 				onGuess: (guess) => {
 					guessProgress = guess / 255;
+					isGuessing = true;
 				},
 
 				onProgressUpdate: (event) => {
 					attackState = event;
 
-					if (event.event == 'edge-case-check-result' && event.paddingValid) {
+					if (event.event == "edge-case-check") {
+						isGuessing = false;
+					}
+
+					if (event.event == 'on-byte-recovered') {
+						isGuessing = false;
 						guessProgress = 1;
 					}
 
 					if (event.event == 'byte-recovered-result') {
 						showResults = true;
-						guessProgress = 1;
+						byteRecoveredResult = event.data;
 					}
 				}
 			},
@@ -172,8 +179,8 @@
 	{#if attackState?.event == 'edge-case-check'}
 		<p class="text-center">Modify the next byte to verify 0x01 was found</p>
 	{:else if attackState?.event == 'edge-case-check-result'}
-		<p class={cn('text-center', attackState.paddingValid ? 'text-green-500' : 'text-red-500')}>
-			{attackState.paddingValid
+		<p class={cn('text-center', attackState.data.paddingValid ? 'text-green-500' : 'text-red-500')}>
+			{attackState.data.paddingValid
 				? 'Padding valid! 0x01 found.'
 				: 'Invalid padding! Last byte cannot be 0x01, continuing bruteforce...'}
 		</p>
@@ -191,21 +198,21 @@
 			XOR
 			<span class="text-red-500">DEC[-{currentByteIndex}]</span>
 		</p>
-	{:else if attackState?.event == 'byte-recovered-result'}
+	{:else if (attackState?.event == 'byte-recovered-result' || attackState?.event == 'on-byte-end') && byteRecoveredResult}
 		<p class="text-center">
-			<span class="text-red-500">{displayByteWrapper(attackState.decByte)}</span> =
+			<span class="text-red-500">{displayByteWrapper(byteRecoveredResult.decByte)}</span> =
 			<span class="text-blue-400"> {displayByteWrapper(currentByteIndex)} </span>
 			XOR
-			<span class="text-green-400">{displayByteWrapper(attackState.guess)}</span>
+			<span class="text-green-400">{displayByteWrapper(byteRecoveredResult.guess)}</span>
 		</p>
 
 		<p class="text-center">
-			<span class="text-blue-400">{displayByteWrapper(attackState.guessedByte)}</span> =
-			<span class="text-green-400">{displayByteWrapper(attackState.originalIVByte)}</span>
+			<span class="text-blue-400">{displayByteWrapper(byteRecoveredResult.guessedByte)}</span> =
+			<span class="text-green-400">{displayByteWrapper(byteRecoveredResult.originalIVByte)}</span>
 			XOR
-			<span class="text-red-500">{displayByteWrapper(attackState.decByte)}</span>
+			<span class="text-red-500">{displayByteWrapper(byteRecoveredResult.decByte)}</span>
 		</p>
-	{:else if !attackState && attackProgress == 'running'}
+	{:else if attackProgress == 'running' || attackState?.event == 'on-byte-start'}
 		<p class="animate-pulse text-center">Bruteforcing IV til valid padding</p>
 	{/if}
 
@@ -218,30 +225,34 @@
 			Reset
 		</button>
 
-		{#if !attackState}
-			<button
-				type="button"
-				class="flex-1 button-default input-layer-2"
-				onclick={findValidPadding}
-				disabled={attackProgress == 'running'}
-			>
+		<button
+			type="button"
+			class="flex-1 button-default input-layer-2"
+			onclick={() => {
+				if (attackProgress == 'idle') {
+					findValidPadding();
+				} else {
+					next();
+				}
+			}}
+			disabled={isGuessing}
+		>
+			{#if attackProgress == 'idle' || attackState?.event == 'on-byte-start'}
 				Automatically find valid padding
-			</button>
-		{:else if attackProgress != 'done'}
-			<button type="button" class="flex-1 button-default input-layer-2" onclick={next}>
-				{#if attackState?.event == 'edge-case-check'}
-					Check edge case
-				{:else if attackState?.event == 'edge-case-check-result'}
-					Continue {!attackState?.paddingValid ? 'searching' : ''}
-				{:else if attackState?.event == 'on-byte-recovered'}
-					Recover DEC[-1]
-				{:else if attackState?.event == 'on-byte-end'}
-					Next byte
-				{:else if attackState?.event == 'on-block-end'}
-					Next block
-				{/if}
-			</button>
-		{/if}
+			{:else if attackState?.event == 'edge-case-check'}
+				Check edge case
+			{:else if attackState?.event == 'edge-case-check-result'}
+				Continue {!attackState?.data.paddingValid ? 'searching' : ''}
+			{:else if attackState?.event == 'on-byte-recovered'}
+				Recover DEC[-1]
+			{:else if attackState?.event == 'on-byte-end' && multipleBytes}
+				Next byte
+			{:else if attackState?.event == 'on-block-end' && multipleBytes}
+				Next block
+			{:else}
+				Restart
+			{/if}
+		</button>
 	</div>
 
 	<div>

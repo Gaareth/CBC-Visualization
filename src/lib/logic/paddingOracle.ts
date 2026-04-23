@@ -5,19 +5,23 @@ type BeforeEdgeCaseCheck = {
 };
 type EdgeCaseCheckResult = {
 	event: 'edge-case-check-result';
-	paddingValid: boolean;
+	data: {
+		paddingValid: boolean;
+	};
 };
 
 type OnByteRecovered = {
 	event: 'on-byte-recovered';
 };
 
-type ByteRecoveredResult = {
+export type ByteRecoveredResult = {
 	event: 'byte-recovered-result';
-	guessedByte: number;
-	decByte: number;
-	guess: number;
-	originalIVByte: number;
+	data: {
+		guessedByte: number;
+		decByte: number;
+		guess: number;
+		originalIVByte: number;
+	};
 };
 
 type OnByteStart = {
@@ -196,7 +200,10 @@ export async function recoverSingleByte(
 				ivBlock[blockSize - byte - 1] ^= 1;
 				let valid2 = paddingOracle([ivBlock, ciphertextBlock]);
 
-				progress?.onProgressUpdate?.({ event: 'edge-case-check-result', paddingValid: valid2 });
+				progress?.onProgressUpdate?.({
+					event: 'edge-case-check-result',
+					data: { paddingValid: valid2 }
+				});
 				await interactionGate.wait();
 
 				// if we found 0x01, then changing the previous byte should not make it invalid
@@ -220,10 +227,12 @@ export async function recoverSingleByte(
 
 			progress?.onProgressUpdate?.({
 				event: 'byte-recovered-result',
-				guessedByte,
-				decByte,
-				guess,
-				originalIVByte
+				data: {
+					guessedByte,
+					decByte,
+					guess,
+					originalIVByte
+				}
 			});
 
 			break;

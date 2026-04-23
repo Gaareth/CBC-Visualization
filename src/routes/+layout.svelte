@@ -32,6 +32,7 @@
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
+	<title>CBC Padding Oracle Attack Demo</title>
 </svelte:head>
 
 {#if showNav}
