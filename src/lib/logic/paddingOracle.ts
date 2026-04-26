@@ -38,6 +38,16 @@ type OnByteEnd = {
 
 type OnBlockEnd = {
 	event: 'on-block-end';
+	data: {
+		blockIndex: number;
+	};
+};
+
+type AfterSetPaddingBytes = {
+	event: 'after-set-padding-bytes';
+	data: {
+		byte: number;
+	};
 };
 
 export type AttackEvent =
@@ -46,6 +56,7 @@ export type AttackEvent =
 	| ByteRecoveredResult
 	| OnByteRecovered
 	| OnByteStart
+	| AfterSetPaddingBytes
 	| OnBlockStart
 	| OnByteEnd
 	| OnBlockEnd;
@@ -135,10 +146,15 @@ export async function recoverSingleBlock(
 	for (let byte = 1; byte < blockSize + 1; byte++) {
 		progress?.onByteStart?.(byte);
 
-		// want to set the resulting plaintext byte to 0x01, ..., 0x02, etc, so the padding matches
-		// iv = byte xor dec
-		for (let i = blockSize - 1; i >= blockSize - byte; i--) {
-			ivBlock[i] = byte ^ outGuessedDecBlock[i]!;
+		if (byte > 1) {
+			await interactionGate.wait();
+			// want to set the resulting plaintext byte to 0x01, ..., 0x02, etc, so the padding matches
+			// iv = byte xor dec
+			for (let i = blockSize - 1; i > blockSize - byte; i--) {
+				ivBlock[i] = byte ^ outGuessedDecBlock[i]!;
+			}
+			progress?.onProgressUpdate?.({ event: 'after-set-padding-bytes', data: { byte } });
+			await interactionGate.wait();
 		}
 
 		await recoverSingleByte(byte, ivBlock, ciphertextBlock, paddingOracle, {
@@ -234,6 +250,7 @@ export async function recoverSingleByte(
 					originalIVByte
 				}
 			});
+			// outGuessedDecBlock[0]
 
 			break;
 		}

@@ -69,8 +69,13 @@
 	inputClassNamesFN[blockSize - 2] = `border-r-${BLOCK_COLORS.fnOutput}!`;
 	inputClassNamesFN[blockSize - 1] = `border-${BLOCK_COLORS.fnOutput}!`;
 
-	let guessedOutputBlock: number[] = $state(new Array(blockSize).fill(undefined));
-	let guessedPlaintextBlock: number[] = $state(new Array(blockSize).fill(undefined));
+	let guessedOutputBlocks: (number | undefined)[][] = $state(
+		Array.from({ length: 2 }, () => new Array(blockSize).fill(undefined))
+	);
+
+	let guessedPlaintextBlocks: (number | undefined)[][] = $state(
+		Array.from({ length: 2 }, () => new Array(blockSize).fill(undefined))
+	);
 
 	function extractPaddingError(result: ReturnType<typeof padder.validatePadding>) {
 		if (result.valid) {
@@ -97,9 +102,9 @@
 			skipEdgeCheck={true}
 			showEdgeCheckSwitch={false}
 			{ciphertextBlocks}
-			{guessedOutputBlock}
+			{guessedOutputBlocks}
 			{paddingOracle}
-			{guessedPlaintextBlock}
+			{guessedPlaintextBlocks}
 			{resetCiphertext}
 		/>
 	</div>
@@ -168,7 +173,7 @@
 			<p class="text-center">
 				<span class="text-red-500"
 					>{displayByte(
-						guessedOutputBlock[guessedOutputBlock.length - 1],
+						guessedOutputBlocks[1][guessedOutputBlocks[1].length - 1],
 						settingsState.displayBytesAs,
 						true
 					)}</span
@@ -204,7 +209,7 @@
 			<p class="text-center">
 				<span class="text-blue-400">
 					{displayByte(
-						guessedPlaintextBlock[guessedPlaintextBlock.length - 1],
+						guessedPlaintextBlocks[1][guessedPlaintextBlocks[1].length - 1],
 						settingsState.displayBytesAs,
 						true
 					)}
@@ -220,7 +225,7 @@
 				XOR
 				<span class="text-red-500">
 					{displayByte(
-						guessedOutputBlock[guessedOutputBlock.length - 1],
+						guessedOutputBlocks[1][guessedOutputBlocks[1].length - 1],
 						settingsState.displayBytesAs,
 						true
 					)}
@@ -253,7 +258,7 @@
 				onChangeCiphertext={(bytes) => (ciphertextBlocks[1] = bytes.map((b) => b ?? 0) as number[])}
 			>
 				{#snippet FnOutputBlock(index)}
-					<Block bytes={guessedOutputBlock} inputClassNames={inputClassNamesFN} />
+					<Block bytes={guessedOutputBlocks[1]} inputClassNames={inputClassNamesFN} />
 				{/snippet}
 
 				{#snippet IVBlock(index)}

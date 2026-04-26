@@ -207,7 +207,7 @@
 				onChangeCiphertext={(bytes) => (ciphertextBlocks[1] = bytes.map((b) => b ?? 0) as number[])}
 			>
 				{#snippet FnOutputBlock(index)}
-					<Block bytes={guessedOutputBlocks[0]} inputClassNames={inputClassNamesFN} />
+					<Block bytes={guessedOutputBlocks[1]} inputClassNames={inputClassNamesFN} />
 				{/snippet}
 
 				{#snippet IVBlock(index)}

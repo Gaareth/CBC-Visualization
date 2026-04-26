@@ -135,8 +135,8 @@
 						<span class="font-bold">last</span> plaintext byte
 					</span>
 					is 0x02, before we bruteforce the
-					<span class={`text-${BLOCK_COLORS.ciphertext}`}> second to last iv byte </span>
-					. How? By modifying the
+					<span class={`text-${BLOCK_COLORS.ciphertext}`}> second to last iv byte </span>. How? By
+					modifying the
 					<span class={`text-${BLOCK_COLORS.ciphertext}`}>
 						<span class="font-bold">last</span> iv byte
 					</span>
@@ -180,9 +180,7 @@
 			<span class="text-red-500">DEC[-1]</span>
 		</p>
 
-	
-
-		<ExplainWrapper>
+		<ExplainWrapper title="Interactive Example - Full Recovery">
 			<div class="not-prose">
 				<ByteRecoverer
 					{ciphertextBlocks}
@@ -195,6 +193,13 @@
 				/>
 			</div>
 		</ExplainWrapper>
+
+		<p>
+			Going to the next block, is now as simple as sending the next ciphertext block to the padding
+			oracle. E. g. for the last block the padding oracle needs ciphertextblocks[-2] (as IV) and
+			ciphertextblocks[-1] , but for the second to last block, the padding oracle
+			needs ciphertextblocks[-3] (as IV) and ciphertextblocks[-2].
+		</p>
 	{/snippet}
 
 	{#snippet visualSnippet()}

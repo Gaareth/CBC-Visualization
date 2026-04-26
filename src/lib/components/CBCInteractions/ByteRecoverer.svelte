@@ -69,7 +69,9 @@
 		attackProgress = 'running';
 
 		const easeOut = (i: number) => {
-			const start = 700;
+			if (i <= 2) return 500;
+
+			const start = 500;
 			const end = 10;
 			const t = 1 - Math.exp(-i / 6);
 			return end + (start - end) * (1 - t);
@@ -96,7 +98,7 @@
 				},
 
 				onBlockEnd: (i) => {
-					attackState = { event: 'on-block-end' };
+					attackState = { event: 'on-block-end', data: { blockIndex: i } };
 				},
 
 				onByteEnd: (byteIndex) => {
@@ -113,7 +115,7 @@
 				onProgressUpdate: (event) => {
 					attackState = event;
 
-					if (event.event == "edge-case-check") {
+					if (event.event == 'edge-case-check') {
 						isGuessing = false;
 					}
 
@@ -150,6 +152,7 @@
 	async function reset() {
 		showResults = false;
 		guessProgress = 0;
+		bytesRecovered = 0;
 		attackState = undefined;
 		attackProgress = 'idle';
 		// guessedOutputBlock.fill(undefined);
@@ -164,6 +167,20 @@
 	function displayByteWrapper(byte: number | undefined) {
 		return displayByte(byte, settingsState.displayBytesAs, true);
 	}
+
+	let inputClassNames: Record<number, string> = $state({});
+
+	let blockSize = $derived(ciphertextBlocks[0].length);
+	$effect(() => {
+		// inputClassNames = {};
+		// inputClassNames[blockSize - currentByteIndex - 1] = `border-r-${BLOCK_COLORS.plaintext}!`;
+		// inputClassNames[blockSize - currentByteIndex] = `border-${BLOCK_COLORS.plaintext}!`;
+
+		inputClassNames = {
+			[blockSize - currentByteIndex - 1]: `border-r-${BLOCK_COLORS.plaintext}!`,
+			[blockSize - currentByteIndex]: `border-${BLOCK_COLORS.plaintext}!`
+		};
+	});
 </script>
 
 <div class="flex flex-col gap-3">
@@ -212,10 +229,19 @@
 			XOR
 			<span class="text-red-500">{displayByteWrapper(byteRecoveredResult.decByte)}</span>
 		</p>
-	{:else if attackProgress == 'running' || attackState?.event == 'on-byte-start'}
+	{:else if attackState?.event == 'on-byte-start' && currentByteIndex > 1}
+		<p>For i in 1..={currentByteIndex - 1}:</p>
+		<p class="text-center">
+			<span class="text-green-400">IV[-i]</span> =
+			<span class="text-blue-400">{displayByteWrapper(currentByteIndex)}</span>
+			XOR
+			<span class="text-red-500">DEC[-i]</span>
+		</p>
+	{:else if isGuessing}
 		<p class="animate-pulse text-center">Bruteforcing IV til valid padding</p>
 	{/if}
 
+	<!-- {guessedOutputBlocks} -->
 	<div class="flex flex-wrap gap-1">
 		<button
 			type="button"
@@ -229,25 +255,36 @@
 			type="button"
 			class="flex-1 button-default input-layer-2"
 			onclick={() => {
+				if (
+					(attackState?.event == 'on-byte-end' && !multipleBytes) ||
+					(attackState?.event == 'on-block-end' && attackState.data.blockIndex == 1)
+				) {
+					reset();
+				}
+
 				if (attackProgress == 'idle') {
 					findValidPadding();
-				} else {
-					next();
 				}
+
+				next();
 			}}
 			disabled={isGuessing}
 		>
-			{#if attackProgress == 'idle' || attackState?.event == 'on-byte-start'}
+			{#if attackProgress == 'idle' || (attackState?.event == 'on-byte-start' && currentByteIndex == 1)}
 				Automatically find valid padding
 			{:else if attackState?.event == 'edge-case-check'}
 				Check edge case
 			{:else if attackState?.event == 'edge-case-check-result'}
 				Continue {!attackState?.data.paddingValid ? 'searching' : ''}
 			{:else if attackState?.event == 'on-byte-recovered'}
-				Recover DEC[-1]
+				Recover DEC[-{currentByteIndex}]
+			{:else if attackState?.event == 'on-byte-start' && currentByteIndex > 1}
+				Set last {currentByteIndex - 1} bytes to {displayByteWrapper(currentByteIndex)}
+			{:else if attackState?.event == 'after-set-padding-bytes'}
+				Start bruteforce of byte {ciphertextBlocks[0].length - currentByteIndex}
 			{:else if attackState?.event == 'on-byte-end' && multipleBytes}
 				Next byte
-			{:else if attackState?.event == 'on-block-end' && multipleBytes}
+			{:else if attackState?.event == 'on-block-end' && multipleBytes && attackState.data.blockIndex != 1}
 				Next block
 			{:else}
 				Restart
@@ -288,11 +325,11 @@
 	{#if !multipleBytes}
 		<p class="lockin-animation font-bold">
 			Recovered plaintext byte: <span class={`text-${BLOCK_COLORS.plaintext} font-bold`}>
-				{displayByteWrapper(guessedPlaintextBlocks[0][guessedPlaintextBlocks[0].length - 1])}
+				{displayByteWrapper(guessedPlaintextBlocks[1][guessedPlaintextBlocks[1].length - 1])}
 			</span>
 		</p>
 
-		{#if originalPlaintext && originalPlaintext[0][originalPlaintext[0].length - 1] !== guessedPlaintextBlocks[0][guessedPlaintextBlocks.length - 1]}
+		{#if originalPlaintext && originalPlaintext[0][originalPlaintext[0].length - 1] !== guessedPlaintextBlocks[1][guessedPlaintextBlocks[1].length - 1]}
 			<p class="text-error">
 				Expected: {displayByteWrapper(
 					originalPlaintext[originalPlaintext.length - 1][originalPlaintext[0].length - 1]
@@ -308,6 +345,8 @@
 						bytes={guessedPlaintextBlocks[index + 1]}
 						title={`Guessed Plaintext Block`}
 						success={showResults}
+						surfaceLevel={2}
+						{inputClassNames}
 					/>
 				{/each}
 			</div>

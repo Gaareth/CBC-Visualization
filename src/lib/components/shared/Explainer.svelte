@@ -1,5 +1,4 @@
 <script>
-
 	import ScrollStory from './ScrollStory.svelte';
 	import EdgeCaseSection from '../../Sections/EdgeCaseSection.svelte';
 	import FindingAByteSection from '../../Sections/FindingAByteSection.svelte';
@@ -8,6 +7,7 @@
 	import PaddingSection from '../../Sections/PaddingSection.svelte';
 
 	import ExpandingToMultipleSection from '$lib/Sections/ExpandingToMultipleSection.svelte';
+	import Card from './Card.svelte';
 </script>
 
 <!-- <ScrollStory sections=[PaddingSection]>
@@ -26,7 +26,7 @@
 		'Exploiting - Finding the padding length',
 		'Exploiting - Recovering a single byte',
 		'Edge cases',
-		'Exploiting - Recovering Bytes',
+		'Exploiting - Recovering Bytes'
 	]}
 >
 	<h1>Padding Oracle Attack Explained</h1>
@@ -37,6 +37,18 @@
 		>
 		and how they reveal information about the plaintext.
 	</p>
+
+	<Card className="border-warning!">
+		<h2 class="my-0!">Disclaimer and Literature</h2>
+		<p class="m-0! mt-2!">
+			I hope I have not made any crude mistakes in the content, but please let me know if you find
+			any! Check out <a
+				href="https://www.nccgroup.com/research/cryptopals-exploiting-cbc-padding-oracles/"
+			>
+				this article
+			</a>, which explains everything and also gave me the idea for these visualization.
+		</p>
+	</Card>
 
 	<PaddingSection />
 	<PaddingOracleSection />
@@ -53,7 +65,6 @@
 	<FindingAByteSection />
 	<EdgeCaseSection />
 	<ExpandingToMultipleSection />
-	
 
 	<!-- todo: Add content for this section -->
 </ScrollStory>
