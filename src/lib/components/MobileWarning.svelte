@@ -21,7 +21,7 @@
 </script>
 
 {#if showMobileWarning}
-	<div class="fixed inset-0 z-9999 flex items-center justify-center bg-black/70 p-4 md:hidden">
+	<div class="fixed inset-0 z-9999 flex items-center justify-center bg-black/70 p-4 md:hidden w-svw h-screen">
 		<div class="relative rounded-lg bg-surface-1 p-6 text-center">
 			<button
 				onclick={closeOverlay}
@@ -34,6 +34,8 @@
 			<p class="text-sm">
 				Sorry this website is not really usable on smaller devices. Its possible this changes in the
 				future.
+
+				You can ignore this hovwever, by closing this warning,
 			</p>
 		</div>
 	</div>
