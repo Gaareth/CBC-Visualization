@@ -41,4 +41,14 @@
 
 <MobileWarning />
 
-{@render children()}
+<main>{@render children()}</main>
+
+<footer class="absolute -bottom-25 min-h-10 w-full bg-surface-1">
+	<div class="flex-center p-2 gap-2">
+		<p>Made by <a href="https://gaareth.com" class="hover:underline">Gaareth</a></p>
+		<p>|</p>
+		<p>
+			Open Source: <a href="https://github.com/Gaareth/CBC-Visualization" class="hover:underline">Github</a>
+		</p>
+	</div>
+</footer>
