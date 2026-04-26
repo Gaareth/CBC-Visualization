@@ -24,7 +24,7 @@
 
 	$effect(() => {
 		if (ctxt.ctxt?.activeId === title) {
-			console.log('i became active section:', title);
+			// console.log('i became active section:', title);
 			ctxt.ctxt.shouldWrap = false;
 		}
 	});

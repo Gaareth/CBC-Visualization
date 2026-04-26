@@ -46,12 +46,12 @@
 
 		diagramWidth += getLeftPadding();
 
-		console.log(
-			'diagram width:',
-			diagramWidth,
-			'visual column width:',
-			ctxt.ctxt.visualColumnWidth
-		);
+		// console.log(
+		// 	'diagram width:',
+		// 	diagramWidth,
+		// 	'visual column width:',
+		// 	ctxt.ctxt.visualColumnWidth
+		// );
 
 		if (diagramWidth > ctxt.ctxt.visualColumnWidth!) {
 			ctxt.ctxt.shouldWrap = true;

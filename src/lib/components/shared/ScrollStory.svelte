@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, setContext } from 'svelte';
+	import { onMount } from 'svelte';
 	import Card from './Card.svelte';
 	import {
 		setSectionContext,
@@ -83,30 +83,51 @@
 	// let visualWrapperEl = $state<HTMLElement>();
 	let resizeObserver: ResizeObserver;
 
+	let tableOfContentsEl = $state<HTMLElement>();
+	let forcedAtTop = $state(false);
+
 	function updateWidth() {
 		if (!storyWrapperEl || !contentEl || !ctxt) return;
 		ctxt.visualColumnWidth = storyWrapperEl.clientWidth - contentEl.clientWidth;
+
+		
+		const spaceOnTheLeft = (document.documentElement.clientWidth - storyWrapperEl.clientWidth)/2;
+		console.log('space on the left:', spaceOnTheLeft);
+		if (spaceOnTheLeft < 240) {
+			forcedAtTop = true;
+		} else {
+			forcedAtTop = false;
+		}
+
+		// if (!tableOfContentsEl) return;
+		// tableOfContentsEl.style.width =
+		// 	(document.documentElement.clientWidth - storyWrapperEl?.clientWidth) / 2 - 10 + 'px';
 	}
 
 	$effect(() => {
-		if (!storyWrapperEl || !contentEl) return;
+		if (!storyWrapperEl || !contentEl || !tableOfContentsEl) return;
 		resizeObserver = new ResizeObserver(updateWidth);
 		resizeObserver.observe(storyWrapperEl);
 		resizeObserver.observe(contentEl);
+		// resizeObserver.observe(tableOfContentsEl);
+		resizeObserver.observe(document.documentElement);
 
 		updateWidth();
 		return () => resizeObserver.disconnect();
 	});
 </script>
 
+
 <div
 	class="relative mx-auto my-10 grid max-w-[1400px] grid-cols-1 gap-13 p-5 lg:grid-cols-2"
 	bind:this={storyWrapperEl}
 >
-	<aside class="static top-7 left-0 h-full w-full lg:absolute lg:w-60 lg:-translate-x-full">
+	<aside
+		class={cn('static top-7 -left-5 h-full w-full col-span-full', !forcedAtTop ? `lg:absolute lg:-translate-x-full lg:w-60` : "")}
+		bind:this={tableOfContentsEl}
+	>
 		<div class="sticky top-7">
 			<Card className="px-3 py-5" title="Contents">
-				<!-- <p>Contents</p> -->
 				<ol class="list-inside list-decimal space-y-3 text-sm">
 					{#each titles as title (title)}
 						<li>
