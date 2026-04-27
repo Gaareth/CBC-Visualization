@@ -179,10 +179,11 @@
 		<p class="text-error">{error.message}</p>
 	{/if} -->
 
+	<!-- h-5 -->
 	{#if !textPosBelow && reserveSpaceForError}
-		<div class={cn('h-5', classNameTextAbove)}>
+		<div class={cn('', classNameTextAbove)}>
 			{#if title}
-				<p>{title}</p>
+				<p >{title}</p>
 			{/if}
 
 			{#if error}

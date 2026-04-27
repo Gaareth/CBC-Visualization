@@ -60,6 +60,8 @@
 
 	{@render dropdownNav('Padding Oracle', [
 		{ label: 'Interactively Explained', href: resolve('/padding-oracle-attack/explain') },
+		{ label: 'Quickly Explained', href: resolve('/padding-oracle-attack/short-explain') },
+
 		{ label: 'Tool', href: resolve('/padding-oracle-attack') }
 	])}
 </nav>

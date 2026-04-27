@@ -48,7 +48,7 @@
 		<p>Made by <a href="https://gaareth.com" class="hover:underline">Gaareth</a></p>
 		<p>|</p>
 		<p>
-			Open Source: <a href="https://github.com/Gaareth/CBC-Visualization" class="hover:underline">Github</a>
+			Open Sourced at <a href="https://github.com/Gaareth/CBC-Visualization" class="hover:underline">Github</a>
 		</p>
 	</div>
 </footer>

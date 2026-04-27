@@ -50,7 +50,8 @@
 	let showResults = $state(false);
 
 	let bytesRecovered = $state(0);
-	let currentByteIndex = $derived(bytesRecovered + 1);
+	let currentByteIndex = $state(1);
+	let currentBlockIndex = $state(null as number | null);
 
 	let blockGate = createGate();
 	let byteGate = createGate();
@@ -93,12 +94,17 @@
 			outGuessedPlaintextBlocks: guessedPlaintextBlocks,
 
 			progress: {
-				onByteStart: () => {
+				onByteStart: (i) => {
 					attackState = { event: 'on-byte-start' };
+					currentByteIndex = i;
 				},
 
 				onBlockEnd: (i) => {
 					attackState = { event: 'on-block-end', data: { blockIndex: i } };
+				},
+
+				onBlockStart: (i) => {
+					currentBlockIndex = i;
 				},
 
 				onByteEnd: (byteIndex) => {
@@ -150,6 +156,9 @@
 	}
 
 	async function reset() {
+		stopAutoGuess?.();
+
+		isGuessing = false;
 		showResults = false;
 		guessProgress = 0;
 		bytesRecovered = 0;
@@ -181,7 +190,29 @@
 			[blockSize - currentByteIndex]: `border-${BLOCK_COLORS.plaintext}!`
 		};
 	});
+
+	function getMismatchErrorForBlock(index: number) {
+		const indices = guessedPlaintextBlocks[index]
+			.filter((byte, i) => originalPlaintext && byte !== originalPlaintext[index][i])
+			.map((_, i) => i);
+
+		console.log(guessedPlaintextBlocks[index]);
+		console.log(originalPlaintext ? originalPlaintext[index] : undefined);
+
+		if (indices.length === 0) {
+			return undefined;
+		}
+
+		return {
+			message: 'Mismatch at bytes: ' + indices.join(', '),
+			indices
+		};
+	}
 </script>
+
+<p>
+	{originalPlaintext}
+</p>
 
 <div class="flex flex-col gap-3">
 	{#if showEdgeCheckSwitch}
@@ -281,7 +312,7 @@
 			{:else if attackState?.event == 'on-byte-start' && currentByteIndex > 1}
 				Set last {currentByteIndex - 1} bytes to {displayByteWrapper(currentByteIndex)}
 			{:else if attackState?.event == 'after-set-padding-bytes'}
-				Start bruteforce of byte {ciphertextBlocks[0].length - currentByteIndex}
+				Start bruteforce of P{currentBlockIndex! - 1}[-{currentByteIndex}]
 			{:else if attackState?.event == 'on-byte-end' && multipleBytes}
 				Next byte
 			{:else if attackState?.event == 'on-block-end' && multipleBytes && attackState.data.blockIndex != 1}
@@ -343,10 +374,13 @@
 				{#each { length: guessedPlaintextBlocks.length - 1 } as _, index (index)}
 					<Block
 						bytes={guessedPlaintextBlocks[index + 1]}
-						title={`Guessed Plaintext Block`}
 						success={showResults}
+						error={getMismatchErrorForBlock(index + 1)}
+						reserveSpaceForError={true}
 						surfaceLevel={2}
-						{inputClassNames}
+						inputClassNames={currentBlockIndex && index === currentBlockIndex - 1
+							? inputClassNames
+							: {}}
 					/>
 				{/each}
 			</div>

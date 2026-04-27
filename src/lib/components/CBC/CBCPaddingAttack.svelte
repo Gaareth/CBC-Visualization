@@ -1,27 +1,26 @@
 <script lang="ts">
-	import CBC from '$lib/components/CBC/CBC.svelte';
 	import { cbcDecrypt, cbcEncrypt } from '$lib/logic/cbc';
-	import type { SvelteComponent } from 'svelte';
-	import { oneTimePad, stringToArray, xorBlocks } from '../../logic/crypto-utils';
+	import { oneTimePad, stringToArray } from '../../logic/crypto-utils';
 	import { PKCS7Padder } from '../../logic/padding';
-	import { autoRunGate, createGate, delay } from '$lib/utils/generic';
+	import { autoRunGate, createGate } from '$lib/utils/generic';
 	import Block from '../shared/Block.svelte';
 	import { cn } from '../../utils/styling';
 	import {
-		findPaddingLengthWithOracle,
 		recoverPlaintextWithOracle,
-		recoverSingleBlock,
 		type PaddingOracle
 	} from '../../logic/paddingOracle';
 	import CBCBlock from './CBCBlock.svelte';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
 	import { CBC_LAYOUT, getGapToNext, getToXorLength } from '$lib/stores/cbcConstants.svelte';
+	import ByteRecoverer from '../CBCInteractions/ByteRecoverer.svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 
 	// let key = [0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08];
 	let key = [0, 0, 0, 0, 0, 0, 0, 0];
 	let initializationVector = $state([4, 20, 150, 3, 100, 41, 42, 201]);
 
-	let plaintext = $state('HELLO');
+	let plaintext = $state('A SECRET MESSAGE');
 	let plaintextBlock = $derived(stringToArray(plaintext));
 
 	let padder = new PKCS7Padder();
@@ -112,7 +111,6 @@
 	let guessedPlaintextBlocks: number[][] = $state(
 		Array.from({ length: numBlocks }, () => new Array(blockSize).fill(0))
 	);
-	console.log(guessedPlaintextBlocks);
 
 	function resetCiphertext() {
 		ciphertextBlocks = cbcEncrypt(
@@ -131,150 +129,27 @@
 		);
 	}
 
-	function zeroIV() {
-		ciphertextBlocks[0] = new Array(blockSize).fill(0);
-	}
-
-	async function findValidPadding() {
-		showSuccess = false;
-		attackInProgress = true;
-
-		const easeOut = (i: number) => {
-			const start = 300;
-			const end = 20;
-			const t = 1 - Math.exp(-i / 5);
-			return end + (start - end) * (1 - t);
-		};
-
-		let byteGate = createGate();
-		const stopAutoGuess = autoRunGate(guessGate, easeOut);
-		const stopAutoByte = autoRunGate(byteGate, () => 0);
-
-		await recoverPlaintextWithOracle(ciphertextBlocks, paddingOracle, {
-			outGuessedDecBlocks: guessedOutputBlocks,
-			outGuessedPlaintextBlocks: guessedPlaintextBlocks,
-			guessGate,
-			byteGate,
-			progress: {
-				onBlockStart: (i) => {
-					currentlyAttackedPlaintextBlock = i - 1;
-				},
-
-				onByteStart: (i) => {
-					if (i == 2) {
-						console.log('A');
-
-						stopAutoByte();
-						stopAutoGuess();
-						return;
-					}
-				}
-			}
-		});
-
-		stopAutoGuess();
-		attackInProgress = false;
-		showSuccess = true;
-	}
-
 	let isLastBlock = $derived((i: number) => i === decryptedplaintextBlocks.length - 1);
+
+	
 </script>
 
-{#snippet autoRun()}
-	<div class="flex flex-col gap-1">
-		<div class="flex-center">
-			<button class="button-default input-layer-2" onclick={async () => await recoverPlaintext()}>
-				Recover Plaintext
-			</button>
-		</div>
-
-		<div class="mx-auto w-fit">
-			<p>Recovered Plaintext:</p>
-			<div class={cn('flex gap-1', { 'lockin-animation': showSuccess })}>
-				{#each { length: guessedPlaintextBlocks.length - 1 } as _, i}
-					<Block
-						bytes={guessedPlaintextBlocks[i + 1]}
-						title={`Guessed Plaintext Block ${i}`}
-						success={showSuccess}
-					/>
-				{/each}
-			</div>
-		</div>
-	</div>
-{/snippet}
-
-{#snippet explainer()}
-	<div class="grid grid-cols-6 items-center gap-10">
-		<div class="col-span-4">
-			<p class="text-justify">
-				You can exploit the padding oracle to find out when the decrypted plaintext has valid
-				padding.
-			</p>
-			<ol class="list-decimal ps-7">
-				<li>Set the IV to zero</li>
-				<li>
-					Change the last byte of the IV until you get valid padding
-
-					<p>
-						You now know that the last plaintext byte of P_0 is (likely) <span class="text-blue-400"
-							>0x01</span
-						><br />
-						<span class="text-blue-400">0x01</span> = <span class="text-green-400">IV[-1]</span> XOR
-						<span class="text-red-500">DEC[-1]</span>
-					</p>
-				</li>
-				<li>
-					Calculate the plaintext byte using XOR operations
-					<div>
-						<p>
-							<span class="text-red-500">DEC[-1]</span> = <span class="text-blue-400">0x01</span>
-							XOR
-							<span class="text-green-400">IV[-1]</span> XOR = <span class="text-red-500">???</span>
-						</p>
-
-						<p>
-							<span class="text-blue-400">P[-1]</span> = <span class="text-green-400">IV[-1]</span>
-							XOR
-							<span class="text-red-500">DEC[-1]</span> = <span class="text-blue-400">???</span>
-						</p>
-					</div>
-				</li>
-			</ol>
-		</div>
-
-		<div class="col-span-2 flex justify-center gap-1">
-			<div class="flex w-fit flex-col gap-1">
-				<button type="button" class="button-default input-layer-2" onclick={zeroIV}>
-					Set IV to zero
-				</button>
-
-				<button type="button" class="button-default input-layer-2" onclick={findValidPadding}>
-					Find valid padding
-				</button>
-
-				<!-- <button type="button" class="button-default input-layer-2" onclick={calculatePlaintext}>
-					Recover plaintext
-				</button> -->
-			</div>
-		</div>
-	</div>
-{/snippet}
-
-<div class="flex flex-col gap-5">
+<div class="flex flex-col gap-10">
 	<ExplainWrapper
-		wrapperClass="w-6xl h-fit"
+		wrapperClass="w-5xl mx-auto"
 		title="Padding Oracle Attack on CBC"
-		slides={[explainer, autoRun]}
-		slideWrapperClass="my-auto"
-		onChangeSlide={(index) => {
-			if (index === 1) {
-				plaintext = 'A SECRET MESSAGE';
-			} else {
-				plaintext = 'WORLD';
-			}
-			resetCiphertext();
-		}}
-	></ExplainWrapper>
+		back={async () => await goto(resolve('/padding-oracle-attack/short-explain'))}
+	>
+		<ByteRecoverer
+			{ciphertextBlocks}
+			{guessedOutputBlocks}
+			{paddingOracle}
+			{guessedPlaintextBlocks}
+			{resetCiphertext}
+			showEdgeCheckSwitch={false}
+			multipleBytes={true}
+		/>
+	</ExplainWrapper>
 
 	<div class={cn('flex justify-center')} style={`gap: ${getGapToNext()}px;`}>
 		{#each { length: decryptedplaintextBlocks.length } as _, i}

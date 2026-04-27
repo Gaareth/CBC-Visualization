@@ -112,7 +112,7 @@
 		title="CBC Decryption"
 		slides={[explain, toAttack]}
 		back={() => goto(resolve('/encryption'))}
-		next={() => goto(resolve('/padding-oracle-attack'))}
+		next={() => goto(resolve('/padding-oracle-attack/short-explain'))}
 		slideWrapperClass="my-auto"
 	></ExplainWrapper>
 
