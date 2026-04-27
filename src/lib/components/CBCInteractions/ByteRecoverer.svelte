@@ -321,6 +321,14 @@
 				Restart
 			{/if}
 		</button>
+
+		<button
+			type="button"
+			class={cn(attackProgress == 'done' && 'flex-1', 'button-default input-layer-2')}
+			onclick={reset}
+		>
+			Auto Run
+		</button>
 	</div>
 
 	<div>
