@@ -183,6 +183,7 @@
 		<ExplainWrapper title="Interactive Example - Full Recovery">
 			<div class="not-prose">
 				<ByteRecoverer
+					{plaintextBlocks}
 					{ciphertextBlocks}
 					{guessedOutputBlocks}
 					{paddingOracle}

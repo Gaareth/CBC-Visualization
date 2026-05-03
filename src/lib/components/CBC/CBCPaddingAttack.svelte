@@ -5,10 +5,7 @@
 	import { autoRunGate, createGate } from '$lib/utils/generic';
 	import Block from '../shared/Block.svelte';
 	import { cn } from '../../utils/styling';
-	import {
-		recoverPlaintextWithOracle,
-		type PaddingOracle
-	} from '../../logic/paddingOracle';
+	import { recoverPlaintextWithOracle, type PaddingOracle } from '../../logic/paddingOracle';
 	import CBCBlock from './CBCBlock.svelte';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
 	import { CBC_LAYOUT, getGapToNext, getToXorLength } from '$lib/stores/cbcConstants.svelte';
@@ -25,7 +22,7 @@
 
 	let padder = new PKCS7Padder();
 
-	let { ciphertextBlocks } = $state(
+	let { ciphertextBlocks, plaintextBlocks } = $state(
 		cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder)
 	);
 
@@ -109,7 +106,7 @@
 	);
 
 	let guessedPlaintextBlocks: number[][] = $state(
-		Array.from({ length: numBlocks }, () => new Array(blockSize).fill(0))
+		Array.from({ length: numBlocks }, () => new Array(blockSize).fill(undefined))
 	);
 
 	function resetCiphertext() {
@@ -130,8 +127,6 @@
 	}
 
 	let isLastBlock = $derived((i: number) => i === decryptedplaintextBlocks.length - 1);
-
-	
 </script>
 
 <div class="flex flex-col gap-10">
@@ -141,6 +136,7 @@
 		back={async () => await goto(resolve('/padding-oracle-attack/short-explain'))}
 	>
 		<ByteRecoverer
+			{plaintextBlocks}
 			{ciphertextBlocks}
 			{guessedOutputBlocks}
 			{paddingOracle}

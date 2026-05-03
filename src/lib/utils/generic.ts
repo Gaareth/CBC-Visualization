@@ -2,6 +2,8 @@ export async function delay(milliseconds: number = 1000) {
 	return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+export type Gate = ReturnType<typeof createGate>;
+
 export function createGate() {
 	let resolver: (() => void) | null = null;
 

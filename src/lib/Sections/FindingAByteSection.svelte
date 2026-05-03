@@ -101,6 +101,7 @@
 		<ByteRecoverer
 			skipEdgeCheck={true}
 			showEdgeCheckSwitch={false}
+			{plaintextBlocks}
 			{ciphertextBlocks}
 			{guessedOutputBlocks}
 			{paddingOracle}

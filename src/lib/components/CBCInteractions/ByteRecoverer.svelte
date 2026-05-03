@@ -12,9 +12,10 @@
 	import { createGate, autoRunGate } from '../../utils/generic';
 	import { BLOCK_COLORS } from '../../utils/styling';
 	import Block from '../shared/Block.svelte';
+	import AutoRunButton from './AutoRunButton.svelte';
 
 	interface Props {
-		plaintextBlocks?: number[][];
+		plaintextBlocks: number[][];
 		ciphertextBlocks: number[][];
 		guessedOutputBlocks: (number | undefined)[][];
 		guessedPlaintextBlocks: (number | undefined)[][];
@@ -57,11 +58,19 @@
 	let byteGate = createGate();
 	let interactionGate = createGate();
 
+	let autoRunIsEnabled = $state(false);
+
 	let attackState: AttackEvent | undefined = $state();
 
-	let stopAutoGuess: () => void;
+	let stopAutoGuess: () => void = $state(() => () => {});
 
 	let byteRecoveredResult: ByteRecoveredResult['data'] | undefined = $state();
+
+	let guessSpeedSettings = $state({
+		type: 'exponential' as 'exponential' | 'constant',
+		constantDelayValue: 500,
+		exponentialDelayDenominator: 6
+	});
 
 	async function findValidPadding() {
 		showResults = false;
@@ -70,12 +79,19 @@
 		attackProgress = 'running';
 
 		const easeOut = (i: number) => {
-			if (i <= 2) return 500;
+			if (i <= 2) return guessSpeedSettings.constantDelayValue;
 
-			const start = 500;
+			const start = guessSpeedSettings.constantDelayValue;
 			const end = 10;
-			const t = 1 - Math.exp(-i / 6);
+			const t = 1 - Math.exp(-i / guessSpeedSettings.exponentialDelayDenominator);
 			return end + (start - end) * (1 - t);
+		};
+		const delayFunction = (i: number) => {
+			if (guessSpeedSettings.type === 'constant') {
+				return guessSpeedSettings.constantDelayValue;
+			} else {
+				return easeOut(i);
+			}
 		};
 
 		if (stopAutoGuess) {
@@ -83,7 +99,7 @@
 		}
 
 		let guessGate = createGate();
-		stopAutoGuess = autoRunGate(guessGate, easeOut);
+		stopAutoGuess = autoRunGate(guessGate, delayFunction);
 
 		await recoverPlaintextWithOracle(ciphertextBlocks, paddingOracle, {
 			blockGate,
@@ -192,38 +208,39 @@
 	});
 
 	function getMismatchErrorForBlock(index: number) {
-		const indices = guessedPlaintextBlocks[index]
-			.filter((byte, i) => originalPlaintext && byte !== originalPlaintext[index][i])
-			.map((_, i) => i);
+		if (originalPlaintext == undefined) {
+			return;
+		}
 
-		console.log(guessedPlaintextBlocks[index]);
-		console.log(originalPlaintext ? originalPlaintext[index] : undefined);
+		let indices: number[] = [];
+		for (let i = 0; i < guessedPlaintextBlocks[index].length; i++) {
+			const guessedByte = guessedPlaintextBlocks[index][i];
+			if (guessedByte != null && guessedByte !== originalPlaintext[index][i]) {
+				indices.push(i);
+			}
+		}
 
 		if (indices.length === 0) {
 			return undefined;
 		}
 
+		const expectedString = indices
+			.map((i) =>
+				displayByte(
+					originalPlaintext ? originalPlaintext[index][i] : undefined,
+					settingsState.displayBytesAs
+				)
+			)
+			.join(', ');
+
 		return {
-			message: 'Mismatch at bytes: ' + indices.join(', '),
+			message: 'Mismatch at bytes: ' + indices.join(', ') + ' Expected: ' + expectedString,
 			indices
 		};
 	}
 </script>
 
-<p>
-	{originalPlaintext}
-</p>
-
-<div class="flex flex-col gap-3">
-	{#if showEdgeCheckSwitch}
-		<label class="flex justify-between">
-			Check for edge cases
-			<div class="flex-center flex-1">
-				<Switch bind:checked={checkEdgeCases} />
-			</div>
-		</label>
-	{/if}
-
+{#snippet InfoContent()}
 	{#if attackState?.event == 'edge-case-check'}
 		<p class="text-center">Modify the next byte to verify 0x01 was found</p>
 	{:else if attackState?.event == 'edge-case-check-result'}
@@ -270,6 +287,21 @@
 		</p>
 	{:else if isGuessing}
 		<p class="animate-pulse text-center">Bruteforcing IV til valid padding</p>
+	{/if}
+{/snippet}
+
+<div class="flex flex-col gap-3">
+	{#if showEdgeCheckSwitch}
+		<label class="flex justify-between">
+			Check for edge cases
+			<div class="flex-center flex-1">
+				<Switch bind:checked={checkEdgeCases} />
+			</div>
+		</label>
+	{/if}
+
+	{#if !autoRunIsEnabled}
+		{@render InfoContent()}
 	{/if}
 
 	<!-- {guessedOutputBlocks} -->
@@ -322,13 +354,14 @@
 			{/if}
 		</button>
 
-		<button
-			type="button"
-			class={cn(attackProgress == 'done' && 'flex-1', 'button-default input-layer-2')}
-			onclick={reset}
-		>
-			Auto Run
-		</button>
+		<AutoRunButton
+			surfaceLevel={2}
+			{blockGate}
+			{byteGate}
+			{interactionGate}
+			bind:isEnabled={autoRunIsEnabled}
+			bind:guessSpeedSettings
+		/>
 	</div>
 
 	<div>
