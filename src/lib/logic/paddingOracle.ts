@@ -200,7 +200,7 @@ export async function recoverSingleByte(
 	let originalIV = ivBlock.slice();
 
 	for (let guess = 0; guess < 256; guess++) {
-		console.log(`guessing byte ${byte}: ${guess}`);
+		// console.log(`guessing byte ${byte}: ${guess}`);
 		progress?.onGuess?.(guess);
 
 		ivBlock[blockSize - byte] = guess;
@@ -221,6 +221,8 @@ export async function recoverSingleByte(
 					data: { paddingValid: valid2 }
 				});
 				await interactionGate.wait();
+
+				ivBlock[blockSize - byte - 1] ^= 1; // restore
 
 				// if we found 0x01, then changing the previous byte should not make it invalid
 				// invalid means we found 0x02, or 0x03, etc.
