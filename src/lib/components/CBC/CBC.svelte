@@ -5,11 +5,11 @@
 	import { getGapToNext } from '$lib/stores/cbcConstants.svelte';
 
 	interface Props {
-		plaintextBlocks: (number | undefined)[][];
-		ciphertextBlocks: (number | undefined)[][];
+		plaintextBlocks: Uint8Array[];
+		ciphertextBlocks: Uint8Array[];
 
 		encryptionMode?: boolean;
-		onIVChange?: (bytes: (number | undefined)[]) => void;
+		onIVChange?: (bytes: Uint8Array) => void;
 		padder?: Padder;
 		addInitPadding?: boolean;
 	}

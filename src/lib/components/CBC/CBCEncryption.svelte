@@ -14,8 +14,8 @@
 
 	let plaintext = $state('Hello, World!');
 	let plaintextBlock = $derived(stringToArray(plaintext));
-	let initializationVector = $state([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]);
-	let key = [0, 0, 0, 0, 0, 0, 0, 0];
+	let initializationVector: Uint8Array = $state(new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]));
+	let key = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
 
 	let plaintextBlocks = $derived(padder.padd(plaintextBlock, initializationVector.length));
 
@@ -36,8 +36,8 @@
 		arrowsRotated = !arrowsRotated;
 	}
 
-	function onIVChange(bytes: (number | undefined)[]) {
-		initializationVector = bytes.map((b) => b ?? 0) as number[];
+	function onIVChange(bytes: Uint8Array) {
+		initializationVector = bytes;
 	}
 </script>
 

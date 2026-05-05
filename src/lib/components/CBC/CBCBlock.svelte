@@ -12,6 +12,7 @@
 		getBlockWidth,
 		getToXorLength
 	} from '$lib/stores/cbcConstants.svelte';
+	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
 
 	const {
 		gap,
@@ -25,9 +26,9 @@
 
 	interface CBCBlockProps {
 		index: number;
-		plaintextBlock: (number | undefined)[];
-		ciphertextBlock: (number | undefined)[];
-		initializationVector?: (number | undefined)[];
+		plaintextBlock: Uint8Array;
+		ciphertextBlock: Uint8Array;
+		initializationVector?: Uint8Array;
 		isLastBlock?: boolean;
 		encryptionMode?: boolean;
 		targetRotation?: number;
@@ -36,9 +37,9 @@
 
 		padder?: Padder;
 
-		onChangePlaintext?: (bytes: (number | undefined)[]) => void;
-		onChangeCiphertext?: (bytes: (number | undefined)[]) => void;
-		onChangeIV?: (bytes: (number | undefined)[]) => void;
+		onChangePlaintext?: (bytes: Uint8Array) => void;
+		onChangeCiphertext?: (bytes: Uint8Array) => void;
+		onChangeIV?: (bytes: Uint8Array) => void;
 
 		PlainTextBlock?: Snippet<[index: number]>;
 		IVBlock?: Snippet<[index: number]>;
@@ -133,7 +134,7 @@
 	{:else}
 		<div class={flippedClass}>
 			<Block
-				bytes={plaintextBlock}
+				bytes={uint8ArrayToUI(plaintextBlock)}
 				onChange={onChangePlaintext}
 				{byteWidth}
 				allowEdit={encryptionMode}

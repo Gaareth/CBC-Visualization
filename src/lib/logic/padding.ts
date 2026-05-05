@@ -1,26 +1,29 @@
 export interface Padder {
-	padd(input: number[], blockSize: number): number[][];
-	validatePadding(input: number[]): { valid: boolean; invalidIndices?: number[]; message?: string };
+	padd(input: Uint8Array, blockSize: number): Uint8Array[];
+	validatePadding(input: Uint8Array): { valid: boolean; invalidIndices?: number[]; message?: string };
 	// unpad(input: number[], blockSize: number): number[];
 }
 
 export class PKCS7Padder implements Padder {
-	padd(input: number[], blockSize: number): number[][] {
-		const chunks = chunk(input, blockSize);
+	padd(input: Uint8Array, blockSize: number): Uint8Array[] {
+		const chunks: Uint8Array[] = chunk(input, blockSize);
 		const lastChunk = chunks[chunks.length - 1];
 
 		if (lastChunk.length === blockSize) {
-			const fullPaddingBlock = new Array(blockSize).fill(blockSize);
+			const fullPaddingBlock = new Uint8Array(blockSize).fill(blockSize);
 			return [...chunks, fullPaddingBlock];
 		}
 
 		const paddingLength = blockSize - (lastChunk.length % blockSize);
-		chunks[chunks.length - 1] = [...lastChunk, ...new Array(paddingLength).fill(paddingLength)];
+		chunks[chunks.length - 1] = new Uint8Array([
+			...lastChunk,
+			...new Uint8Array(paddingLength).fill(paddingLength)
+		]);
 
 		return chunks;
 	}
 
-	validatePadding(input: number[]) {
+	validatePadding(input: Uint8Array) {
 		const blockSize = input.length;
 		const paddingLength = input[input.length - 1];
 
@@ -47,8 +50,11 @@ export class PKCS7Padder implements Padder {
 	}
 }
 
-function chunk(array: number[], size: number): number[][] {
-	const result: number[][] = [];
+export function chunk<T extends { slice(start: number, end: number): T; length: number }>(
+	array: T,
+	size: number
+): T[] {
+	const result: T[] = [];
 	for (let i = 0; i < array.length; i += size) {
 		result.push(array.slice(i, i + size));
 	}

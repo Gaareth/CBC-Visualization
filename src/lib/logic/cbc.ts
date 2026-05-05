@@ -2,12 +2,12 @@ import { xorBlocks } from './crypto-utils';
 import { PKCS7Padder, type Padder } from './padding';
 
 export function cbcEncryptBlocks(
-	plaintextBlocks: number[][],
-	key: number[],
-	iv: number[],
-	blockCipherFn: (plaintext: number[], key: number[]) => number[]
+	plaintextBlocks: Uint8Array[],
+	key: Uint8Array,
+	iv: Uint8Array,
+	blockCipherFn: (plaintext: Uint8Array, key: Uint8Array) => Uint8Array
 ) {
-	const ciphertextBlocks: number[][] = [iv];
+	const ciphertextBlocks: Uint8Array[] = [iv];
 	let previousBlock = iv;
 
 	for (const plaintextBlock of plaintextBlocks) {
