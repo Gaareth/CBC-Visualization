@@ -45,7 +45,11 @@
 			ciphertextBlock={ciphertextBlocks[i + 1]}
 			initializationVector={i === 0 ? ciphertextBlocks[0] : undefined}
 			isLastBlock={isLastBlock(i)}
-			onChangeCiphertext={(bytes) => (ciphertextBlocks[i + 1] = bytes)}
+			onChangeCiphertext={(bytes) => {
+				console.log('Ciphertext changed:', bytes);
+				// console.log('Before change, ciphertextBlocks:', ciphertextBlocks[i+1]);
+				(ciphertextBlocks[i + 1] = bytes)
+			}}
 			onChangePlaintext={(bytes) => {
 				plaintextBlocks[i] = bytes;
 				plaintextBlocks = [...plaintextBlocks];

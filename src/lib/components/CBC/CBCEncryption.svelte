@@ -9,18 +9,24 @@
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
+	import { encrypt as teaEncrypt, generateRandomKey as generateTeaKey, getFixedKey } from "$lib/logic/ciphers/cipherTEA";
 
 	const padder = new PKCS7Padder();
 
 	let plaintext = $state('Hello, World!');
 	let plaintextBlock = $derived(stringToArray(plaintext));
+<<<<<<< Updated upstream
 	let initializationVector = $state([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]);
 	let key = [0, 0, 0, 0, 0, 0, 0, 0];
+=======
+	let initializationVector: Uint8Array = $state(new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]));
+	let key = $state(getFixedKey());
+>>>>>>> Stashed changes
 
 	let plaintextBlocks = $derived(padder.padd(plaintextBlock, initializationVector.length));
 
 	let ciphertextBlocks = $derived(
-		cbcEncryptBlocks(plaintextBlocks, key, initializationVector, oneTimePad)
+		cbcEncryptBlocks(plaintextBlocks, key, initializationVector, teaEncrypt)
 	);
 
 	let cbc: SvelteComponent;

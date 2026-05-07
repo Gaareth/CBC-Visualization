@@ -9,6 +9,7 @@
 	import Settings from '$lib/components/Settings.svelte';
 	import MobileWarning from '$lib/components/MobileWarning.svelte';
 	import { resolve } from '$app/paths';
+	import { settingsState } from '$lib/stores/settings.svelte';
 
 	let { children } = $props();
 
@@ -23,6 +24,10 @@
 				await navigation.complete;
 			});
 		});
+	});
+
+	$effect(() => {
+		localStorage.setItem('settings', JSON.stringify(settingsState));
 	});
 </script>
 

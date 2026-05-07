@@ -5,9 +5,21 @@ export interface Padder {
 }
 
 export class PKCS7Padder implements Padder {
+<<<<<<< Updated upstream
 	padd(input: number[], blockSize: number): number[][] {
 		const chunks = chunk(input, blockSize);
 		const lastChunk = chunks[chunks.length - 1];
+=======
+	padd(input: Uint8Array, blockSize: number): Uint8Array[] {
+		const chunks: Uint8Array[] = chunk(input, blockSize);
+
+		if (chunks.length === 0) {
+			const fullPaddingBlock = new Uint8Array(blockSize).fill(blockSize);
+			return [fullPaddingBlock];
+		}
+
+		const lastChunk = chunks.length > 0 ? chunks[chunks.length - 1] : chunks[0];
+>>>>>>> Stashed changes
 
 		if (lastChunk.length === blockSize) {
 			const fullPaddingBlock = new Array(blockSize).fill(blockSize);

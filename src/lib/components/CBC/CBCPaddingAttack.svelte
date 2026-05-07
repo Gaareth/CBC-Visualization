@@ -16,10 +16,17 @@
 	import CBCBlock from './CBCBlock.svelte';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
 	import { CBC_LAYOUT, getGapToNext, getToXorLength } from '$lib/stores/cbcConstants.svelte';
+<<<<<<< Updated upstream
+=======
+	import ByteRecoverer from '../CBCInteractions/ByteRecoverer.svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
+	import { getFixedKey } from '$lib/logic/ciphers/cipherTEA';
+	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
+>>>>>>> Stashed changes
 
-	// let key = [0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a, 0x09, 0x08];
-	let key = [0, 0, 0, 0, 0, 0, 0, 0];
-	let initializationVector = $state([4, 20, 150, 3, 100, 41, 42, 201]);
+	let key = getFixedKey();
+	let initializationVector = $state(new Uint8Array([4, 20, 150, 3, 100, 41, 42, 201]));
 
 	let plaintext = $state('HELLO');
 	let plaintextBlock = $derived(stringToArray(plaintext));
@@ -51,28 +58,6 @@
 		return result.valid;
 	};
 
-	let guessGate = $state(createGate());
-	async function recoverPlaintext() {
-		showSuccess = false;
-		attackInProgress = true;
-
-		const stopAutoGuess = autoRunGate(guessGate, () => 10);
-
-		await recoverPlaintextWithOracle(ciphertextBlocks, paddingOracle, {
-			outGuessedDecBlocks: guessedOutputBlocks,
-			outGuessedPlaintextBlocks: guessedPlaintextBlocks,
-			guessGate,
-			progress: {
-				onBlockStart: (i) => {
-					currentlyAttackedPlaintextBlock = i - 1;
-				}
-			}
-		});
-
-		stopAutoGuess();
-		attackInProgress = false;
-		showSuccess = true;
-	}
 
 	let lastBlockPaddingValidationResult = $derived(
 		padder.validatePadding(decryptedplaintextBlocks[decryptedplaintextBlocks.length - 1])
@@ -285,15 +270,14 @@
 				ciphertextBlock={ciphertextBlocks[i + 1]}
 				initializationVector={i === 0 ? ciphertextBlocks[0] : undefined}
 				isLastBlock={isLastBlock(i)}
-				onChangeCiphertext={(bytes) =>
-					(ciphertextBlocks[i + 1] = bytes.map((b) => b ?? 0) as number[])}
+				onChangeCiphertext={(bytes) => (ciphertextBlocks[i + 1] = bytes)}
 				onChangeIV={(bytes) => {
-					ciphertextBlocks[0] = bytes.map((b) => b ?? 0) as number[];
+					ciphertextBlocks[0] = bytes;
 				}}
 			>
 				{#snippet PlainTextBlock(index)}
 					<Block
-						bytes={decryptedplaintextBlocks[index]}
+						bytes={uint8ArrayToUI(decryptedplaintextBlocks[index])}
 						error={getPaddingErrorForBlock(index)}
 						success={showSuccess}
 						reserveSpaceForError={true}

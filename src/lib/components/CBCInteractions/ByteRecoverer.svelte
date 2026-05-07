@@ -14,11 +14,16 @@
 	import Block from '../shared/Block.svelte';
 
 	interface Props {
+<<<<<<< Updated upstream
 		plaintextBlocks?: number[][];
 		ciphertextBlocks: number[][];
+=======
+		plaintextBlocks: Uint8Array[];
+		ciphertextBlocks: Uint8Array[];
+>>>>>>> Stashed changes
 		guessedOutputBlocks: (number | undefined)[][];
 		guessedPlaintextBlocks: (number | undefined)[][];
-		paddingOracle: (cBlocks: number[][]) => boolean;
+		paddingOracle: (cBlocks: Uint8Array[]) => boolean;
 
 		resetCiphertext: () => void;
 		skipEdgeCheck?: boolean;
@@ -40,7 +45,7 @@
 	}: Props = $props();
 
 	// svelte-ignore state_referenced_locally
-	let originalPlaintext: number[][] | undefined = $state();
+	let originalPlaintext: Uint8Array[] | undefined = $state();
 
 	let checkEdgeCases = $derived(!skipEdgeCheck);
 	let guessProgress = $state(0);

@@ -99,6 +99,14 @@
 			indices: result.invalidIndices ?? []
 		};
 	}
+
+	function wrapOnChange(handler?: (bytes: Uint8Array) => void) {
+		return (bytes: (number | undefined)[]) => {
+			if (handler) {
+				handler(new Uint8Array(bytes.map((b) => b ?? 0)));
+			}
+		};
+	}
 </script>
 
 {#snippet xor()}
@@ -133,8 +141,13 @@
 	{:else}
 		<div class={flippedClass}>
 			<Block
+<<<<<<< Updated upstream
 				bytes={plaintextBlock}
 				onChange={onChangePlaintext}
+=======
+				bytes={uint8ArrayToUI(plaintextBlock)}
+				onChange={wrapOnChange(onChangePlaintext)}
+>>>>>>> Stashed changes
 				{byteWidth}
 				allowEdit={encryptionMode}
 				error={paddingResult && extractPaddingError(paddingResult)}
@@ -160,9 +173,9 @@
 				{:else}
 					<div class={flippedClass}>
 						<Block
-							bytes={initializationVector}
+							bytes={uint8ArrayToUI(initializationVector)}
 							{byteWidth}
-							onChange={onChangeIV}
+							onChange={wrapOnChange(onChangeIV)}
 							allowEdit={true}
 							reserveSpaceForError={true}
 							title="Initialization Vector (IV)"
@@ -230,11 +243,11 @@
 	</div>
 
 	<Block
-		bytes={ciphertextBlock}
+		bytes={uint8ArrayToUI(ciphertextBlock)}
 		className={cn(flippedClass)}
 		{byteWidth}
 		allowEdit={!encryptionMode}
-		onChange={onChangeCiphertext}
+		onChange={wrapOnChange(onChangeCiphertext)}
 	/>
 
 	<p class={cn(flippedClass)}>Ciphertext Block {index} (C_{index})</p>

@@ -7,8 +7,13 @@ export function cbcEncryptBlocks(
 	iv: number[],
 	blockCipherFn: (plaintext: number[], key: number[]) => number[]
 ) {
+<<<<<<< Updated upstream
 	const ciphertextBlocks: number[][] = [iv];
 	let previousBlock = iv;
+=======
+	const ciphertextBlocks: Uint8Array[] = [iv];
+	let previousBlock: Uint8Array = iv.slice();
+>>>>>>> Stashed changes
 
 	for (const plaintextBlock of plaintextBlocks) {
 		const xored_block = xorBlocks(plaintextBlock, previousBlock);
@@ -21,13 +26,13 @@ export function cbcEncryptBlocks(
 }
 
 export function cbcEncrypt(
-	plaintext: number[],
-	key: number[],
-	iv: number[],
-	blockCipherFn: (plaintext: number[], key: number[]) => number[],
+	plaintext: Uint8Array,
+	key: Uint8Array,
+	iv: Uint8Array,
+	blockCipherFn: (plaintext: Uint8Array, key: Uint8Array) => Uint8Array,
 	padder: Padder = new PKCS7Padder()
 ) {
-	let plaintextBlocks: number[][] = padder.padd(plaintext, iv.length);
+	let plaintextBlocks: Uint8Array[] = padder.padd(plaintext, iv.length);
 	let ciphertextBlocks = cbcEncryptBlocks(plaintextBlocks, key, iv, blockCipherFn);
 
 	plaintextBlocks.unshift(iv);
@@ -39,15 +44,17 @@ export function cbcEncrypt(
 }
 
 export function cbcDecrypt(
-	ciphertextBlocks: number[][],
-	key: number[],
-	blockCipherFn: (plaintext: number[], key: number[]) => number[]
-): number[][] {
-	let previousCiphertext = ciphertextBlocks[0];
-	const plaintextBlocks: number[][] = [];
+	ciphertextBlocks: Uint8Array[],
+	key: Uint8Array,
+	blockCipherFn: (plaintext: Uint8Array, key: Uint8Array) => Uint8Array
+): Uint8Array[] {
+	let ciphertextCopy = ciphertextBlocks.map(block => new Uint8Array(block));
 
-	for (const ciphertext_block of ciphertextBlocks.slice(1)) {
-		let decrypted_block = blockCipherFn(ciphertext_block, key);
+	let previousCiphertext = ciphertextCopy[0];
+	const plaintextBlocks: Uint8Array[] = [];
+
+	for (const ciphertext_block of ciphertextCopy.slice(1)) {
+		let decrypted_block = blockCipherFn(new Uint8Array(ciphertext_block), key); // Make a copy to avoid mutating the original
 		decrypted_block = xorBlocks(decrypted_block, previousCiphertext);
 		plaintextBlocks.push(decrypted_block);
 		previousCiphertext = ciphertext_block;

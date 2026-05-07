@@ -17,7 +17,7 @@
 		showSuccess: boolean;
 		resetCiphertext: () => void;
 		paddingOracle: PaddingOracle;
-		ciphertextBlocks: number[][];
+		ciphertextBlocks: Uint8Array[];
 	}
 
 	let {
