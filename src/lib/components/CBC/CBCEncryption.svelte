@@ -1,26 +1,30 @@
 <script lang="ts">
 	import CBC from '$lib/components/CBC/CBC.svelte';
 	import type { SvelteComponent } from 'svelte';
-	import { oneTimePad, stringToArray } from '../../logic/crypto-utils';
-	import { cbcEncrypt, cbcEncryptBlocks } from '../../logic/cbc';
+	import { stringToArray } from '../../logic/crypto-utils';
+	import { cbcEncryptBlocks } from '../../logic/cbc';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
-	import { PKCS7Padder } from '../../logic/padding';
 	import FloatingInput from '../ui/FloatingInput.svelte';
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-
-	const padder = new PKCS7Padder();
+	import { getBlockCipher, getKey, getPadder } from '$lib/logic/cbc-service';
+	import { settingsState } from '$lib/stores/settings.svelte';
 
 	let plaintext = $state('Hello, World!');
 	let plaintextBlock = $derived(stringToArray(plaintext));
-	let initializationVector: Uint8Array = $state(new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]));
-	let key = new Uint8Array([0, 0, 0, 0, 0, 0, 0, 0]);
+	let initializationVector: Uint8Array = $state(
+		new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01])
+	);
+
+	const cipher = $derived(getBlockCipher(settingsState.blockCipher));
+	const key = $derived(getKey(cipher, plaintextBlock, settingsState));
+	const padder = $derived(getPadder(settingsState.paddingScheme));
 
 	let plaintextBlocks = $derived(padder.padd(plaintextBlock, initializationVector.length));
 
 	let ciphertextBlocks = $derived(
-		cbcEncryptBlocks(plaintextBlocks, key, initializationVector, oneTimePad)
+		cbcEncryptBlocks(plaintextBlocks, key, initializationVector, cipher.encrypt)
 	);
 
 	let cbc: SvelteComponent;
@@ -36,7 +40,7 @@
 		arrowsRotated = !arrowsRotated;
 	}
 
-	function onIVChange(bytes: Uint8Array) {
+	function onChangeIV(bytes: Uint8Array) {
 		initializationVector = bytes;
 	}
 </script>
@@ -106,5 +110,5 @@
 		next={() => goto(resolve('/decryption'))}
 	></ExplainWrapper>
 
-	<CBC bind:plaintextBlocks {ciphertextBlocks} encryptionMode={true} bind:this={cbc} {onIVChange} />
+	<CBC bind:plaintextBlocks {ciphertextBlocks} encryptionMode={true} bind:this={cbc} {onChangeIV} />
 </div>

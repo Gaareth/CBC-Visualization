@@ -1,16 +1,12 @@
 <script lang="ts">
-	import Block from '$lib/components/shared/Block.svelte';
-	import Card from '$lib/components/shared/Card.svelte';
 	import CBC from '$lib/components/CBC/CBC.svelte';
-	import CBCDecryption from '$lib/components/CBC/CBCDecryption.svelte';
 	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
 
-	import { cbcDecrypt, cbcEncrypt, cbcEncryptBlocks } from '$lib/logic/cbc';
+	import { cbcDecrypt, cbcEncrypt } from '$lib/logic/cbc';
 	import { stringToArray, oneTimePad } from '$lib/logic/crypto-utils';
 
 	import { PKCS7Padder } from '$lib/logic/padding';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
-	import { updateBlock } from '$lib/utils/reactivity.svelte';
 	import { cn } from '$lib/utils/styling';
 	import hljs from 'highlight.js/lib/core';
 	import javascript from 'highlight.js/lib/languages/javascript';

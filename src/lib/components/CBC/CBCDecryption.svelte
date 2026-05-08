@@ -5,55 +5,53 @@
 	import { cbcDecrypt, cbcEncrypt, cbcEncryptBlocks } from '../../logic/cbc';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
 	import { PKCS7Padder } from '../../logic/padding';
-	import FloatingInput from '../ui/FloatingInput.svelte';
-	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import Block from '../shared/Block.svelte';
-	import { updateBlock } from '../../utils/reactivity.svelte';
+	import {
+		decryptCBCWithContext,
+		encryptCBCWithContext,
+		getBlockCipher,
+		getKey,
+		getPadder
+	} from '$lib/logic/cbc-service';
+	import { settingsState } from '$lib/stores/settings.svelte';
 
-	const padder = new PKCS7Padder();
+	const padder = getPadder(settingsState.paddingScheme);
 
 	let plaintext = $state('HELLO WORLD');
 	let plaintextBlock = $derived(stringToArray(plaintext));
-	let initializationVector = $state([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
-	let key = [0, 0, 0, 0, 0, 0, 0, 0];
-
-	// let plaintextBlocks = $derived(padder.padd(plaintextBlock, initializationVector.length));
-
-	// let ciphertextBlocks = $state(
-	// 	cbcEncryptBlocks(plaintextBlocks, key, initializationVector, oneTimePad)
-	// );
-
-	let { ciphertextBlocks } = $state(
-		cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder)
+	let initializationVector: Uint8Array = $state(
+		new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
 	);
 
-	let plaintextBlocks = $derived(cbcDecrypt(ciphertextBlocks, key, oneTimePad));
+	let { ciphertextBlocks, key } = $derived(
+		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
+	);
 
-	let cbc: SvelteComponent;
-
-	function oninput(event: Event) {
-		const target = event.target as HTMLInputElement;
-		plaintext = target.value;
-	}
+	let plaintextBlocks = $derived(decryptCBCWithContext(ciphertextBlocks, key, settingsState));
 
 	function modifyIV() {
 		const lastIndex = initializationVector.length - 1;
-
-		ciphertextBlocks = updateBlock(ciphertextBlocks, 0, (block) => {
-			block[lastIndex] = (block[lastIndex] + 1) % 256;
-		});
+		const modifiedIV = new Uint8Array(ciphertextBlocks[0]);
+		modifiedIV[lastIndex] = (modifiedIV[lastIndex] + 1) % 256;
+		ciphertextBlocks[0] = modifiedIV;
+		ciphertextBlocks = [...ciphertextBlocks];
 	}
 
 	function createPaddingError() {
 		const blockIndex = ciphertextBlocks.length - 2;
 		const lastIndex = initializationVector.length - 1;
 
-		ciphertextBlocks = updateBlock(ciphertextBlocks, blockIndex, (block) => {
-			block[lastIndex] = (block[lastIndex] + 1) % 256;
-		});
+		const modifiedBlock = new Uint8Array(ciphertextBlocks[blockIndex]);
+		modifiedBlock[lastIndex] = (modifiedBlock[lastIndex] + 1) % 256;
+		ciphertextBlocks[blockIndex] = modifiedBlock;
+		ciphertextBlocks = [...ciphertextBlocks];
 	}
+
+
+		console.log(plaintextBlocks);
+	console.log(ciphertextBlocks);
+	
 </script>
 
 {#snippet explain()}
@@ -120,9 +118,17 @@
 		{plaintextBlocks}
 		bind:ciphertextBlocks
 		encryptionMode={false}
-		bind:this={cbc}
-		onIVChange={(bytes) => {
-			// ciphertextBlocks[0] = bytes.map((b) => b ?? 0) as number[];
+		onChangeIV={(bytes) => {
+			ciphertextBlocks[0] = bytes;
+			ciphertextBlocks = [...ciphertextBlocks];
+		}}
+		onPlaintextChange={(blocks) => {
+			plaintextBlocks = blocks;
+			plaintextBlocks = [...plaintextBlocks];
+		}}
+		onCiphertextChange={(blocks) => {
+			ciphertextBlocks = blocks;
+			ciphertextBlocks = [...ciphertextBlocks];
 		}}
 		{padder}
 	/>

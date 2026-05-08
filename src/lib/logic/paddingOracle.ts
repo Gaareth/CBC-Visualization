@@ -70,10 +70,10 @@ type AttackProgress = {
 	onProgressUpdate?: (event: AttackEvent) => void;
 };
 
-export type PaddingOracle = (ciphertextBlocks: number[][]) => boolean;
+export type PaddingOracle = (ciphertextBlocks: Uint8Array[]) => boolean;
 
 export async function recoverPlaintextWithOracle(
-	ciphertextBlocks: number[][],
+	ciphertextBlocks: Uint8Array[],
 	paddingOracle: PaddingOracle,
 	{
 		skipEdgeCaseCheck = false,
@@ -116,8 +116,8 @@ export async function recoverPlaintextWithOracle(
 }
 
 export async function recoverSingleBlock(
-	ivBlock: number[],
-	ciphertextBlock: number[],
+	ivBlock: Uint8Array,
+	ciphertextBlock: Uint8Array,
 	paddingOracle: PaddingOracle,
 	{
 		skipEdgeCaseCheck = false,
@@ -176,8 +176,8 @@ export async function recoverSingleBlock(
 
 export async function recoverSingleByte(
 	byte: number,
-	ivBlock: number[],
-	ciphertextBlock: number[],
+	ivBlock: Uint8Array,
+	ciphertextBlock: Uint8Array,
 	paddingOracle: PaddingOracle,
 	{
 		skipEdgeCaseCheck = false,
@@ -261,20 +261,20 @@ export async function recoverSingleByte(
 	}
 }
 
-function fillArray(arr: number[], newValue: number) {
+function fillArray(arr: Uint8Array, newValue: number) {
 	for (let i = 0; i < arr.length; i++) {
 		arr[i] = newValue;
 	}
 }
 
-function setArray(arr: number[], newValues: number[]) {
+function setArray(arr: Uint8Array, newValues: Uint8Array) {
 	for (let i = 0; i < arr.length; i++) {
 		arr[i] = newValues[i];
 	}
 }
 
 export async function findPaddingLengthWithOracle(
-	ciphertextBlocks: number[][],
+	ciphertextBlocks: Uint8Array[],
 	paddingOracle: PaddingOracle,
 	byteGate: { wait: () => Promise<void> } = autoGate
 ): Promise<number | null> {

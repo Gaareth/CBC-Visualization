@@ -1,3 +1,5 @@
+import { displayByte } from "$lib/utils/compute";
+
 export interface Padder {
 	padd(input: Uint8Array, blockSize: number): Uint8Array[];
 	validatePadding(input: Uint8Array): { valid: boolean; invalidIndices?: number[]; message?: string };
@@ -45,7 +47,7 @@ export class PKCS7Padder implements Padder {
 		return {
 			valid: invalidPaddingIndices.length === 0,
 			invalidIndices: invalidPaddingIndices,
-			message: `Expected ${paddingLength}`
+			message: `Expected ${paddingLength} bytes of value 0x${displayByte(paddingLength, "hex")}.`
 		};
 	}
 }

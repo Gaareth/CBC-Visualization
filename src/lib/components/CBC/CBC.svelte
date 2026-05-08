@@ -9,7 +9,10 @@
 		ciphertextBlocks: Uint8Array[];
 
 		encryptionMode?: boolean;
-		onIVChange?: (bytes: Uint8Array) => void;
+		onChangeIV?: (bytes: Uint8Array) => void;
+		onPlaintextChange?: (blocks: Uint8Array[]) => void;
+		onCiphertextChange?: (blocks: Uint8Array[]) => void;
+
 		padder?: Padder;
 		addInitPadding?: boolean;
 	}
@@ -17,14 +20,15 @@
 	let {
 		plaintextBlocks = $bindable(),
 		ciphertextBlocks = $bindable(),
-		onIVChange,
+		onChangeIV,
+		onPlaintextChange,
+		onCiphertextChange,
 
 		encryptionMode = true,
 		padder,
 		addInitPadding = false
 	}: Props = $props();
 
-	const initializationVector = $derived(ciphertextBlocks[0]);
 
 	let targetRotation = $derived(encryptionMode ? 90 : 270);
 
@@ -34,6 +38,7 @@
 
 	const isLastBlock = $derived((i: number) => i === plaintextBlocks.length - 1);
 </script>
+
 
 <div class={cn('flex justify-center')} style={`gap: ${getGapToNext()}px;`}>
 	{#each { length: plaintextBlocks.length } as _, i}
@@ -45,14 +50,18 @@
 			ciphertextBlock={ciphertextBlocks[i + 1]}
 			initializationVector={i === 0 ? ciphertextBlocks[0] : undefined}
 			isLastBlock={isLastBlock(i)}
-			onChangeCiphertext={(bytes) => (ciphertextBlocks[i + 1] = bytes)}
+			onChangeCiphertext={(bytes) => {
+				ciphertextBlocks[i + 1] = bytes;
+				onCiphertextChange?.(ciphertextBlocks);
+			}}
 			onChangePlaintext={(bytes) => {
 				plaintextBlocks[i] = bytes;
 				plaintextBlocks = [...plaintextBlocks];
+				onPlaintextChange?.(plaintextBlocks);
 			}}
 			onChangeIV={(bytes) => {
 				// ciphertextBlocks[0] = bytes;
-				onIVChange?.(bytes);
+				onChangeIV?.(bytes);
 			}}
 			{padder}
 			addInitPadding={addInitPadding && i === 0}

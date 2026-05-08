@@ -7,8 +7,6 @@
 	import { autoRunGate, type Gate } from '$lib/utils/generic';
 	import { Slider } from '$lib/components/ui/slider/index.js';
 	import Separator from '../ui/separator/separator.svelte';
-	import { setContext } from 'svelte';
-	import ToggleGroup from '../ui/toggle-group/toggle-group.svelte';
 
 	interface Props {
 		surfaceLevel?: SurfaceLevel;
