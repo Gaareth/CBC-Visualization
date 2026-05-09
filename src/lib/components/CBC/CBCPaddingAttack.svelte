@@ -12,22 +12,37 @@
 	import ByteRecoverer from '../CBCInteractions/ByteRecoverer.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { getFixedKey } from '$lib/logic/ciphers/cipherTEA';
 	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
+	import {
+		encryptCBCWithContext,
+		decryptCBCWithContext,
+		getPadder,
+		getKey,
+		getBlockCipher
+	} from '$lib/logic/cbc-service';
+	import { settingsState } from '$lib/stores/settings.svelte';
 
-	let key = getFixedKey();
 	let initializationVector = $state(new Uint8Array([4, 20, 150, 3, 100, 41, 42, 201]));
 
 	let plaintext = $state('A SECRET MESSAGE');
 	let plaintextBlock = $derived(stringToArray(plaintext));
 
-	let padder = new PKCS7Padder();
+	let padder = $derived(getPadder(settingsState.paddingScheme));
+	let key = $derived(getKey(getBlockCipher(settingsState.blockCipher), plaintextBlock));
 
-	let { ciphertextBlocks, plaintextBlocks } = $state(
+	let { plaintextBlocks, ciphertextBlocks } = $derived(
 		cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder)
 	);
 
 	let decryptedplaintextBlocks = $derived(cbcDecrypt(ciphertextBlocks, key, oneTimePad));
+
+	// let { plaintextBlocks, ciphertextBlocks, key, padder } = $state(
+	// 	encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
+	// );
+
+	// let decryptedplaintextBlocks = $derived(
+	// 	decryptCBCWithContext(ciphertextBlocks, key, settingsState)
+	// );
 
 	let blockSize = $derived(ciphertextBlocks[0].length);
 	let numBlocks = $derived(ciphertextBlocks.length);
@@ -47,7 +62,6 @@
 
 		return result.valid;
 	};
-
 
 	let lastBlockPaddingValidationResult = $derived(
 		padder.validatePadding(decryptedplaintextBlocks[decryptedplaintextBlocks.length - 1])
@@ -89,12 +103,10 @@
 	);
 
 	function resetCiphertext() {
-		ciphertextBlocks = cbcEncrypt(
+		ciphertextBlocks = encryptCBCWithContext(
 			plaintextBlock,
-			key,
 			initializationVector,
-			oneTimePad,
-			padder
+			settingsState
 		).ciphertextBlocks;
 
 		guessedOutputBlocks = Array.from({ length: numBlocks }, () =>
@@ -116,7 +128,7 @@
 	>
 		<ByteRecoverer
 			{plaintextBlocks}
-			{ciphertextBlocks}
+			bind:ciphertextBlocks
 			{guessedOutputBlocks}
 			{paddingOracle}
 			{guessedPlaintextBlocks}
@@ -135,9 +147,13 @@
 				ciphertextBlock={ciphertextBlocks[i + 1]}
 				initializationVector={i === 0 ? ciphertextBlocks[0] : undefined}
 				isLastBlock={isLastBlock(i)}
-				onChangeCiphertext={(bytes) => (ciphertextBlocks[i + 1] = bytes)}
+				onChangeCiphertext={(bytes) => {
+					ciphertextBlocks[i + 1] = bytes;
+					ciphertextBlocks = [...ciphertextBlocks];
+				}}
 				onChangeIV={(bytes) => {
 					ciphertextBlocks[0] = bytes;
+					ciphertextBlocks = [...ciphertextBlocks];
 				}}
 			>
 				{#snippet PlainTextBlock(index)}

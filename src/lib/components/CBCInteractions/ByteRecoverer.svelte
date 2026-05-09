@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Switch } from '$lib/components/ui/switch';
 	import { cn } from '$lib/utils';
+	import { circOut } from 'svelte/easing';
 	import {
 		recoverPlaintextWithOracle,
 		recoverSingleByte,
@@ -29,7 +30,7 @@
 
 	let {
 		plaintextBlocks,
-		ciphertextBlocks,
+		ciphertextBlocks = $bindable(),
 		guessedOutputBlocks,
 		guessedPlaintextBlocks,
 		paddingOracle,
@@ -132,6 +133,10 @@
 				onGuess: (guess) => {
 					guessProgress = guess / 255;
 					isGuessing = true;
+				},
+
+				onCiphertextChange: () => {
+					ciphertextBlocks = [...ciphertextBlocks];
 				},
 
 				onProgressUpdate: (event) => {

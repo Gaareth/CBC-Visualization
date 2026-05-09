@@ -25,12 +25,15 @@ export function cbcEncrypt(
 	key: Uint8Array,
 	iv: Uint8Array,
 	blockCipherFn: (plaintext: Uint8Array, key: Uint8Array) => Uint8Array,
-	padder: Padder = new PKCS7Padder()
+	padder: Padder = new PKCS7Padder(),
+	addIV: boolean | undefined = true
 ) {
 	let plaintextBlocks: Uint8Array[] = padder.padd(plaintext, iv.length);
 	let ciphertextBlocks = cbcEncryptBlocks(plaintextBlocks, key, iv, blockCipherFn);
 
-	plaintextBlocks.unshift(iv);
+	if (addIV) {
+		plaintextBlocks.unshift(iv);
+	}
 
 	return {
 		ciphertextBlocks,

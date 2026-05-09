@@ -67,6 +67,7 @@ type AttackProgress = {
 	onByteStart?: (byteIndex: number) => void;
 	onByteEnd?: (byteIndex: number) => void;
 	onGuess?: (guess: number) => void;
+	onCiphertextChange?: () => void;
 	onProgressUpdate?: (event: AttackEvent) => void;
 };
 
@@ -153,6 +154,7 @@ export async function recoverSingleBlock(
 			for (let i = blockSize - 1; i > blockSize - byte; i--) {
 				ivBlock[i] = byte ^ outGuessedDecBlock[i]!;
 			}
+			progress?.onCiphertextChange?.();
 			progress?.onProgressUpdate?.({ event: 'after-set-padding-bytes', data: { byte } });
 			await interactionGate.wait();
 		}
@@ -204,6 +206,7 @@ export async function recoverSingleByte(
 		progress?.onGuess?.(guess);
 
 		ivBlock[blockSize - byte] = guess;
+		progress?.onCiphertextChange?.();
 
 		let valid = paddingOracle([ivBlock, ciphertextBlock]);
 
@@ -215,6 +218,7 @@ export async function recoverSingleByte(
 
 				ivBlock[blockSize - byte - 1] ^= 1;
 				let valid2 = paddingOracle([ivBlock, ciphertextBlock]);
+				progress?.onCiphertextChange?.();
 
 				progress?.onProgressUpdate?.({
 					event: 'edge-case-check-result',
@@ -223,6 +227,7 @@ export async function recoverSingleByte(
 				await interactionGate.wait();
 
 				ivBlock[blockSize - byte - 1] ^= 1; // restore
+				progress?.onCiphertextChange?.();
 
 				// if we found 0x01, then changing the previous byte should not make it invalid
 				// invalid means we found 0x02, or 0x03, etc.

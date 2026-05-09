@@ -8,7 +8,13 @@
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { getBlockCipher, getKey, getPadder } from '$lib/logic/cbc-service';
+	import {
+		encryptCBCWithContext,
+		getBlockCipher,
+		getCBCSettings,
+		getKey,
+		getPadder
+	} from '$lib/logic/cbc-service';
 	import { settingsState } from '$lib/stores/settings.svelte';
 
 	let plaintext = $state('Hello, World!');
@@ -17,12 +23,8 @@
 		new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01])
 	);
 
-	const cipher = $derived(getBlockCipher(settingsState.blockCipher));
-	const key = $derived(getKey(cipher, plaintextBlock, settingsState));
-	const padder = $derived(getPadder(settingsState.paddingScheme));
-
+	const { padder, key, cipher } = $derived(getCBCSettings(plaintextBlock, settingsState));
 	let plaintextBlocks = $derived(padder.padd(plaintextBlock, initializationVector.length));
-
 	let ciphertextBlocks = $derived(
 		cbcEncryptBlocks(plaintextBlocks, key, initializationVector, cipher.encrypt)
 	);
@@ -110,5 +112,16 @@
 		next={() => goto(resolve('/decryption'))}
 	></ExplainWrapper>
 
-	<CBC bind:plaintextBlocks {ciphertextBlocks} encryptionMode={true} bind:this={cbc} {onChangeIV} />
+	<CBC
+		bind:plaintextBlocks
+		{ciphertextBlocks}
+		encryptionMode={true}
+		bind:this={cbc}
+		{onChangeIV}
+		onPlaintextChange={(blocks) => {
+			plaintextBlocks = blocks;
+			plaintextBlocks = [...plaintextBlocks];
+			console.log(plaintextBlocks);
+		}}
+	/>
 </div>

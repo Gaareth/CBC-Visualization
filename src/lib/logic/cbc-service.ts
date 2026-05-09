@@ -25,10 +25,27 @@ export function getPadder(name: PaddingScheme): Padder {
 	return padderRegistry[name]();
 }
 
+export function getCBCSettings(plaintext: Uint8Array, settings: typeof settingsState) {
+	const cipher = getBlockCipher(settings.blockCipher);
+	if (!cipher) {
+		throw new Error(`Unsupported block cipher: ${settings.blockCipher}`);
+	}
+
+	const padder = getPadder(settings.paddingScheme);
+	if (!padder) {
+		throw new Error(`Unsupported padding scheme: ${settings.paddingScheme}`);
+	}
+
+	const key = getKey(cipher, plaintext);
+
+	return { cipher, padder, key };
+}
+
 export function encryptCBCWithContext(
 	plaintext: Uint8Array,
 	iv: Uint8Array,
-	settings: typeof settingsState
+	settings: typeof settingsState,
+	addIV: boolean | undefined = true
 ) {
 	const cipher = getBlockCipher(settings.blockCipher);
 	if (!cipher) {
@@ -40,12 +57,12 @@ export function encryptCBCWithContext(
 		throw new Error(`Unsupported padding scheme: ${settings.paddingScheme}`);
 	}
 
-	const key = getKey(cipher, plaintext, settings);
+	const key = getKey(cipher, plaintext);
 
-	return { ...cbcEncrypt(plaintext, key, iv, cipher.encrypt, padder), key };
+	return { ...cbcEncrypt(plaintext, key, iv, cipher.encrypt, padder, addIV), key, padder };
 }
 
-export function getKey(cipher: Cipher, plaintext: Uint8Array, settings: typeof settingsState) {
+export function getKey(cipher: Cipher, plaintext: Uint8Array) {
 	let key;
 	if (cipher.getFixedKey) {
 		key = cipher.getFixedKey();
@@ -54,9 +71,8 @@ export function getKey(cipher: Cipher, plaintext: Uint8Array, settings: typeof s
 	} else if (cipher instanceof OTPCipher && cipher.generateKeyWithLength) {
 		key = cipher.generateKeyWithLength(plaintext.length);
 	} else {
-		throw new Error(`Cipher ${settings.blockCipher} does not support key generation`);
+		throw new Error(`Cipher ${cipher} does not support key generation`);
 	}
-
 
 	return key;
 }

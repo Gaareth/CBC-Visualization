@@ -10,21 +10,20 @@
 	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { cn } from '$lib/utils/styling';
 	import { CBC_LAYOUT, getBlockWidth, getLeftPadding } from '$lib/stores/cbcConstants.svelte';
+	import { encryptCBCWithContext } from '$lib/logic/cbc-service';
+	import { settingsState } from '$lib/stores/settings.svelte';
 
 	const title = 'What is Padding?';
-
-	const padder = new PKCS7Padder();
 
 	let defaultPlaintext = 'Hello World!';
 	let plaintext = $derived(defaultPlaintext.slice(0, 5));
 	let plaintextBlock = $derived(stringToArray(plaintext));
-	let initializationVector = $state([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01]);
-	let key = [0, 0, 0, 0, 0, 0, 0, 0];
+	let initializationVector = $state(
+		new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01])
+	);
 
-	let plaintextBlocks = $derived(padder.padd(plaintextBlock, initializationVector.length));
-
-	let ciphertextBlocks = $derived(
-		cbcEncryptBlocks(plaintextBlocks, key, initializationVector, oneTimePad)
+	let { ciphertextBlocks, plaintextBlocks } = $derived(
+		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState, false)
 	);
 
 	function oninput(event: Event) {
