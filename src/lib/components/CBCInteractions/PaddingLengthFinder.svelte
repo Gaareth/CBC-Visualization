@@ -1,9 +1,7 @@
 <script lang="ts">
-	import Card from '../shared/Card.svelte';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
 	import { findPaddingLengthWithOracle, type PaddingOracle } from '../../logic/paddingOracle';
-	import { createGate, autoRunGate, delay } from '../../utils/generic';
-	import { updateInnerIndex } from '../../utils/reactivity.svelte';
+	import { createGate, autoRunGate } from '../../utils/generic';
 
 	interface Props {
 		paddingValidation:
@@ -17,7 +15,8 @@
 		showSuccess: boolean;
 		resetCiphertext: () => void;
 		paddingOracle: PaddingOracle;
-		ciphertextBlocks: number[][];
+		ciphertextBlocks: Uint8Array[];
+		onCiphertextChange?: () => void;
 	}
 
 	let {
@@ -26,7 +25,8 @@
 		showSuccess = $bindable(false),
 		resetCiphertext,
 		paddingOracle,
-		ciphertextBlocks = $bindable()
+		ciphertextBlocks,
+		onCiphertextChange
 	}: Props = $props();
 
 	let paddingLengthGate = $state(createGate());
@@ -38,7 +38,12 @@
 
 		showSuccess = false;
 		runningIndex = 0;
-		await findPaddingLengthWithOracle(ciphertextBlocks, paddingOracle, paddingLengthGate);
+		await findPaddingLengthWithOracle(
+			ciphertextBlocks,
+			paddingOracle,
+			paddingLengthGate,
+			onCiphertextChange
+		);
 
 		showSuccess = true;
 

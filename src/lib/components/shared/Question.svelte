@@ -10,9 +10,10 @@
 		question: Snippet;
 		reveal: Snippet;
 		className?: string;
+		title?: string;
 	}
 
-	let { question, reveal, id, className }: Props = $props();
+	let { question, reveal, id, className, title }: Props = $props();
 
 	let showReveal = $state(false);
 	onMount(() => {
@@ -28,7 +29,7 @@
 	}
 </script>
 
-<Card title="Question" className={cn('flex flex-col', className)}>
+<Card title={"Question" + (title ? `: ${title}` : '')} className={cn('flex flex-col', className)}>
 	{@render question()}
 
 	<Divider className="my-4" surfaceLevel={1} />

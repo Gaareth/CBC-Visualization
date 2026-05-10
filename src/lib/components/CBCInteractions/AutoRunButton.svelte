@@ -16,6 +16,7 @@
 		interactionGate: Gate;
 
 		isEnabled?: boolean;
+		isToggleable?: boolean;
 		guessSpeedSettings?: {
 			type: 'exponential' | 'constant';
 			constantDelayValue: number;
@@ -29,6 +30,7 @@
 		byteGate,
 		interactionGate,
 		isEnabled = $bindable(false),
+		isToggleable = true,
 		guessSpeedSettings = $bindable({
 			type: 'exponential',
 			constantDelayValue: 100,
@@ -47,6 +49,8 @@
 	});
 
 	function autoRunToggle() {
+		if (!isToggleable) return;
+
 		if (isEnabled) {
 			autoRunState.stopBlockAutoRun();
 			autoRunState.stopByteAutoRun();
@@ -83,6 +87,7 @@
 			isEnabled ? inputLayer[(surfaceLevel + 1) as SurfaceLevel] : inputLayer[surfaceLevel]
 		)}
 		onclick={autoRunToggle}
+		disabled={!isToggleable}
 	>
 		{#if isEnabled}
 			Stop Auto-Run
@@ -152,7 +157,10 @@
 						<button
 							class={cn(
 								'button-default border-r-0!',
-								guessSpeedSettings.type === 'constant' && guessSpeedSettings.constantDelayValue === 0 ? inputLayer[3] : inputLayer[2]
+								guessSpeedSettings.type === 'constant' &&
+									guessSpeedSettings.constantDelayValue === 0
+									? inputLayer[3]
+									: inputLayer[2]
 							)}
 							onclick={() => setConstant(0)}>Instant</button
 						>
@@ -168,7 +176,10 @@
 						<button
 							class={cn(
 								'button-default',
-								guessSpeedSettings.type === 'constant' && guessSpeedSettings.constantDelayValue !== 0 ? inputLayer[3] : inputLayer[2]
+								guessSpeedSettings.type === 'constant' &&
+									guessSpeedSettings.constantDelayValue !== 0
+									? inputLayer[3]
+									: inputLayer[2]
 							)}
 							onclick={() => setConstant()}
 						>

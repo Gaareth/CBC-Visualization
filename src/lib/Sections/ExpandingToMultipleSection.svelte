@@ -1,10 +1,7 @@
 <script lang="ts">
 	import Block from '$lib/components/shared/Block.svelte';
 	import CBCBlock from '$lib/components/CBC/CBCBlock.svelte';
-	import Divider from '$lib/components/shared/Divider.svelte';
-	import { cbcEncrypt, cbcDecrypt } from '$lib/logic/cbc';
-	import { oneTimePad, stringToArray } from '$lib/logic/crypto-utils';
-	import { PKCS7Padder } from '$lib/logic/padding';
+	import { stringToArray } from '$lib/logic/crypto-utils';
 	import { type PaddingOracle } from '$lib/logic/paddingOracle';
 	import Question from '$lib/components/shared/Question.svelte';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
@@ -13,21 +10,24 @@
 
 	import ByteRecoverer from '$lib/components/CBCInteractions/ByteRecoverer.svelte';
 	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
+	import { encryptCBCWithContext, decryptCBCWithContext } from '$lib/logic/cbc-service';
+	import { settingsState } from '$lib/stores/settings.svelte';
+	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
+	import { resolve } from '$app/paths';
 
 	let showSuccess = $state(false);
 
-	let padder = new PKCS7Padder();
 	let plaintext = $state('FORCE');
 	let plaintextBlock = $derived(stringToArray(plaintext));
-	let initializationVector = [0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff];
-
-	let key = [0, 0, 0, 0, 0, 0, 0, 0];
-
-	let { ciphertextBlocks } = $state(
-		cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder)
+	let initializationVector = $state(
+		new Uint8Array([0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff])
 	);
 
-	let plaintextBlocks = $derived(cbcDecrypt(ciphertextBlocks, key, oneTimePad));
+	let { ciphertextBlocks, key, padder } = $derived(
+		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
+	);
+
+	let plaintextBlocks = $derived(decryptCBCWithContext(ciphertextBlocks, key, settingsState));
 
 	const blockSize = $derived(ciphertextBlocks[0].length);
 
@@ -36,7 +36,7 @@
 	);
 
 	const paddingOracle: PaddingOracle = (cBlocks) => {
-		const decrypted = cbcDecrypt(cBlocks, key, oneTimePad);
+		const decrypted = decryptCBCWithContext(cBlocks, key, settingsState);
 		const lastBlock = decrypted[decrypted.length - 1];
 
 		const result = padder.validatePadding(lastBlock);
@@ -46,12 +46,10 @@
 	};
 
 	function resetCiphertext() {
-		ciphertextBlocks = cbcEncrypt(
+		ciphertextBlocks = encryptCBCWithContext(
 			plaintextBlock,
-			key,
 			initializationVector,
-			oneTimePad,
-			padder
+			settingsState
 		).ciphertextBlocks;
 	}
 
@@ -91,11 +89,13 @@
 <StorySection title="Exploiting - Recovering Bytes" headingLevel={3}>
 	{#snippet children()}
 		<!-- <h3>Exploitation - Recovering Bytes</h3> -->
-		<ol class="mb-0! list-disc">
+		<p class="my-0!">Some remaining questions:</p>
+		<ol class="my-0! list-disc">
 			<li>How do we now recover more than just a single byte?</li>
 
 			<li>
-				How can we use the padding oracle to recover information about the second to last byte?
+				or to begin with: How can we use the padding oracle to recover information about the second
+				to last byte?
 			</li>
 		</ol>
 
@@ -112,9 +112,8 @@
 
 					<li>
 						What conditions must be met, so a valid padding is obtained and information about the
-						second to
 						<span class={`text-${BLOCK_COLORS.plaintext}`}>
-							last byte of the decrypted plaintext
+							second to last byte of the decrypted plaintext
 						</span>
 						is gained?
 					</li>
@@ -123,8 +122,9 @@
 
 			{#snippet reveal()}
 				<p>
-					Just similarly bruteforcing the second to last iv byte until we get valid padding won't
-					work, because not only the
+					Just similarly bruteforcing the
+					<span class={`text-${BLOCK_COLORS.ciphertext}`}> second to last iv byte </span>
+					until we get valid padding won't work, because not only the
 					<span class={`text-${BLOCK_COLORS.plaintext}`}>penultimate plaintext byte</span>
 					has to be valid padding but also all the following bytes.
 				</p>
@@ -184,7 +184,7 @@
 			<div class="not-prose">
 				<ByteRecoverer
 					{plaintextBlocks}
-					{ciphertextBlocks}
+					bind:ciphertextBlocks
 					{guessedOutputBlocks}
 					{paddingOracle}
 					{guessedPlaintextBlocks}
@@ -195,11 +195,38 @@
 			</div>
 		</ExplainWrapper>
 
+		<h4>How do we extend this to multiple blocks?</h4>
+
 		<p>
-			Going to the next block, is now as simple as sending the next ciphertext block to the padding
-			oracle. E. g. for the last block the padding oracle needs ciphertextblocks[-2] (as IV) and
-			ciphertextblocks[-1] , but for the second to last block, the padding oracle
-			needs ciphertextblocks[-3] (as IV) and ciphertextblocks[-2].
+			Moving to the next block is straightforward: you simply send a different pair of ciphertext
+			blocks to the padding oracle.
+		</p>
+
+		<p>
+			For example, to recover the last plaintext block (so plaintextblocks[-1]), the padding oracle
+			needs ciphertextblocks[-2] (as IV) and ciphertextblocks[-1]. For the second to last block, the
+			padding oracle needs ciphertextblocks[-3] (as IV) and ciphertextblocks[-2], and so on.
+		</p>
+
+		<p>
+			In general, to recover plaintext block P[i], you always submit the pair (C[i−1], C[i]) to the
+			padding oracle and repeat the above attack procedure.
+		</p>
+
+		<h4>Further actions</h4>
+		<p>
+			Congratulations! You can now try it out for multiple blocks <a href={resolve('/padding-oracle-attack')}>
+				here
+			</a>
+			or/and deepen your understanding of the attack by reading through
+			<a href="https://www.nccgroup.com/research/cryptopals-exploiting-cbc-padding-oracles/">
+				this fantastic article
+			</a>.
+		</p>
+
+		<p>
+			You could also change the cipher and <strike>TODO: the padding scheme</strike> in the settings and restart from the
+			beginning.
 		</p>
 	{/snippet}
 
@@ -214,7 +241,10 @@
 				ciphertextBlock={ciphertextBlocks[1]}
 				initializationVector={ciphertextBlocks[0]}
 				isLastBlock={true}
-				onChangeCiphertext={(bytes) => (ciphertextBlocks[1] = bytes.map((b) => b ?? 0) as number[])}
+				onChangeCiphertext={(bytes) => {
+					ciphertextBlocks[1] = new Uint8Array(bytes.map((b) => b ?? 0));
+					ciphertextBlocks = [...ciphertextBlocks];
+				}}
 			>
 				{#snippet FnOutputBlock(index)}
 					<Block bytes={guessedOutputBlocks[1]} inputClassNames={inputClassNamesFN} />
@@ -222,9 +252,10 @@
 
 				{#snippet IVBlock(index)}
 					<Block
-						bytes={ciphertextBlocks[0]}
+						bytes={uint8ArrayToUI(ciphertextBlocks[0])}
 						onChange={(bytes) => {
-							ciphertextBlocks[0] = bytes.map((b) => b ?? 0) as number[];
+							ciphertextBlocks[0] = new Uint8Array(bytes.map((b) => b ?? 0));
+							ciphertextBlocks = [...ciphertextBlocks];
 						}}
 						allowEdit={true}
 						reserveSpaceForError={true}
@@ -236,7 +267,7 @@
 
 				{#snippet PlainTextBlock(index)}
 					<Block
-						bytes={plaintextBlocks[index]}
+						bytes={uint8ArrayToUI(plaintextBlocks[index])}
 						error={extractPaddingError(paddingValidation)}
 						success={showSuccess}
 						reserveSpaceForError={true}

@@ -10,7 +10,7 @@
 	} from '../../logic/paddingOracle';
 	import { settingsState } from '../../stores/settings.svelte';
 	import { displayByte } from '../../utils/compute';
-	import { createGate, autoRunGate } from '../../utils/generic';
+	import { createGate, autoRunGate, autoGate } from '../../utils/generic';
 	import { BLOCK_COLORS } from '../../utils/styling';
 	import Block from '../shared/Block.svelte';
 	import AutoRunButton from './AutoRunButton.svelte';
@@ -26,6 +26,7 @@
 		skipEdgeCheck?: boolean;
 		showEdgeCheckSwitch?: boolean;
 		multipleBytes?: boolean;
+		autoRunEnabled?: boolean;
 	}
 
 	let {
@@ -38,7 +39,8 @@
 		skipEdgeCheck = false,
 		showEdgeCheckSwitch = false,
 
-		multipleBytes = false
+		multipleBytes = false,
+		autoRunEnabled = true
 	}: Props = $props();
 
 	// svelte-ignore state_referenced_locally
@@ -88,6 +90,12 @@
 			return end + (start - end) * (1 - t);
 		};
 		const delayFunction = (i: number) => {
+			if (guessSpeedSettings.constantDelayValue == 0) {
+				// @ts-ignore
+				guessGate = autoGate;
+				return 0;
+			}
+
 			if (guessSpeedSettings.type === 'constant') {
 				return guessSpeedSettings.constantDelayValue;
 			} else {
@@ -182,6 +190,7 @@
 		isGuessing = false;
 		showResults = false;
 		guessProgress = 0;
+		currentByteIndex = 1;
 		bytesRecovered = 0;
 		attackState = undefined;
 		attackProgress = 'idle';
@@ -220,7 +229,9 @@
 		let indices: number[] = [];
 		for (let i = 0; i < guessedPlaintextBlocks[index].length; i++) {
 			const guessedByte = guessedPlaintextBlocks[index][i];
-			if (guessedByte != null && guessedByte !== originalPlaintext[index][i]) {
+			const originalByte = originalPlaintext[index][i];
+
+			if (guessedByte != null && guessedByte !== originalByte) {
 				indices.push(i);
 			}
 		}
@@ -232,7 +243,9 @@
 		const expectedString = indices
 			.map((i) =>
 				displayByte(
-					originalPlaintext ? originalPlaintext[index][i] : undefined,
+					originalPlaintext && originalPlaintext[index]?.[i] !== undefined
+						? originalPlaintext[index]?.[i]
+						: undefined,
 					settingsState.displayBytesAs
 				)
 			)
@@ -366,6 +379,7 @@
 			{interactionGate}
 			bind:isEnabled={autoRunIsEnabled}
 			bind:guessSpeedSettings
+			isToggleable={autoRunEnabled}
 		/>
 	</div>
 
@@ -399,6 +413,7 @@
 {/if}
 
 {#snippet ResultPanel()}
+
 	{#if !multipleBytes}
 		<p class="lockin-animation font-bold">
 			Recovered plaintext byte: <span class={`text-${BLOCK_COLORS.plaintext} font-bold`}>
@@ -421,7 +436,7 @@
 					<Block
 						bytes={guessedPlaintextBlocks[index + 1]}
 						success={showResults}
-						error={getMismatchErrorForBlock(index + 1)}
+						error={getMismatchErrorForBlock(index)}
 						reserveSpaceForError={true}
 						surfaceLevel={2}
 						inputClassNames={currentBlockIndex && index === currentBlockIndex - 1

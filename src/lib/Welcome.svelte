@@ -26,7 +26,7 @@
 			explanation and tool to demonstrate the padding oracle attack.
 
 			<br />
-			You can skip directly to the parts relevant for you, or you can take the tour:
+			You can skip directly to the parts relevant for you (using the navigation above), or you can take the tour:
 		</p>
 
 		<div class="mt-4 flex-center h-full">
@@ -34,7 +34,7 @@
 				class="button-default border-2 border-primary-0! bg-surface-1 text-xl hover:bg-surface-2!"
 				onclick={onstart}
 			>
-				Lets go!
+				Take the tour!
 			</button>
 		</div>
 	</div>

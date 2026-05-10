@@ -281,7 +281,8 @@ function setArray(arr: Uint8Array, newValues: Uint8Array) {
 export async function findPaddingLengthWithOracle(
 	ciphertextBlocks: Uint8Array[],
 	paddingOracle: PaddingOracle,
-	byteGate: { wait: () => Promise<void> } = autoGate
+	byteGate: { wait: () => Promise<void> } = autoGate,
+	onCiphertextChange?: () => void
 ): Promise<number | null> {
 	// Find the first byte that results in invalid padding
 	// Go from left to right. If padding is valid only a data byte has been changed
@@ -296,6 +297,7 @@ export async function findPaddingLengthWithOracle(
 	for (let i = 0; i < blockSize; i++) {
 		let originalByte = secondLastCipherBlock[i];
 		secondLastCipherBlock[i] = (originalByte + 1) % 256;
+		onCiphertextChange?.();
 
 		await byteGate.wait();
 		let valid = paddingOracle(ciphertextBlocks);

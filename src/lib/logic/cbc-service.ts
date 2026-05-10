@@ -3,6 +3,7 @@ import { cbcDecrypt, cbcEncrypt } from './cbc';
 import { OTPCipher } from './ciphers/otp/cipherOTP';
 import { TeaCipher } from './ciphers/tea/cipherTEA';
 import { PKCS7Padder, type Padder } from './padding';
+import type { PaddingOracle } from './paddingOracle';
 
 const cipherRegistry = {
 	TEA: () => new TeaCipher(),
@@ -59,7 +60,11 @@ export function encryptCBCWithContext(
 
 	const key = getKey(cipher, plaintext);
 
-	return { ...cbcEncrypt(plaintext, key, iv, cipher.encrypt, padder, addIV), key, padder };
+	return {
+		...cbcEncrypt(plaintext, key, new Uint8Array(iv), cipher.encrypt, padder, addIV),
+		key,
+		padder
+	};
 }
 
 export function getKey(cipher: Cipher, plaintext: Uint8Array) {
@@ -94,3 +99,29 @@ export function decryptCBCWithContext(
 
 	return cbcDecrypt(ciphertext, key, cipher.decrypt);
 }
+
+// const paddingOracle: PaddingOracle = (cBlocks) => {
+// 	const decrypted = cbcDecrypt(cBlocks, key, oneTimePad);
+// 	const lastBlock = decrypted[decrypted.length - 1];
+
+// 	const result = padder.validatePadding(lastBlock);
+// 	paddingValidation = result;
+
+// 	return result.valid;
+// };
+
+// export function paddingOracle(
+// 	ciphertextBlocks: Uint8Array[],
+// 	key: Uint8Array,
+// 	settings: typeof settingsState
+// ) {
+
+// 	const padder = getPadder(settings.paddingScheme);
+// 	const decrypted = decryptCBCWithContext(ciphertextBlocks, key, settingsState);
+// 	const lastBlock = decrypted[decrypted.length - 1];
+
+// 	const result = padder.validatePadding(lastBlock);
+// 	paddingValidation = result;
+
+// 	return result.valid;
+// }

@@ -15,21 +15,19 @@
 	import { BLOCK_COLORS, cn } from '$lib/utils/styling';
 
 	import ByteRecoverer from '$lib/components/CBCInteractions/ByteRecoverer.svelte';
+	import { encryptCBCWithContext, decryptCBCWithContext } from '$lib/logic/cbc-service';
+	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
 
 	let showSuccess = $state(false);
 
-	let padder = new PKCS7Padder();
 	let plaintext = $state('FORCE');
 	let plaintextBlock = $derived(stringToArray(plaintext));
-	let initializationVector = [0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff];
-
-	let key = [0, 0, 0, 0, 0, 0, 0, 0];
-
-	let { ciphertextBlocks } = $state(
-		cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder)
+	const initializationVector = new Uint8Array([0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff]);
+	let { ciphertextBlocks, key, padder } = $derived(
+		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
 	);
 
-	let plaintextBlocks = $derived(cbcDecrypt(ciphertextBlocks, key, oneTimePad));
+	let plaintextBlocks = $derived(decryptCBCWithContext(ciphertextBlocks, key, settingsState));
 
 	const blockSize = $derived(ciphertextBlocks[0].length);
 
@@ -38,7 +36,7 @@
 	);
 
 	const paddingOracle: PaddingOracle = (cBlocks) => {
-		const decrypted = cbcDecrypt(cBlocks, key, oneTimePad);
+		const decrypted = decryptCBCWithContext(ciphertextBlocks, key, settingsState);
 		const lastBlock = decrypted[decrypted.length - 1];
 
 		const result = padder.validatePadding(lastBlock);
@@ -48,13 +46,18 @@
 	};
 
 	function resetCiphertext() {
-		ciphertextBlocks = cbcEncrypt(
+		// TODO: not correcty updating the iv
+		const newCiphertextBlocks = encryptCBCWithContext(
 			plaintextBlock,
-			key,
 			initializationVector,
-			oneTimePad,
-			padder
+			settingsState
 		).ciphertextBlocks;
+		ciphertextBlocks[0] = new Uint8Array(initializationVector); // trigger reactivity
+		ciphertextBlocks = [...newCiphertextBlocks];
+	
+		console.log(initializationVector);
+		
+		console.log('Ciphertext reset');
 	}
 
 	const inputClassNamesPL: Record<number, string> = {};
@@ -90,7 +93,7 @@
 
 {#snippet example()}
 	<div class="not-prose flex w-full flex-col gap-1">
-		<p>Try it out: Modify the IV until you get valid padding</p>
+		<p class="text-center">Try it out: Modify the IV until you get valid padding</p>
 
 		<Divider
 			className="my-4 text-muted-foreground text-base"
@@ -102,11 +105,12 @@
 			skipEdgeCheck={true}
 			showEdgeCheckSwitch={false}
 			{plaintextBlocks}
-			{ciphertextBlocks}
+			bind:ciphertextBlocks
 			{guessedOutputBlocks}
 			{paddingOracle}
 			{guessedPlaintextBlocks}
 			{resetCiphertext}
+			autoRunEnabled={false}
 		/>
 	</div>
 {/snippet}
@@ -132,19 +136,19 @@
 
 		<Question id="valid-padding-plaintext">
 			{#snippet question()}
-				<p class="my-0! text-center">What does this tell you?</p>
+				<p class="my-0! text-center">What does a valid padding result tell you?</p>
 			{/snippet}
 
 			{#snippet reveal()}
 				<p class="my-0!">
-					If you get no padding error, the <span class={`text-${BLOCK_COLORS.plaintext}`}
-						>last byte of the decrypted plaintext</span
-					>
+					If you get no padding error, the
+					<span class={`text-${BLOCK_COLORS.plaintext}`}>last byte of the decrypted plaintext</span>
 					is likely (except for a few cases)
 					<span class={`text-${BLOCK_COLORS.plaintext} font-bold`}>0x01</span>. You can then try all
 					possible byte values (0-255) for the
 					<span class={`text-${BLOCK_COLORS.ciphertext}`}>last byte of the IV</span>, to find a
-					<span class={`text-${BLOCK_COLORS.plaintext}`}>plaintext</span> with valid padding.
+					<span class={`text-${BLOCK_COLORS.plaintext}`}>plaintext</span> with valid padding. As you can
+					see on the right, this means the following:
 				</p>
 
 				<p class="text-center">
@@ -158,10 +162,10 @@
 
 		<div>
 			<p class="mb-0!">
-				With this knowledge, you can then first calculate the <span
-					class={`text-${BLOCK_COLORS.fnOutput}`}
-					>last byte of the output of the block cipher decryption function</span
-				>
+				With this knowledge, you can then rearrange this equation and first calculate the
+				<span class={`text-${BLOCK_COLORS.fnOutput}`}>
+					last byte of the output of the block cipher decryption function
+				</span>
 				(DEC):
 			</p>
 
@@ -193,12 +197,17 @@
 
 		<div class="my-10">
 			<p class="mb-0!">
-				and then the
-				<span class={`text-${BLOCK_COLORS.plaintext}`}>last byte of the original plaintext</span>
-				by xoring with the
+				As you now know the confidential output of the decryption function, you only need to xor
+				<span class={`text-${BLOCK_COLORS.fnOutput}`}>it</span>
+				with the
 				<span class={`text-${BLOCK_COLORS.ciphertext}`}>
 					last byte of the <span class="font-bold">original</span> IV
-				</span>:
+				</span>
+				to get the
+
+				<span class={`text-${BLOCK_COLORS.plaintext}`}
+					>last byte of the <span class="font-bold">original</span> plaintext</span
+				>:
 			</p>
 
 			<p class="text-center">
@@ -234,8 +243,17 @@
 			</p>
 		</div>
 
+		<p class="mb-10!">Now put your knowledge to the test and recover your first byte:</p>
+
 		<ExplainWrapper slides={[example]} title="Interactive Example - Recovering a Byte"
 		></ExplainWrapper>
+
+		<Card
+			className="text-center font-semibold mt-5 border-primary-1! dark:text-primary-5"
+			surfaceLevel={1}
+		>
+			Congratulations! You've successfully recovered your first byte of the plaintext.
+		</Card>
 
 		<p>
 			Learn about edge cases and <a
@@ -256,7 +274,10 @@
 				ciphertextBlock={ciphertextBlocks[1]}
 				initializationVector={ciphertextBlocks[0]}
 				isLastBlock={true}
-				onChangeCiphertext={(bytes) => (ciphertextBlocks[1] = bytes.map((b) => b ?? 0) as number[])}
+				onChangeCiphertext={(bytes) => {
+					ciphertextBlocks[1] = bytes;
+					ciphertextBlocks = [...ciphertextBlocks];
+				}}
 			>
 				{#snippet FnOutputBlock(index)}
 					<Block bytes={guessedOutputBlocks[1]} inputClassNames={inputClassNamesFN} />
@@ -264,9 +285,10 @@
 
 				{#snippet IVBlock(index)}
 					<Block
-						bytes={ciphertextBlocks[0]}
+						bytes={uint8ArrayToUI(ciphertextBlocks[0])}
 						onChange={(bytes) => {
-							ciphertextBlocks[0] = bytes.map((b) => b ?? 0) as number[];
+							ciphertextBlocks[0] = new Uint8Array(bytes.map((b) => b ?? 0));
+							ciphertextBlocks = [...ciphertextBlocks];
 						}}
 						allowEdit={true}
 						reserveSpaceForError={true}
@@ -278,7 +300,7 @@
 
 				{#snippet PlainTextBlock(index)}
 					<Block
-						bytes={plaintextBlocks[index]}
+						bytes={uint8ArrayToUI(plaintextBlocks[index])}
 						error={extractPaddingError(paddingValidation)}
 						success={showSuccess}
 						reserveSpaceForError={true}

@@ -3,9 +3,7 @@
 	import CBCBlock from '$lib/components/CBC/CBCBlock.svelte';
 	import Divider from '$lib/components/shared/Divider.svelte';
 	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
-	import { cbcEncrypt, cbcDecrypt } from '$lib/logic/cbc';
-	import { oneTimePad, stringToArray } from '$lib/logic/crypto-utils';
-	import { PKCS7Padder } from '$lib/logic/padding';
+	import { stringToArray } from '$lib/logic/crypto-utils';
 	import { type PaddingOracle } from '$lib/logic/paddingOracle';
 	import Question from '$lib/components/shared/Question.svelte';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
@@ -15,21 +13,23 @@
 	import { toast } from 'svelte-sonner';
 	import ByteRecoverer from '$lib/components/CBCInteractions/ByteRecoverer.svelte';
 	import { fade } from 'svelte/transition';
+	import { encryptCBCWithContext, decryptCBCWithContext } from '$lib/logic/cbc-service';
+	import { settingsState } from '$lib/stores/settings.svelte';
+	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
 
 	let showRecoverer = $state(false);
 
-	let padder = new PKCS7Padder();
 	let plaintext = $state('FORCE');
 	let plaintextBlock = $derived(stringToArray(plaintext));
-	let initializationVector = [0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff];
-
-	let key = [0, 0, 0, 0, 0, 0, 0, 0];
-
-	let { ciphertextBlocks } = $state(
-		cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder)
+	let initializationVector = $state(
+		new Uint8Array([0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff])
 	);
 
-	let plaintextBlocks = $derived(cbcDecrypt(ciphertextBlocks, key, oneTimePad));
+	let { ciphertextBlocks, key, padder } = $derived(
+		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
+	);
+
+	let plaintextBlocks = $derived(decryptCBCWithContext(ciphertextBlocks, key, settingsState));
 
 	const blockSize = $derived(ciphertextBlocks[0].length);
 
@@ -38,7 +38,7 @@
 	);
 
 	const paddingOracle: PaddingOracle = (cBlocks) => {
-		const decrypted = cbcDecrypt(cBlocks, key, oneTimePad);
+		const decrypted = decryptCBCWithContext(cBlocks, key, settingsState);
 		const lastBlock = decrypted[decrypted.length - 1];
 
 		const result = padder.validatePadding(lastBlock);
@@ -48,12 +48,10 @@
 	};
 
 	function resetCiphertext() {
-		ciphertextBlocks = cbcEncrypt(
+		ciphertextBlocks = encryptCBCWithContext(
 			plaintextBlock,
-			key,
 			initializationVector,
-			oneTimePad,
-			padder
+			settingsState
 		).ciphertextBlocks;
 	}
 
@@ -76,8 +74,12 @@
 	inputClassNamesFN[blockSize - 1] = `border-${BLOCK_COLORS.fnOutput}`;
 
 	const numBlocks = $derived(ciphertextBlocks.length);
-	let guessedOutputBlocks: (number | undefined)[][] = $state(new Array(numBlocks).fill(new Array(blockSize).fill(undefined)));
-	let guessedPlaintextBlocks: (number | undefined)[][] = $state(new Array(numBlocks).fill(new Array(blockSize).fill(undefined)));
+	let guessedOutputBlocks: (number | undefined)[][] = $state(
+		new Array(numBlocks).fill(new Array(blockSize).fill(undefined))
+	);
+	let guessedPlaintextBlocks: (number | undefined)[][] = $state(
+		new Array(numBlocks).fill(new Array(blockSize).fill(undefined))
+	);
 
 	function extractPaddingError(result: ReturnType<typeof padder.validatePadding>) {
 		if (result.valid) {
@@ -95,7 +97,7 @@
 		const paddingByte = getRandomInt(2, blockSize - 1);
 		initializationVector[initializationVector.length - 1] = 0xa0;
 
-		plaintextBlock = new Array(blockSize - paddingByte).fill(paddingByte);
+		plaintextBlock = new Uint8Array(blockSize - paddingByte).fill(paddingByte);
 		resetCiphertext();
 
 		toast.info('Updated blocks', {
@@ -109,8 +111,8 @@
 	<div class="not-prose flex w-full flex-col gap-4">
 		<div class="grid grid-cols-5 gap-4">
 			<p class="col-span-3">
-				Set the plaintext and iv to a specific value, to simulate wrongly finding e.g. 0x02 instead
-				of 0x01
+				Set the plaintext and IV to specific values to simulate incorrectly finding, for example,
+				0x02 instead of 0x01.
 			</p>
 			<div class="col-span-2 flex-center">
 				<button type="button" class="button-default input-layer-2" onclick={simulateEdgeCase}>
@@ -129,12 +131,14 @@
 			<div in:fade>
 				<ByteRecoverer
 					{plaintextBlocks}
-					{ciphertextBlocks}
+					bind:ciphertextBlocks
 					{guessedOutputBlocks}
 					{paddingOracle}
 					{guessedPlaintextBlocks}
 					{resetCiphertext}
 					showEdgeCheckSwitch={true}
+					autoRunEnabled={false}
+					multipleBytes={false}
 				/>
 			</div>
 		{/if}
@@ -148,9 +152,16 @@
 			plaintext to 0x01. However, there are some edge cases to consider.
 		</p>
 
-		<Question id="valid-padding-plaintext-edge-cases" className="mb-8">
+		<Question
+			id="valid-padding-plaintext-edge-cases"
+			className="mb-8"
+			title="Can you think of an exception?"
+		>
 			{#snippet question()}
-				<p class="my-0! text-center">Can you think of an exception?</p>
+				<p class="text-center">
+					Can you think of exceptions, where the padding oracle result is valid but the last byte of
+					the decrypted plaintext is not 0x01?
+				</p>
 				<ul class="not-prose list-disc px-4">
 					<li>
 						<Spoiler surfaceLevel={2} remember={true}
@@ -174,7 +185,7 @@
 			{/snippet}
 
 			{#snippet reveal()}
-				<p>
+				<p class="mt-0!">
 					Suppose the penultimate byte of the decrypted plaintext is 0x02. You will then get a valid
 					padding result if you set the last byte of the decrypted plaintext to <span
 						class="font-bold">0x02</span
@@ -204,7 +215,10 @@
 				ciphertextBlock={ciphertextBlocks[1]}
 				initializationVector={ciphertextBlocks[0]}
 				isLastBlock={true}
-				onChangeCiphertext={(bytes) => (ciphertextBlocks[1] = bytes.map((b) => b ?? 0) as number[])}
+				onChangeCiphertext={(bytes) => {
+					ciphertextBlocks[1] = new Uint8Array(bytes.map((b) => b ?? 0));
+					ciphertextBlocks = [...ciphertextBlocks];
+				}}
 			>
 				{#snippet FnOutputBlock(index)}
 					<Block bytes={guessedOutputBlocks[1]} inputClassNames={inputClassNamesFN} />
@@ -212,9 +226,10 @@
 
 				{#snippet IVBlock(index)}
 					<Block
-						bytes={ciphertextBlocks[0]}
+						bytes={uint8ArrayToUI(ciphertextBlocks[0])}
 						onChange={(bytes) => {
-							ciphertextBlocks[0] = bytes.map((b) => b ?? 0) as number[];
+							ciphertextBlocks[0] = new Uint8Array(bytes.map((b) => b ?? 0));
+							ciphertextBlocks = [...ciphertextBlocks];
 						}}
 						allowEdit={true}
 						reserveSpaceForError={true}
@@ -226,7 +241,7 @@
 
 				{#snippet PlainTextBlock(index)}
 					<Block
-						bytes={plaintextBlocks[index]}
+						bytes={uint8ArrayToUI(plaintextBlocks[index])}
 						error={extractPaddingError(paddingValidation)}
 						reserveSpaceForError={true}
 						title={`Plaintext Block ${index} (P_${index})`}

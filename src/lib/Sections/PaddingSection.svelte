@@ -3,9 +3,7 @@
 	import CBC from '$lib/components/CBC/CBC.svelte';
 	import { getSectionContext } from '$lib/contexts/scrollStoryContext';
 	import FloatingInput from '$lib/components/ui/FloatingInput.svelte';
-	import { cbcEncryptBlocks } from '$lib/logic/cbc';
-	import { stringToArray, oneTimePad } from '$lib/logic/crypto-utils';
-	import { PKCS7Padder } from '$lib/logic/padding';
+	import { stringToArray } from '$lib/logic/crypto-utils';
 	import NumberInput from '$lib/components/ui/NumberInput.svelte';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { cn } from '$lib/utils/styling';

@@ -1,15 +1,25 @@
-import { displayByte } from "$lib/utils/compute";
+import { displayByte } from '$lib/utils/compute';
 
 export interface Padder {
 	padd(input: Uint8Array, blockSize: number): Uint8Array[];
-	validatePadding(input: Uint8Array): { valid: boolean; invalidIndices?: number[]; message?: string };
+	validatePadding(input: Uint8Array): {
+		valid: boolean;
+		invalidIndices: number[];
+		message: string;
+	};
 	// unpad(input: number[], blockSize: number): number[];
 }
 
 export class PKCS7Padder implements Padder {
 	padd(input: Uint8Array, blockSize: number): Uint8Array[] {
 		const chunks: Uint8Array[] = chunk(input, blockSize);
-		const lastChunk = chunks[chunks.length - 1];
+
+		if (chunks.length === 0) {
+			const fullPaddingBlock = new Uint8Array(blockSize).fill(blockSize);
+			return [fullPaddingBlock];
+		}
+
+		const lastChunk = chunks.length > 0 ? chunks[chunks.length - 1] : chunks[0];
 
 		if (lastChunk.length === blockSize) {
 			const fullPaddingBlock = new Uint8Array(blockSize).fill(blockSize);
@@ -33,7 +43,7 @@ export class PKCS7Padder implements Padder {
 			return {
 				valid: false,
 				invalidIndices: [input.length - 1],
-				message: `Expected 0 <= padding < ${Math.min(blockSize, 256)}. Got ${paddingLength}`
+				message: `Expected 0 <= padding < ${Math.min(blockSize, 256)}. Got ${paddingLength}d (0x${displayByte(paddingLength, 'hex')})`
 			};
 		}
 
@@ -47,7 +57,7 @@ export class PKCS7Padder implements Padder {
 		return {
 			valid: invalidPaddingIndices.length === 0,
 			invalidIndices: invalidPaddingIndices,
-			message: `Expected ${paddingLength} bytes of value 0x${displayByte(paddingLength, "hex")}.`
+			message: `Expected ${paddingLength} bytes of value 0x${displayByte(paddingLength, 'hex')}.`
 		};
 	}
 }

@@ -1,13 +1,13 @@
 <script lang="ts">
 	import CBC from '$lib/components/CBC/CBC.svelte';
 	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
-
-	import { cbcDecrypt, cbcEncrypt } from '$lib/logic/cbc';
-	import { stringToArray, oneTimePad } from '$lib/logic/crypto-utils';
-
+	import { stringToArray } from '$lib/logic/crypto-utils';
+	import { encryptCBCWithContext, decryptCBCWithContext } from '$lib/logic/cbc-service';
+	import { settingsState } from '$lib/stores/settings.svelte';
 	import { PKCS7Padder } from '$lib/logic/padding';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { cn } from '$lib/utils/styling';
+
 	import hljs from 'highlight.js/lib/core';
 	import javascript from 'highlight.js/lib/languages/javascript';
 	hljs.registerLanguage('typescript', javascript);
@@ -26,22 +26,26 @@
 		language: 'typescript'
 	}).value;
 
-	const padder = new PKCS7Padder();
-
 	let plaintext = 'ORACLE';
 	let plaintextBlock = stringToArray(plaintext);
-	let initializationVector = $state([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
-	let key = [0, 0, 0, 0, 0, 0, 0, 0];
-
-	let { ciphertextBlocks } = $state(
-		cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder)
+	let initializationVector = $state(
+		new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
 	);
 
-	let plaintextBlocks = $derived(cbcDecrypt(ciphertextBlocks, key, oneTimePad));
+	let { ciphertextBlocks, key, padder } = $derived(
+		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
+	);
+
+	let plaintextBlocks = $derived(decryptCBCWithContext(ciphertextBlocks, key, settingsState));
 
 	function createPaddingError() {
+		const blockIndex = ciphertextBlocks.length - 2;
 		const lastIndex = initializationVector.length - 1;
-		ciphertextBlocks[0][lastIndex] = (ciphertextBlocks[0][lastIndex] + 1) % 256;
+
+		const modifiedBlock = new Uint8Array(ciphertextBlocks[blockIndex]);
+		modifiedBlock[lastIndex] = (modifiedBlock[lastIndex] + 1) % 256;
+		ciphertextBlocks[blockIndex] = modifiedBlock;
+		ciphertextBlocks = [...ciphertextBlocks];
 	}
 </script>
 
@@ -99,9 +103,13 @@
 				{plaintextBlocks}
 				bind:ciphertextBlocks
 				encryptionMode={false}
-				onIVChange={(bytes) => {
-					console.log('IV changed', bytes);
-					ciphertextBlocks[0] = bytes.map((b) => b ?? 0) as number[];
+				onChangeIV={(bytes) => {
+					ciphertextBlocks[0] = bytes;
+					ciphertextBlocks = [...ciphertextBlocks];
+				}}
+				onCiphertextChange={(bytes) => {
+					ciphertextBlocks = bytes;
+					ciphertextBlocks = [...ciphertextBlocks];
 				}}
 				{padder}
 				addInitPadding={true}

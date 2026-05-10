@@ -8,20 +8,23 @@
 	import PaddingLengthFinder from '$lib/components/CBCInteractions/PaddingLengthFinder.svelte';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { cn } from '$lib/utils/styling';
+	import { encryptCBCWithContext, decryptCBCWithContext } from '$lib/logic/cbc-service';
+	import { settingsState } from '$lib/stores/settings.svelte';
+	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
 
 	let showSuccess = $state(false);
 
-	let padder = new PKCS7Padder();
 	let plaintext = 'LENGTH';
 	let plaintextBlock = stringToArray(plaintext);
-	let initializationVector = $state([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00]);
-	let key = [0, 0, 0, 0, 0, 0, 0, 0];
-
-	let { ciphertextBlocks } = $state(
-		cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder)
+	let initializationVector = $state(
+		new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
 	);
 
-	let plaintextBlocks = $derived(cbcDecrypt(ciphertextBlocks, key, oneTimePad));
+	let { ciphertextBlocks, key, padder } = $derived(
+		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
+	);
+
+	let plaintextBlocks = $derived(decryptCBCWithContext(ciphertextBlocks, key, settingsState));
 
 	const blockSize = $derived(ciphertextBlocks[0].length);
 
@@ -30,7 +33,7 @@
 	);
 
 	const paddingOracle: PaddingOracle = (cBlocks) => {
-		const decrypted = cbcDecrypt(cBlocks, key, oneTimePad);
+		const decrypted = decryptCBCWithContext(cBlocks, key, settingsState);
 		const lastBlock = decrypted[decrypted.length - 1];
 
 		const result = padder.validatePadding(lastBlock);
@@ -44,13 +47,14 @@
 		// 	cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder).ciphertextBlocks
 		// );
 
-		ciphertextBlocks = cbcEncrypt(
+		initializationVector = new Uint8Array(initializationVector.length);
+		ciphertextBlocks = encryptCBCWithContext(
 			plaintextBlock,
-			key,
 			initializationVector,
-			oneTimePad,
-			padder
+			settingsState
 		).ciphertextBlocks;
+
+		ciphertextBlocks = [...ciphertextBlocks];
 	}
 
 	function extractPaddingError(result: ReturnType<typeof padder.validatePadding>) {
@@ -73,6 +77,9 @@
 			{paddingOracle}
 			{blockSize}
 			{paddingValidation}
+			onCiphertextChange={() => {
+				ciphertextBlocks = [...ciphertextBlocks];
+			}}
 		/>
 	{/snippet}
 
@@ -87,14 +94,18 @@
 				ciphertextBlock={ciphertextBlocks[1]}
 				initializationVector={ciphertextBlocks[0]}
 				isLastBlock={true}
-				onChangeCiphertext={(bytes) => (ciphertextBlocks[1] = bytes.map((b) => b ?? 0) as number[])}
+				onChangeCiphertext={(bytes) => {
+					ciphertextBlocks[1] = bytes;
+					ciphertextBlocks = [...ciphertextBlocks];
+				}}
 				onChangeIV={(bytes) => {
-					ciphertextBlocks[0] = bytes.map((b) => b ?? 0) as number[];
+					ciphertextBlocks[0] = bytes;
+					ciphertextBlocks = [...ciphertextBlocks];
 				}}
 			>
 				{#snippet PlainTextBlock(index)}
 					<Block
-						bytes={plaintextBlocks[index]}
+						bytes={uint8ArrayToUI(plaintextBlocks[index])}
 						error={extractPaddingError(paddingValidation)}
 						success={showSuccess}
 						reserveSpaceForError={true}
