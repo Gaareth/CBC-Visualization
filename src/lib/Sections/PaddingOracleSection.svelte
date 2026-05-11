@@ -4,7 +4,6 @@
 	import { stringToArray } from '$lib/logic/crypto-utils';
 	import { encryptCBCWithContext, decryptCBCWithContext } from '$lib/logic/cbc-service';
 	import { settingsState } from '$lib/stores/settings.svelte';
-	import { PKCS7Padder } from '$lib/logic/padding';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
 	import { cn } from '$lib/utils/styling';
 

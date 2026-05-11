@@ -4,7 +4,7 @@
 	import Block from '../shared/Block.svelte';
 	import { cn } from '../../utils/styling';
 	import type { Snippet } from 'svelte';
-	import type { Padder } from '../../logic/padding';
+	import type { Padder } from '../../logic/padding/padding';
 	import {
 		CBC_LAYOUT,
 		getLeftPadding,

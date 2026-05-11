@@ -24,7 +24,7 @@
 	);
 
 	const { padder, key, cipher } = $derived(getCBCSettings(plaintextBlock, settingsState));
-	let plaintextBlocks = $derived(padder.padd(plaintextBlock, initializationVector.length));
+	let plaintextBlocks = $derived(padder.pad(plaintextBlock, initializationVector.length));
 	let ciphertextBlocks = $derived(
 		cbcEncryptBlocks(plaintextBlocks, key, initializationVector, cipher.encrypt)
 	);

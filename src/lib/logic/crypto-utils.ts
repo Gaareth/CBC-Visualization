@@ -1,4 +1,4 @@
-import { PKCS7Padder } from './padding';
+import { PKCS7Padder } from './padding/padder';
 
 export function oneTimePad(plaintext: Uint8Array, key: Uint8Array): Uint8Array {
 	return xorBlocks(plaintext, key);
@@ -28,5 +28,5 @@ export function generateKeyFromString(s: string, keySizeBytes?: number): Uint8Ar
 	}
 
 	const padder = new PKCS7Padder();
-	return padder.padd(arrTyped, keySizeBytes)[0];
+	return padder.pad(arrTyped, keySizeBytes)[0];
 }

@@ -1,19 +1,10 @@
 <script lang="ts">
 	import CBC from '$lib/components/CBC/CBC.svelte';
-	import type { SvelteComponent } from 'svelte';
-	import { oneTimePad, stringToArray } from '../../logic/crypto-utils';
-	import { cbcDecrypt, cbcEncrypt, cbcEncryptBlocks } from '../../logic/cbc';
+	import { stringToArray } from '../../logic/crypto-utils';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
-	import { PKCS7Padder } from '../../logic/padding';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import {
-		decryptCBCWithContext,
-		encryptCBCWithContext,
-		getBlockCipher,
-		getKey,
-		getPadder
-	} from '$lib/logic/cbc-service';
+	import { decryptCBCWithContext, encryptCBCWithContext, getPadder } from '$lib/logic/cbc-service';
 	import { settingsState } from '$lib/stores/settings.svelte';
 
 	const padder = getPadder(settingsState.paddingScheme);
@@ -48,10 +39,8 @@
 		ciphertextBlocks = [...ciphertextBlocks];
 	}
 
-
-		console.log(plaintextBlocks);
+	console.log(plaintextBlocks);
 	console.log(ciphertextBlocks);
-	
 </script>
 
 {#snippet explain()}

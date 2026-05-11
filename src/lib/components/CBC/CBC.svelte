@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { cn } from '../../utils/styling';
 	import CBCBlock from './CBCBlock.svelte';
-	import type { Padder } from '../../logic/padding';
+	import type { Padder } from '../../logic/padding/padding';
 	import { getGapToNext } from '$lib/stores/cbcConstants.svelte';
 
 	interface Props {

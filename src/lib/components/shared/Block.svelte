@@ -172,7 +172,7 @@
 	);
 </script>
 
-<div class={cn('relative flex flex-col gap-2 text-center', className)}>
+<div class={cn('relative flex flex-col gap-2 text-center', className)} style:width={`${bytes.length * (byteWidth)}px`}>
 	<!-- <p>{previous}</p>
 	<p>{[...flashIndices]}</p> -->
 	<!-- {#if error}
@@ -181,13 +181,13 @@
 
 	<!-- h-5 -->
 	{#if !textPosBelow && reserveSpaceForError}
-		<div class={cn('', classNameTextAbove)}>
+		<div class={cn('w-full', classNameTextAbove)}>
 			{#if title}
 				<p >{title}</p>
 			{/if}
 
 			{#if error}
-				<p class="text-error">{error.message}</p>
+				<p class="text-error break-all w-full">{error.message}</p>
 			{/if}
 		</div>
 	{/if}
@@ -218,13 +218,13 @@
 	</div>
 
 	{#if textPosBelow && reserveSpaceForError}
-		<div class="h-5">
+		<div class="h-5 w-full">
 			{#if title}
 				<p>{title}</p>
 			{/if}
 
 			{#if error}
-				<p class="text-error">{error.message}</p>
+				<p class="text-error break-all w-full">{error.message}</p>
 			{/if}
 		</div>
 	{/if}

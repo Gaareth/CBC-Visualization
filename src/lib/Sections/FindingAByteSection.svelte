@@ -4,9 +4,7 @@
 	import CBCBlock from '$lib/components/CBC/CBCBlock.svelte';
 	import Divider from '$lib/components/shared/Divider.svelte';
 	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
-	import { cbcEncrypt, cbcDecrypt } from '$lib/logic/cbc';
-	import { oneTimePad, stringToArray } from '$lib/logic/crypto-utils';
-	import { PKCS7Padder } from '$lib/logic/padding';
+	import { stringToArray } from '$lib/logic/crypto-utils';
 	import { type PaddingOracle } from '$lib/logic/paddingOracle';
 	import Question from '$lib/components/shared/Question.svelte';
 	import { settingsState } from '$lib/stores/settings.svelte';

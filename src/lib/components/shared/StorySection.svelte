@@ -14,7 +14,7 @@
 
 	let { title, headingLevel = 2, children, visualSnippet }: Props = $props();
 
-	let sectionEl: HTMLElement;
+	let sectionEl: HTMLElement | undefined = $state();
 	const ctxt = getSectionContext();
 	onMount(() => {
 		if (ctxt.register && sectionEl) {

@@ -2,8 +2,8 @@ import { settingsState, type BlockCipher, type PaddingScheme } from '$lib/stores
 import { cbcDecrypt, cbcEncrypt } from './cbc';
 import { OTPCipher } from './ciphers/otp/cipherOTP';
 import { TeaCipher } from './ciphers/tea/cipherTEA';
-import { PKCS7Padder, type Padder } from './padding';
-import type { PaddingOracle } from './paddingOracle';
+import { ANSIX923RandomPadder, ANSIX923ZeroPadder, PKCS7Padder } from './padding/padder';
+import type { Padder } from './padding/padding';
 
 const cipherRegistry = {
 	TEA: () => new TeaCipher(),
@@ -15,7 +15,10 @@ const cipherRegistry = {
 } satisfies Record<BlockCipher, () => Cipher>;
 
 const padderRegistry = {
-	PKCS7: () => new PKCS7Padder()
+	'PKCS#5/7': () => new PKCS7Padder(),
+	'ANSI X9.23 (zeros)': () => new ANSIX923ZeroPadder(),
+	'ANSI X9.23 (random)': () =>
+		new ANSIX923RandomPadder((len) => crypto.getRandomValues(new Uint8Array(len)))
 } satisfies Record<PaddingScheme, () => Padder>;
 
 export function getBlockCipher(name: BlockCipher): Cipher {

@@ -1,11 +1,9 @@
 <script lang="ts">
 	import { cbcDecrypt, cbcEncrypt } from '$lib/logic/cbc';
 	import { oneTimePad, stringToArray } from '../../logic/crypto-utils';
-	import { PKCS7Padder } from '../../logic/padding';
-	import { autoRunGate, createGate } from '$lib/utils/generic';
 	import Block from '../shared/Block.svelte';
 	import { cn } from '../../utils/styling';
-	import { recoverPlaintextWithOracle, type PaddingOracle } from '../../logic/paddingOracle';
+	import {  type PaddingOracle } from '../../logic/paddingOracle';
 	import CBCBlock from './CBCBlock.svelte';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
 	import { CBC_LAYOUT, getGapToNext, getToXorLength } from '$lib/stores/cbcConstants.svelte';
@@ -15,7 +13,6 @@
 	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
 	import {
 		encryptCBCWithContext,
-		decryptCBCWithContext,
 		getPadder,
 		getKey,
 		getBlockCipher

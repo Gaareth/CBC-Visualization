@@ -1,5 +1,6 @@
 import { xorBlocks } from './crypto-utils';
-import { PKCS7Padder, type Padder } from './padding';
+import { PKCS7Padder } from './padding/padder';
+import type { Padder } from './padding/padding';
 
 export function cbcEncryptBlocks(
 	plaintextBlocks: Uint8Array[],
@@ -28,7 +29,7 @@ export function cbcEncrypt(
 	padder: Padder = new PKCS7Padder(),
 	addIV: boolean | undefined = true
 ) {
-	let plaintextBlocks: Uint8Array[] = padder.padd(plaintext, iv.length);
+	let plaintextBlocks: Uint8Array[] = padder.pad(plaintext, iv.length);
 	let ciphertextBlocks = cbcEncryptBlocks(plaintextBlocks, key, iv, blockCipherFn);
 
 	if (addIV) {

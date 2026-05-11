@@ -1,9 +1,7 @@
 <script lang="ts">
 	import Block from '$lib/components/shared/Block.svelte';
 	import CBCBlock from '$lib/components/CBC/CBCBlock.svelte';
-	import { cbcEncrypt, cbcDecrypt } from '$lib/logic/cbc';
-	import { oneTimePad, stringToArray } from '$lib/logic/crypto-utils';
-	import { PKCS7Padder } from '$lib/logic/padding';
+	import {  stringToArray } from '$lib/logic/crypto-utils';
 	import type { PaddingOracle } from '$lib/logic/paddingOracle';
 	import PaddingLengthFinder from '$lib/components/CBCInteractions/PaddingLengthFinder.svelte';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
