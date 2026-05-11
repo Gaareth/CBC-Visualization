@@ -16,3 +16,14 @@ export function uint8ArrayToUIBlocks(input: Uint8Array, blockSize: number): numb
 	}
 	return blocks;
 }
+
+/**
+ *  Wraps an onChange handler to convert the UI's (number | undefined)[] back into a Uint8Array for your logic to consume.
+ */
+export function wrapOnChange(handler?: (bytes: Uint8Array) => void) {
+	return (bytes: (number | undefined)[]) => {
+		if (handler) {
+			handler(new Uint8Array(bytes.map((b) => b ?? 0)));
+		}
+	};
+}

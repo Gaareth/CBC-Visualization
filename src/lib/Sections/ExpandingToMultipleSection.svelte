@@ -14,10 +14,12 @@
 	import { settingsState } from '$lib/stores/settings.svelte';
 	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
 	import { resolve } from '$app/paths';
+	import PlaintextColor from '$lib/components/CBC/Colored/PlaintextColor.svelte';
+	import CiphertextColor from '$lib/components/CBC/Colored/CiphertextColor.svelte';
 
 	let showSuccess = $state(false);
 
-	let plaintext = $state('FORCE');
+	let plaintext = $state('BYTES');
 	let plaintextBlock = $derived(stringToArray(plaintext));
 	let initializationVector = $state(
 		new Uint8Array([0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff])
@@ -101,8 +103,10 @@
 
 		<p>
 			For the last byte, we simply "bruteforced" the
-			<span class={`text-${BLOCK_COLORS.ciphertext} font-bold`}>last iv byte</span> until the padding
-			was valid, which then revealed that the last byte of the decrypted plaintext was 0x01.
+			<CiphertextColor className="font-bold">last iv byte</CiphertextColor> until the padding was valid,
+			which then revealed that the last byte of the decrypted
+			<PlaintextColor>plaintext</PlaintextColor>
+			was 0x01.
 		</p>
 
 		<Question id="second-to-last-byte">
@@ -112,9 +116,7 @@
 
 					<li>
 						What conditions must be met, so a valid padding is obtained and information about the
-						<span class={`text-${BLOCK_COLORS.plaintext}`}>
-							second to last byte of the decrypted plaintext
-						</span>
+						<PlaintextColor>second to last byte of the decrypted plaintext</PlaintextColor>
 						is gained?
 					</li>
 				</ol>
@@ -123,17 +125,17 @@
 			{#snippet reveal()}
 				<p>
 					Just similarly bruteforcing the
-					<span class={`text-${BLOCK_COLORS.ciphertext}`}> second to last iv byte </span>
+					<CiphertextColor>second to last iv byte</CiphertextColor>
 					until we get valid padding won't work, because not only the
-					<span class={`text-${BLOCK_COLORS.plaintext}`}>penultimate plaintext byte</span>
+					<PlaintextColor>penultimate plaintext byte</PlaintextColor>
 					has to be valid padding but also all the following bytes.
 				</p>
 
 				<p>
 					So we also need to ensure that the
-					<span class={`text-${BLOCK_COLORS.plaintext}`}>
+					<PlaintextColor>
 						<span class="font-bold">last</span> plaintext byte
-					</span>
+					</PlaintextColor>
 					is 0x02, before we bruteforce the
 					<span class={`text-${BLOCK_COLORS.ciphertext}`}> second to last iv byte </span>. How? By
 					modifying the
@@ -158,7 +160,7 @@
 		</Question>
 
 		<p>
-			How to set the last plaintext byte to 0x02? Remember, we just recovered
+			How to set the last <PlaintextColor>plaintext</PlaintextColor> byte to 0x02? Remember, we just recovered
 			<span class="text-red-500">DEC[-1]</span>, so we can calculate the required
 			<span class={`text-${BLOCK_COLORS.ciphertext}`}>iv</span> byte value to get a
 			<span class={`text-${BLOCK_COLORS.plaintext}`}>plaintext</span>
@@ -215,7 +217,9 @@
 
 		<h4>Further actions</h4>
 		<p>
-			Congratulations! You can now try it out for multiple blocks <a href={resolve('/padding-oracle-attack')}>
+			Congratulations! You can now try it out for multiple blocks <a
+				href={resolve('/padding-oracle-attack')}
+			>
 				here
 			</a>
 			or/and deepen your understanding of the attack by reading through
@@ -225,8 +229,8 @@
 		</p>
 
 		<p>
-			You could also change the cipher and <strike>TODO: the padding scheme</strike> in the settings and restart from the
-			beginning.
+			You could also change the cipher and <strike>TODO: the padding scheme</strike> in the settings and
+			restart from the beginning.
 		</p>
 	{/snippet}
 

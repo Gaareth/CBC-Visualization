@@ -1,7 +1,5 @@
 <script lang="ts">
-	import Block from '$lib/components/shared/Block.svelte';
 	import Card from '$lib/components/shared/Card.svelte';
-	import CBCBlock from '$lib/components/CBC/CBCBlock.svelte';
 	import Divider from '$lib/components/shared/Divider.svelte';
 	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
 	import { stringToArray } from '$lib/logic/crypto-utils';
@@ -14,11 +12,9 @@
 
 	import ByteRecoverer from '$lib/components/CBCInteractions/ByteRecoverer.svelte';
 	import { encryptCBCWithContext, decryptCBCWithContext } from '$lib/logic/cbc-service';
-	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
+	import CBCColored from '$lib/components/CBC/Colored/CBCColored.svelte';
 
-	let showSuccess = $state(false);
-
-	let plaintext = $state('FORCE');
+	let plaintext = $state('RECOVER');
 	let plaintextBlock = $derived(stringToArray(plaintext));
 	const initializationVector = new Uint8Array([0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff]);
 	let { ciphertextBlocks, key, padder } = $derived(
@@ -44,7 +40,6 @@
 	};
 
 	function resetCiphertext() {
-		// TODO: not correcty updating the iv
 		const newCiphertextBlocks = encryptCBCWithContext(
 			plaintextBlock,
 			initializationVector,
@@ -52,23 +47,7 @@
 		).ciphertextBlocks;
 		ciphertextBlocks[0] = new Uint8Array(initializationVector); // trigger reactivity
 		ciphertextBlocks = [...newCiphertextBlocks];
-	
-		console.log(initializationVector);
-		
-		console.log('Ciphertext reset');
 	}
-
-	const inputClassNamesPL: Record<number, string> = {};
-	inputClassNamesPL[blockSize - 2] = `border-r-${BLOCK_COLORS.plaintext}!`;
-	inputClassNamesPL[blockSize - 1] = `border-${BLOCK_COLORS.plaintext}!`;
-
-	const inputClassNamesIV: Record<number, string> = {};
-	inputClassNamesIV[blockSize - 2] = `border-r-${BLOCK_COLORS.ciphertext}!`;
-	inputClassNamesIV[blockSize - 1] = `border-${BLOCK_COLORS.ciphertext}!`;
-
-	const inputClassNamesFN: Record<number, string> = {};
-	inputClassNamesFN[blockSize - 2] = `border-r-${BLOCK_COLORS.fnOutput}!`;
-	inputClassNamesFN[blockSize - 1] = `border-${BLOCK_COLORS.fnOutput}!`;
 
 	let guessedOutputBlocks: (number | undefined)[][] = $state(
 		Array.from({ length: 2 }, () => new Array(blockSize).fill(undefined))
@@ -77,16 +56,6 @@
 	let guessedPlaintextBlocks: (number | undefined)[][] = $state(
 		Array.from({ length: 2 }, () => new Array(blockSize).fill(undefined))
 	);
-
-	function extractPaddingError(result: ReturnType<typeof padder.validatePadding>) {
-		if (result.valid) {
-			return undefined;
-		}
-		return {
-			message: result.message ?? 'Invalid padding',
-			indices: result.invalidIndices ?? []
-		};
-	}
 </script>
 
 {#snippet example()}
@@ -264,7 +233,19 @@
 	{#snippet visualSnippet()}
 		<h2 class="mb-10 text-center text-2xl font-bold">Recovering a Single Byte</h2>
 		<div class={cn('not-prose flex w-fit justify-end')}>
-			<CBCBlock
+			<CBCColored
+				plaintextBlock={plaintextBlocks[0]}
+				bind:ciphertextBlock={ciphertextBlocks[1]}
+				initializationVector={ciphertextBlocks[0]}
+				guessedOutputBlock={guessedOutputBlocks[1]}
+				{paddingValidation}
+				onChangeCiphertext={(bytes) => {
+					ciphertextBlocks[1] = bytes;
+					ciphertextBlocks = [...ciphertextBlocks];
+				}}
+			/>
+
+			<!-- <CBCBlock
 				addInitPadding={true}
 				encryptionMode={false}
 				index={0}
@@ -308,7 +289,7 @@
 						className="flex-center"
 					/>
 				{/snippet}
-			</CBCBlock>
+			</CBCBlock> -->
 		</div>
 	{/snippet}
 </StorySection>

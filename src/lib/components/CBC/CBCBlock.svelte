@@ -12,7 +12,7 @@
 		getBlockWidth,
 		getToXorLength
 	} from '$lib/stores/cbcConstants.svelte';
-	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
+	import { uint8ArrayToUI, wrapOnChange } from '$lib/utils/arrayConversion';
 
 	const {
 		gap,
@@ -101,13 +101,6 @@
 		};
 	}
 
-	function wrapOnChange(handler?: (bytes: Uint8Array) => void) {
-		return (bytes: (number | undefined)[]) => {
-			if (handler) {
-				handler(new Uint8Array(bytes.map((b) => b ?? 0)));
-			}
-		};
-	}
 </script>
 
 {#snippet xor()}
