@@ -16,7 +16,7 @@
 	let defaultPlaintext = 'Hello World!';
 	let plaintext = $derived(defaultPlaintext.slice(0, 5));
 	let plaintextBlock = $derived(stringToArray(plaintext));
-	let initializationVector = $state(
+	let initializationVector: Uint8Array = $state(
 		new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01])
 	);
 
@@ -42,13 +42,6 @@
 		let diagramWidth = numBlocks * (getBlockWidth() + CBC_LAYOUT.gap) - CBC_LAYOUT.gap;
 
 		diagramWidth += getLeftPadding();
-
-		// console.log(
-		// 	'diagram width:',
-		// 	diagramWidth,
-		// 	'visual column width:',
-		// 	ctxt.ctxt.visualColumnWidth
-		// );
 
 		if (diagramWidth > ctxt.ctxt.visualColumnWidth!) {
 			ctxt.ctxt.shouldWrap = true;
@@ -109,7 +102,11 @@
 		<div
 			class={cn('not-prose flex w-fit justify-end', ctxt.ctxt?.shouldWrap ? 'justify-center' : '')}
 		>
-			<CBC bind:plaintextBlocks {ciphertextBlocks} encryptionMode={true} addInitPadding={true} />
+			<CBC bind:plaintextBlocks {ciphertextBlocks} encryptionMode={true} addInitPadding={true} 
+				onChangeIV={(bytes) => {
+					initializationVector = bytes;
+				}}
+			/>
 		</div>
 	{/snippet}
 </StorySection>

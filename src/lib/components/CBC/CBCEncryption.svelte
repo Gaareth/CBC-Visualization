@@ -121,7 +121,6 @@
 		onPlaintextChange={(blocks) => {
 			plaintextBlocks = blocks;
 			plaintextBlocks = [...plaintextBlocks];
-			console.log(plaintextBlocks);
 		}}
 	/>
 </div>

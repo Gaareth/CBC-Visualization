@@ -61,6 +61,7 @@
 			}}
 			onChangeIV={(bytes) => {
 				// ciphertextBlocks[0] = bytes;
+				// ciphertextBlocks = [...ciphertextBlocks];
 				onChangeIV?.(bytes);
 			}}
 			{padder}

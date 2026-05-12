@@ -195,6 +195,10 @@
 					ciphertextBlocks[1] = bytes;
 					ciphertextBlocks = [...ciphertextBlocks];
 				}}
+				onChangeIV={(bytes) => {
+					ciphertextBlocks[0] = bytes;
+					ciphertextBlocks = [...ciphertextBlocks];
+				}}
 			/>
 		</div>
 	{/snippet}
