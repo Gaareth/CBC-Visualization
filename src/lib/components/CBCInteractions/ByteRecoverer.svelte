@@ -1,10 +1,8 @@
 <script lang="ts">
 	import { Switch } from '$lib/components/ui/switch';
 	import { cn } from '$lib/utils';
-	import { circOut } from 'svelte/easing';
 	import {
 		recoverPlaintextWithOracle,
-		recoverSingleByte,
 		type AttackEvent,
 		type ByteRecoveredResult
 	} from '../../logic/paddingOracle';
@@ -13,7 +11,7 @@
 	import { createGate, autoRunGate, autoGate } from '../../utils/generic';
 	import { BLOCK_COLORS } from '../../utils/styling';
 	import Block from '../shared/Block.svelte';
-	import AutoRunButton from './AutoRunButton.svelte';
+	import AutoRunButton, { AUTO_RUN_DELAY_DEFAULT, type AutoRunState } from './AutoRunButton.svelte';
 
 	interface Props {
 		plaintextBlocks: Uint8Array[];
@@ -32,8 +30,8 @@
 	let {
 		plaintextBlocks,
 		ciphertextBlocks = $bindable(),
-		guessedOutputBlocks,
-		guessedPlaintextBlocks,
+		guessedOutputBlocks = $bindable(),
+		guessedPlaintextBlocks = $bindable(),
 		paddingOracle,
 		resetCiphertext,
 		skipEdgeCheck = false,
@@ -74,6 +72,8 @@
 		constantDelayValue: 500,
 		exponentialDelayDenominator: 6
 	});
+
+	let autoRunDelay = $state(AUTO_RUN_DELAY_DEFAULT);
 
 	async function findValidPadding() {
 		showResults = false;
@@ -145,6 +145,11 @@
 
 				onCiphertextChange: () => {
 					ciphertextBlocks = [...ciphertextBlocks];
+				},
+
+				onOutputChange: () => {
+					guessedPlaintextBlocks = [...guessedPlaintextBlocks];
+					guessedOutputBlocks = [...guessedOutputBlocks];
 				},
 
 				onProgressUpdate: (event) => {
@@ -308,6 +313,48 @@
 	{/if}
 {/snippet}
 
+{#snippet ActionButton()}
+	<button
+		type="button"
+		class="flex-1 button-default input-layer-2"
+		onclick={() => {
+			if (
+				(attackState?.event == 'on-byte-end' && !multipleBytes) ||
+				(attackState?.event == 'on-block-end' && attackState.data.blockIndex == 1)
+			) {
+				reset();
+			}
+
+			if (attackProgress == 'idle') {
+				findValidPadding();
+			}
+
+			next();
+		}}
+		disabled={isGuessing}
+	>
+		{#if attackProgress == 'idle' || (attackState?.event == 'on-byte-start' && currentByteIndex == 1)}
+			Automatically find valid padding
+		{:else if attackState?.event == 'edge-case-check'}
+			Check edge case
+		{:else if attackState?.event == 'edge-case-check-result'}
+			Continue {!attackState?.data.paddingValid ? 'searching' : ''}
+		{:else if attackState?.event == 'on-byte-recovered'}
+			Recover DEC[-{currentByteIndex}]
+		{:else if attackState?.event == 'on-byte-start' && currentByteIndex > 1}
+			Set last {currentByteIndex - 1} bytes to {displayByteWrapper(currentByteIndex)}
+		{:else if attackState?.event == 'after-set-padding-bytes'}
+			Start bruteforce of P{currentBlockIndex! - 1}[-{currentByteIndex}]
+		{:else if attackState?.event == 'on-byte-end' && multipleBytes}
+			Next byte
+		{:else if attackState?.event == 'on-block-end' && multipleBytes && attackState.data.blockIndex != 1}
+			Next block
+		{:else}
+			Restart
+		{/if}
+	</button>
+{/snippet}
+
 <div class="flex flex-col gap-3">
 	{#if showEdgeCheckSwitch}
 		<label class="flex justify-between">
@@ -318,7 +365,7 @@
 		</label>
 	{/if}
 
-	{#if !autoRunIsEnabled}
+	{#if autoRunDelay >= 5000}
 		{@render InfoContent()}
 	{/if}
 
@@ -332,45 +379,7 @@
 			Reset
 		</button>
 
-		<button
-			type="button"
-			class="flex-1 button-default input-layer-2"
-			onclick={() => {
-				if (
-					(attackState?.event == 'on-byte-end' && !multipleBytes) ||
-					(attackState?.event == 'on-block-end' && attackState.data.blockIndex == 1)
-				) {
-					reset();
-				}
-
-				if (attackProgress == 'idle') {
-					findValidPadding();
-				}
-
-				next();
-			}}
-			disabled={isGuessing}
-		>
-			{#if attackProgress == 'idle' || (attackState?.event == 'on-byte-start' && currentByteIndex == 1)}
-				Automatically find valid padding
-			{:else if attackState?.event == 'edge-case-check'}
-				Check edge case
-			{:else if attackState?.event == 'edge-case-check-result'}
-				Continue {!attackState?.data.paddingValid ? 'searching' : ''}
-			{:else if attackState?.event == 'on-byte-recovered'}
-				Recover DEC[-{currentByteIndex}]
-			{:else if attackState?.event == 'on-byte-start' && currentByteIndex > 1}
-				Set last {currentByteIndex - 1} bytes to {displayByteWrapper(currentByteIndex)}
-			{:else if attackState?.event == 'after-set-padding-bytes'}
-				Start bruteforce of P{currentBlockIndex! - 1}[-{currentByteIndex}]
-			{:else if attackState?.event == 'on-byte-end' && multipleBytes}
-				Next byte
-			{:else if attackState?.event == 'on-block-end' && multipleBytes && attackState.data.blockIndex != 1}
-				Next block
-			{:else}
-				Restart
-			{/if}
-		</button>
+		{@render ActionButton()}
 
 		<AutoRunButton
 			surfaceLevel={2}
@@ -379,6 +388,7 @@
 			{interactionGate}
 			bind:isEnabled={autoRunIsEnabled}
 			bind:guessSpeedSettings
+			bind:autoRunDelay
 			isToggleable={autoRunEnabled}
 		/>
 	</div>
@@ -413,7 +423,6 @@
 {/if}
 
 {#snippet ResultPanel()}
-
 	{#if !multipleBytes}
 		<p class="lockin-animation font-bold">
 			Recovered plaintext byte: <span class={`text-${BLOCK_COLORS.plaintext} font-bold`}>

@@ -91,11 +91,11 @@
 		}
 	}
 
-	let guessedOutputBlocks: number[][] = $state(
+	let guessedOutputBlocks: number[][] = $derived(
 		Array.from({ length: numBlocks }, () => new Array(blockSize).fill(undefined))
 	);
 
-	let guessedPlaintextBlocks: number[][] = $state(
+	let guessedPlaintextBlocks: number[][] = $derived(
 		Array.from({ length: numBlocks }, () => new Array(blockSize).fill(undefined))
 	);
 

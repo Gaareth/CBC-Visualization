@@ -68,6 +68,7 @@ type AttackProgress = {
 	onByteEnd?: (byteIndex: number) => void;
 	onGuess?: (guess: number) => void;
 	onCiphertextChange?: () => void;
+	onOutputChange?: () => void;
 	onProgressUpdate?: (event: AttackEvent) => void;
 };
 
@@ -247,6 +248,7 @@ export async function recoverSingleByte(
 
 			outGuessedDecBlock[blockSize - byte] = decByte;
 			outGuessedPlaintextBlock[blockSize - byte] = guessedByte;
+			progress?.onOutputChange?.();
 
 			progress?.onProgressUpdate?.({
 				event: 'byte-recovered-result',

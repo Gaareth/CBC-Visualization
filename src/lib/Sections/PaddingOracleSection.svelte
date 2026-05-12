@@ -97,6 +97,8 @@
 	{/snippet}
 
 	{#snippet visualSnippet()}
+		<h2 class="mb-10 text-center text-2xl font-bold">What is a Padding Oracle?</h2>
+
 		<div class={cn('not-prose flex w-fit justify-end')}>
 			<CBC
 				{plaintextBlocks}

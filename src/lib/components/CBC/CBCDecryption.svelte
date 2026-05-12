@@ -39,8 +39,6 @@
 		ciphertextBlocks = [...ciphertextBlocks];
 	}
 
-	console.log(plaintextBlocks);
-	console.log(ciphertextBlocks);
 </script>
 
 {#snippet explain()}
