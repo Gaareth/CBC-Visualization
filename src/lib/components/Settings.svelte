@@ -8,7 +8,9 @@
 		BLOCK_CIPHERS,
 		DISPLAY_BYTES_AS,
 		PADDING_SCHEMES,
-		settingsState
+		settingsState,
+		TODO_BLOCK_CIPHERS,
+		TODO_PADDING_SCHEMES
 	} from '$lib/stores/settings.svelte';
 	import Label from '$lib/components/ui/label/label.svelte';
 	import * as Select from '$lib/components/ui/select/index.js';
@@ -47,14 +49,40 @@
 		<Select.Content>
 			<Select.Group>
 				<Select.Label>Padding</Select.Label>
-				{#each PADDING_SCHEMES as format (format)}
-					<Select.Item value={format} label={format}>
-						{format}
+				{#each PADDING_SCHEMES as scheme (scheme)}
+					<Select.Item value={scheme} label={scheme}>
+						{scheme}
+					</Select.Item>
+				{/each}
+			</Select.Group>
+
+			<Select.Group>
+				<Select.Label>Currently not supported</Select.Label>
+				{#each TODO_PADDING_SCHEMES as scheme (scheme)}
+					<Select.Item value={scheme} label={scheme} disabled={true}>
+						{scheme}
 					</Select.Item>
 				{/each}
 			</Select.Group>
 		</Select.Content>
 	</Select.Root>
+
+	<p class="col-span-2 -mt-2! text-muted-foreground">
+		{#if settingsState.paddingScheme === 'PKCS#5/7'}
+			Pads with bytes all set to the padding length (E.g., 0x03 0x03 0x03).
+		{:else if settingsState.paddingScheme === 'ANSI X9.23 (zeros)'}
+			Pads with zeros and sets the last byte to the padding length.
+			<span class="text-warning">
+				Ideally (and necessarily to be secure), the zero bytes should not be validated; here they
+				are checked intentionally to demonstrate the padding-oracle attack.
+			</span>
+		{:else if settingsState.paddingScheme === 'ANSI X9.23 (random)'}
+			Pads with random bytes and sets the last byte to the padding length. Full recovery of the
+			plaintext is not possible with this padding scheme.
+		{:else if settingsState.paddingScheme === 'ISO/IEC 7816-4 (0x80 then zeros)'}
+			Pads with a single 0x80 byte followed by zeros.
+		{/if}
+	</p>
 {/snippet}
 
 {#snippet cipherSelect()}
@@ -66,14 +94,33 @@
 		<Select.Content>
 			<Select.Group>
 				<Select.Label>Block Cipher</Select.Label>
-				{#each BLOCK_CIPHERS as format (format)}
-					<Select.Item value={format} label={format}>
-						{format}
+				{#each BLOCK_CIPHERS as cipher (cipher)}
+					<Select.Item value={cipher} label={cipher}>
+						{cipher}
+					</Select.Item>
+				{/each}
+			</Select.Group>
+
+			<Select.Group>
+				<Select.Label>Currently not supported</Select.Label>
+				{#each TODO_BLOCK_CIPHERS as cipher (cipher)}
+					<Select.Item value={cipher} label={cipher} disabled={true}>
+						{cipher}
 					</Select.Item>
 				{/each}
 			</Select.Group>
 		</Select.Content>
 	</Select.Root>
+
+	<p class="col-span-2 -mt-2! text-muted-foreground">
+		{#if settingsState.blockCipher === 'TEA'}
+			TEA (Tiny Encryption Algorithm) is a simple (~20LOC) Feistel cipher. Probably should not be
+			used for real applications.
+		{:else if settingsState.blockCipher === 'OTP'}
+			Simple XOR of the plaintext with a key. However, insecure when used here as a block cipher with key size equal to the block size and with
+			reused keys. Try breaking it!
+		{/if}
+	</p>
 {/snippet}
 
 <div class="fixed right-5 bottom-5 z-9999">

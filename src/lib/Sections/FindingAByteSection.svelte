@@ -77,7 +77,7 @@
 			{paddingOracle}
 			{guessedPlaintextBlocks}
 			{resetCiphertext}
-			autoRunEnabled={false}
+			autoRunAllowed={false}
 		/>
 	</div>
 {/snippet}

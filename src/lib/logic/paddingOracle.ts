@@ -67,9 +67,11 @@ type AttackProgress = {
 	onByteStart?: (byteIndex: number) => void;
 	onByteEnd?: (byteIndex: number) => void;
 	onGuess?: (guess: number) => void;
+	onProgressUpdate?: (event: AttackEvent) => void;
+
+	// to trigger reactivity in svelte components when the ciphertext or output (outGuessed or outPlaintextBlocks) changes
 	onCiphertextChange?: () => void;
 	onOutputChange?: () => void;
-	onProgressUpdate?: (event: AttackEvent) => void;
 };
 
 export type PaddingOracle = (ciphertextBlocks: Uint8Array[]) => boolean;
@@ -175,6 +177,7 @@ export async function recoverSingleBlock(
 	}
 
 	setArray(ivBlock, originalIV); // restore IV for next round with reactivity
+	progress?.onCiphertextChange?.();
 }
 
 export async function recoverSingleByte(

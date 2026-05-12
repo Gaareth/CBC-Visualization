@@ -113,7 +113,7 @@
 					{guessedPlaintextBlocks}
 					{resetCiphertext}
 					showEdgeCheckSwitch={true}
-					autoRunEnabled={false}
+					autoRunAllowed={false}
 					multipleBytes={false}
 				/>
 			</div>

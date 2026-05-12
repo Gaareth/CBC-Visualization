@@ -172,7 +172,10 @@
 	);
 </script>
 
-<div class={cn('relative flex flex-col gap-2 text-center', className)} style:width={`${bytes.length * (byteWidth)}px`}>
+<div
+	class={cn('relative flex flex-col gap-2 text-center', className)}
+	style:width={`${bytes.length * byteWidth}px`}
+>
 	<!-- <p>{previous}</p>
 	<p>{[...flashIndices]}</p> -->
 	<!-- {#if error}
@@ -183,11 +186,11 @@
 	{#if !textPosBelow && reserveSpaceForError}
 		<div class={cn('w-full', classNameTextAbove)}>
 			{#if title}
-				<p >{title}</p>
+				<p>{title}</p>
 			{/if}
 
 			{#if error}
-				<p class="text-error break-all w-full">{error.message}</p>
+				<p class="w-full break-all text-error">{error.message}</p>
 			{/if}
 		</div>
 	{/if}
@@ -201,8 +204,8 @@
 				type="text"
 				class={cn(
 					'input-group-item number-input-no-spin text-center',
-					error?.indices.includes(i + 1) ? 'border-e-0' : '',
-					error?.indices.includes(i) ? 'border-s border-error' : '',
+					error?.indices.includes(i + 1) ? 'border-e-0!' : '',
+					error?.indices.includes(i) ? ' border-error!' : '',
 					success ? 'border-success' : '',
 					flashIndices.has(i) ? 'z-10 opacity-100! ring-2 ring-primary-0 ring-offset-1' : '',
 					'transition-all duration-300 ease-out',
@@ -213,6 +216,9 @@
 				style:width={`${byteWidth}px`}
 				style:height={`${byteHeight}px`}
 				title={error?.indices.includes(i) ? error.message : undefined}
+				style={error?.indices.includes(i)
+					? 'border-left: 1px solid var(--color-error) !important;'
+					: ''}
 			/>
 		{/each}
 	</div>
@@ -224,7 +230,7 @@
 			{/if}
 
 			{#if error}
-				<p class="text-error break-all w-full">{error.message}</p>
+				<p class="w-full break-all text-error">{error.message}</p>
 			{/if}
 		</div>
 	{/if}

@@ -24,7 +24,7 @@
 		skipEdgeCheck?: boolean;
 		showEdgeCheckSwitch?: boolean;
 		multipleBytes?: boolean;
-		autoRunEnabled?: boolean;
+		autoRunAllowed?: boolean;
 	}
 
 	let {
@@ -38,7 +38,7 @@
 		showEdgeCheckSwitch = false,
 
 		multipleBytes = false,
-		autoRunEnabled = true
+		autoRunAllowed= true
 	}: Props = $props();
 
 	// svelte-ignore state_referenced_locally
@@ -365,7 +365,7 @@
 		</label>
 	{/if}
 
-	{#if autoRunDelay >= 5000}
+	{#if !autoRunIsEnabled || autoRunDelay >= 5000}
 		{@render InfoContent()}
 	{/if}
 
@@ -389,7 +389,7 @@
 			bind:isEnabled={autoRunIsEnabled}
 			bind:guessSpeedSettings
 			bind:autoRunDelay
-			isToggleable={autoRunEnabled}
+			isToggleable={autoRunAllowed}
 		/>
 	</div>
 
