@@ -48,7 +48,6 @@ describe('PKCS7 padding', () => {
 		const blockSize = 16;
 		const fullBlock = new Uint8Array(16);
 		const padding = padder.pad(fullBlock, blockSize);
-		console.log(padding);
 
 		const fullPadding = new Uint8Array(blockSize).fill(blockSize);
 		expect(padding).toEqual([fullBlock, fullPadding]);

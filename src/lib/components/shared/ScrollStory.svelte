@@ -29,7 +29,7 @@
 	});
 
 	const register = (section: SectionRegistration) => {
-		console.log('registering section:', section.id);
+		// console.log('registering section:', section.id);
 		registrations.push(section);
 		if (!activeId) activeId = section.id;
 	};
@@ -62,7 +62,7 @@
 				// Pick the section closest to the top of viewport
 				visible.sort((a, b) => a.top - b.top);
 				activeId = visible[0].id;
-				console.log('active section:', activeId);
+				// console.log('active section:', activeId);
 			},
 			{
 				// this creates a virtual "activation line"
@@ -92,7 +92,7 @@
 
 		
 		const spaceOnTheLeft = (document.documentElement.clientWidth - storyWrapperEl.clientWidth)/2;
-		console.log('space on the left:', spaceOnTheLeft);
+		// console.log('space on the left:', spaceOnTheLeft);
 		if (spaceOnTheLeft < 240) {
 			forcedAtTop = true;
 		} else {
