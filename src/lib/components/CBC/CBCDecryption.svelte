@@ -4,10 +4,8 @@
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import { decryptCBCWithContext, encryptCBCWithContext, getPadder } from '$lib/logic/cbc-service';
+	import { decryptCBCWithContext, encryptCBCWithContext } from '$lib/logic/cbc-service';
 	import { settingsState } from '$lib/stores/settings.svelte';
-
-	const padder = getPadder(settingsState.paddingScheme);
 
 	let plaintext = $state('HELLO WORLD');
 	let plaintextBlock = $derived(stringToArray(plaintext));
@@ -15,7 +13,7 @@
 		new Uint8Array([0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00])
 	);
 
-	let { ciphertextBlocks, key } = $derived(
+	let { ciphertextBlocks, key, padder } = $derived(
 		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
 	);
 

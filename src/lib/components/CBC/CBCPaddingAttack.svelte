@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { cbcDecrypt, cbcEncrypt } from '$lib/logic/cbc';
-	import { oneTimePad, stringToArray } from '../../logic/crypto-utils';
+	import { stringToArray } from '../../logic/crypto-utils';
 	import Block from '../shared/Block.svelte';
 	import { cn } from '../../utils/styling';
-	import {  type PaddingOracle } from '../../logic/paddingOracle';
+	import { type PaddingOracle } from '../../logic/paddingOracle';
 	import CBCBlock from './CBCBlock.svelte';
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
 	import { CBC_LAYOUT, getGapToNext, getToXorLength } from '$lib/stores/cbcConstants.svelte';
@@ -11,12 +10,7 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
-	import {
-		encryptCBCWithContext,
-		getPadder,
-		getKey,
-		getBlockCipher
-	} from '$lib/logic/cbc-service';
+	import { encryptCBCWithContext, decryptCBCWithContext } from '$lib/logic/cbc-service';
 	import { settingsState } from '$lib/stores/settings.svelte';
 
 	let initializationVector = $state(new Uint8Array([4, 20, 150, 3, 100, 41, 42, 201]));
@@ -24,22 +18,13 @@
 	let plaintext = $state('A SECRET MESSAGE');
 	let plaintextBlock = $derived(stringToArray(plaintext));
 
-	let padder = $derived(getPadder(settingsState.paddingScheme));
-	let key = $derived(getKey(getBlockCipher(settingsState.blockCipher), plaintextBlock));
-
-	let { plaintextBlocks, ciphertextBlocks } = $derived(
-		cbcEncrypt(plaintextBlock, key, initializationVector, oneTimePad, padder)
+	let { plaintextBlocks, ciphertextBlocks, key, padder, paddingScheme } = $derived(
+		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
 	);
 
-	let decryptedplaintextBlocks = $derived(cbcDecrypt(ciphertextBlocks, key, oneTimePad));
-
-	// let { plaintextBlocks, ciphertextBlocks, key, padder } = $state(
-	// 	encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
-	// );
-
-	// let decryptedplaintextBlocks = $derived(
-	// 	decryptCBCWithContext(ciphertextBlocks, key, settingsState)
-	// );
+	let decryptedplaintextBlocks = $derived(
+		decryptCBCWithContext(ciphertextBlocks, key, settingsState)
+	);
 
 	let blockSize = $derived(ciphertextBlocks[0].length);
 	let numBlocks = $derived(ciphertextBlocks.length);
@@ -50,8 +35,9 @@
 
 	// Could be simpler. E.g. take the pkaintext directly.
 	// But this is for realism, as in a real attack we would only have the ciphertext and the oracle.
+
 	const paddingOracle: PaddingOracle = (cBlocks) => {
-		const decrypted = cbcDecrypt(cBlocks, key, oneTimePad);
+		const decrypted = decryptCBCWithContext(cBlocks, key, settingsState);
 		const lastBlock = decrypted[decrypted.length - 1];
 
 		const result = padder.validatePadding(lastBlock);
@@ -59,7 +45,6 @@
 
 		return result.valid;
 	};
-
 	let lastBlockPaddingValidationResult = $derived(
 		padder.validatePadding(decryptedplaintextBlocks[decryptedplaintextBlocks.length - 1])
 	);
@@ -114,6 +99,9 @@
 		);
 	}
 
+	// neccessary to trigger reactivity when changing a byte in the iv, dont get completely why tho
+	let firstCipherBlock = $derived(new Uint8Array(ciphertextBlocks[0]));
+
 	let isLastBlock = $derived((i: number) => i === decryptedplaintextBlocks.length - 1);
 </script>
 
@@ -126,9 +114,10 @@
 		<ByteRecoverer
 			{plaintextBlocks}
 			bind:ciphertextBlocks
-			{guessedOutputBlocks}
+			bind:guessedOutputBlocks
+			bind:guessedPlaintextBlocks
 			{paddingOracle}
-			{guessedPlaintextBlocks}
+			{paddingScheme}
 			{resetCiphertext}
 			showEdgeCheckSwitch={false}
 			multipleBytes={true}
@@ -142,7 +131,7 @@
 				index={i}
 				plaintextBlock={decryptedplaintextBlocks[i]}
 				ciphertextBlock={ciphertextBlocks[i + 1]}
-				initializationVector={i === 0 ? ciphertextBlocks[0] : undefined}
+				initializationVector={i === 0 ? firstCipherBlock : undefined}
 				isLastBlock={isLastBlock(i)}
 				onChangeCiphertext={(bytes) => {
 					ciphertextBlocks[i + 1] = bytes;

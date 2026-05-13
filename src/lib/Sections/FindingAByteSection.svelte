@@ -73,10 +73,10 @@
 			showEdgeCheckSwitch={false}
 			{plaintextBlocks}
 			bind:ciphertextBlocks
-			{guessedOutputBlocks}
+			bind:guessedOutputBlocks
+			bind:guessedPlaintextBlocks
 			{paddingOracle}
 			{paddingScheme}
-			{guessedPlaintextBlocks}
 			{resetCiphertext}
 			autoRunAllowed={false}
 		/>
@@ -236,7 +236,7 @@
 		<div class={cn('not-prose flex w-fit justify-end')}>
 			<CBCColored
 				plaintextBlock={plaintextBlocks[0]}
-				bind:ciphertextBlock={ciphertextBlocks[1]}
+				ciphertextBlock={ciphertextBlocks[1]}
 				initializationVector={ciphertextBlocks[0]}
 				guessedOutputBlock={guessedOutputBlocks[1]}
 				{paddingValidation}

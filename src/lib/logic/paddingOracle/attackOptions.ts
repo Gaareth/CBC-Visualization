@@ -56,10 +56,3 @@ export function normalizeShared(opts: AttackSharedOptions) {
 		progress: opts.progress
 	};
 }
-
-export function normalizeSharedBlock(opts: OutBlock) {
-	return {
-		outGuessedDecBlock: opts.outGuessedDecBlock ?? [],
-		outGuessedPlaintextBlock: opts.outGuessedPlaintextBlock ?? []
-	};
-}

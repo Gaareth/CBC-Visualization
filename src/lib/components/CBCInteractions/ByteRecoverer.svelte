@@ -117,6 +117,7 @@
 
 		let guessGate = createGate();
 		stopAutoGuess = autoRunGate(guessGate, delayFunction);
+		
 		const attackablePaddingScheme: SupportedAttackablePaddingSchemes =
 			ATTACKABLE_PADDING_SCHEMES.includes(paddingScheme as any)
 				? (paddingScheme as SupportedAttackablePaddingSchemes)
@@ -367,21 +368,21 @@
 {/snippet}
 
 <div class="flex flex-col gap-3">
-	<div class="border-warning border p-1.5">
-		{#if paddingScheme == 'ANSI X9.23 (random)'}
-			<p>
-				The padding validator only validates the last byte and not the random padding, so the oracle
-				would only reveal the possible valid values for the last byte (0x01 - blockSize).
-			</p>
-		{/if}
+	{#if !ATTACKABLE_PADDING_SCHEMES.includes(paddingScheme as any)}
+		<div class="border border-warning p-1.5">
+			{#if paddingScheme == 'ANSI X9.23 (random)'}
+				<p>
+					The padding validator only validates the last byte and not the random padding, so the
+					oracle would only reveal the possible valid values for the last byte (0x01 - blockSize).
+				</p>
+			{/if}
 
-		{#if !ATTACKABLE_PADDING_SCHEMES.includes(paddingScheme as any)}
 			<p>
 				The recovery algorithm based on PKCS#7 padding is used instead. You can observe where it
 				fails.
 			</p>
-		{/if}
-	</div>
+		</div>
+	{/if}
 
 	{#if showEdgeCheckSwitch}
 		<label class="flex justify-between">

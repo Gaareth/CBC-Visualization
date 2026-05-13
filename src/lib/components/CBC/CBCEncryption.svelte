@@ -8,13 +8,7 @@
 	import { fade } from 'svelte/transition';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import {
-		encryptCBCWithContext,
-		getBlockCipher,
-		getCBCSettings,
-		getKey,
-		getPadder
-	} from '$lib/logic/cbc-service';
+	import { getCBCSettings } from '$lib/logic/cbc-service';
 	import { settingsState } from '$lib/stores/settings.svelte';
 
 	let plaintext = $state('Hello, World!');

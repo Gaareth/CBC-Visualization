@@ -25,7 +25,7 @@
 		new Uint8Array([0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff])
 	);
 
-	let { ciphertextBlocks, key, padder } = $derived(
+	let { ciphertextBlocks, key, padder, paddingScheme } = $derived(
 		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
 	);
 
@@ -108,9 +108,10 @@
 				<ByteRecoverer
 					{plaintextBlocks}
 					bind:ciphertextBlocks
-					{guessedOutputBlocks}
+					bind:guessedOutputBlocks
+					bind:guessedPlaintextBlocks
 					{paddingOracle}
-					{guessedPlaintextBlocks}
+					{paddingScheme}
 					{resetCiphertext}
 					showEdgeCheckSwitch={true}
 					autoRunAllowed={false}
@@ -187,7 +188,7 @@
 		<div class={cn('not-prose flex w-fit justify-end')}>
 			<CBCColored
 				plaintextBlock={plaintextBlocks[0]}
-				bind:ciphertextBlock={ciphertextBlocks[1]}
+				ciphertextBlock={ciphertextBlocks[1]}
 				initializationVector={ciphertextBlocks[0]}
 				guessedOutputBlock={guessedOutputBlocks[1]}
 				{paddingValidation}

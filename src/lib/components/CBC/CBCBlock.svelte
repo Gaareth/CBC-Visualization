@@ -100,7 +100,6 @@
 			indices: result.invalidIndices ?? []
 		};
 	}
-
 </script>
 
 {#snippet xor()}

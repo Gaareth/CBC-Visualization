@@ -216,7 +216,7 @@
 				style:width={`${byteWidth}px`}
 				style:height={`${byteHeight}px`}
 				title={error?.indices.includes(i) ? error.message : undefined}
-				style={error?.indices.includes(i)
+				style={error?.indices.includes(i) && !inputClassNames?.[i]
 					? 'border-left: 1px solid var(--color-error) !important;'
 					: ''}
 			/>

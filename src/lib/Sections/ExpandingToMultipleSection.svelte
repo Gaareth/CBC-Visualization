@@ -18,15 +18,13 @@
 	import CiphertextColor from '$lib/components/CBC/Colored/CiphertextColor.svelte';
 	import CBCColored from '$lib/components/CBC/Colored/CBCColored.svelte';
 
-	let showSuccess = $state(false);
-
 	let plaintext = $state('BYTES');
 	let plaintextBlock = $derived(stringToArray(plaintext));
 	let initializationVector = $state(
 		new Uint8Array([0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff])
 	);
 
-	let { ciphertextBlocks, key, padder } = $derived(
+	let { ciphertextBlocks, key, padder, paddingScheme } = $derived(
 		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
 	);
 
@@ -213,6 +211,7 @@
 					bind:guessedOutputBlocks
 					bind:guessedPlaintextBlocks
 					{paddingOracle}
+					{paddingScheme}
 					{resetCiphertext}
 					showEdgeCheckSwitch={false}
 					multipleBytes={true}
@@ -230,7 +229,7 @@
 		<div class={cn('not-prose flex w-fit justify-end')}>
 			<CBCColored
 				plaintextBlock={plaintextBlocks[0]}
-				bind:ciphertextBlock={ciphertextBlocks[1]}
+				ciphertextBlock={ciphertextBlocks[1]}
 				initializationVector={ciphertextBlocks[0]}
 				guessedOutputBlock={guessedOutputBlocks[1]}
 				{paddingValidation}

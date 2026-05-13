@@ -1,7 +1,12 @@
 import type { PaddingScheme } from '$lib/stores/settings.svelte';
 import { autoGate } from '$lib/utils/generic';
 import type { PaddingOracle } from '.';
-import { normalizeShared, normalizeSharedBlock, type AttackBlockOptions, type AttackByteOptions, type AttackOptions } from './attackOptions';
+import {
+	normalizeShared,
+	type AttackBlockOptions,
+	type AttackByteOptions,
+	type AttackOptions
+} from './attackOptions';
 
 export const ATTACKABLE_PADDING_SCHEMES = [
 	'PKCS#5/7',
@@ -16,6 +21,9 @@ export async function recoverPlaintextWithOracle(
 	opts: AttackOptions = {}
 ) {
 	const { progress } = normalizeShared(opts);
+	const outGuessedDecBlocks = opts.outGuessedDecBlocks ?? [];
+	const outGuessedPlaintextBlocks = opts.outGuessedPlaintextBlocks ?? [];
+
 	const blockGate = opts.blockGate ?? autoGate;
 
 	for (let i = ciphertextBlocks.length - 1; i > 0; i--) {
@@ -26,7 +34,11 @@ export async function recoverPlaintextWithOracle(
 			ciphertextBlocks[i],
 			paddingOracle,
 			paddingScheme,
-			opts
+			{
+				...opts,
+				outGuessedDecBlock: (outGuessedDecBlocks[i] ??= []),
+				outGuessedPlaintextBlock: (outGuessedPlaintextBlocks[i] ??= [])
+			}
 		);
 
 		progress?.onBlockEnd?.(i);
@@ -44,7 +56,7 @@ export async function recoverSingleBlock(
 	opts: AttackBlockOptions = {}
 ) {
 	const { interactionGate, progress } = normalizeShared(opts);
-	const { outGuessedDecBlock } = normalizeSharedBlock(opts);
+	const outGuessedDecBlock = opts.outGuessedDecBlock ?? [];
 	const byteGate = opts.byteGate ?? autoGate;
 
 	const blockSize = ivBlock.length;
@@ -121,7 +133,9 @@ export async function recoverSingleByte(
 	opts: AttackByteOptions = {}
 ) {
 	const { interactionGate, progress, skipEdgeCaseCheck } = normalizeShared(opts);
-	const { outGuessedDecBlock, outGuessedPlaintextBlock } = normalizeSharedBlock(opts);
+	const outGuessedDecBlock = opts.outGuessedDecBlock ?? [];
+	const outGuessedPlaintextBlock = opts.outGuessedPlaintextBlock ?? [];
+	
 	const guessGate = opts.guessGate ?? autoGate;
 
 	const blockSize = ivBlock.length;
