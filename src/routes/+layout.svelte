@@ -40,6 +40,13 @@
 	<title>CBC Padding Oracle Attack Demo</title>
 </svelte:head>
 
+<noscript>
+	<div class="bg-dark p-4 text-center text-light">
+		<p class="text-lg font-bold">JavaScript is highly recommended, as the main content here are interactive examples.</p>
+		<p>You can read the raw explanations at <a href={resolve("/padding-oracle-attack/explain")} class="underline">/explain</a> although without JavaScript.</p>
+	</div>
+</noscript>
+
 {#if showNav}
 	<Nav className="mx-1 sm:mx-auto sm:w-3xl my-5" />
 {/if}
@@ -49,11 +56,13 @@
 <main>{@render children()}</main>
 
 <footer class="absolute -bottom-25 min-h-10 w-full bg-surface-1">
-	<div class="flex-center p-2 gap-2">
+	<div class="flex-center gap-2 p-2">
 		<p>Made by <a href="https://gaareth.com" class="hover:underline">Gaareth</a></p>
 		<p>|</p>
 		<p>
-			Open Sourced at <a href="https://github.com/Gaareth/CBC-Visualization" class="hover:underline">Github</a>
+			Open Sourced at <a href="https://github.com/Gaareth/CBC-Visualization" class="hover:underline"
+				>Github</a
+			>
 		</p>
 	</div>
 </footer>
