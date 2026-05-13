@@ -17,7 +17,7 @@
 	let plaintext = $state('RECOVER');
 	let plaintextBlock = $derived(stringToArray(plaintext));
 	const initializationVector = new Uint8Array([0x10, 0xf0, 0xf0, 0x42, 0x00, 0xfe, 0xb0, 0xff]);
-	let { ciphertextBlocks, key, padder } = $derived(
+	let { ciphertextBlocks, key, padder, paddingScheme } = $derived(
 		encryptCBCWithContext(plaintextBlock, initializationVector, settingsState)
 	);
 
@@ -75,6 +75,7 @@
 			bind:ciphertextBlocks
 			{guessedOutputBlocks}
 			{paddingOracle}
+			{paddingScheme}
 			{guessedPlaintextBlocks}
 			{resetCiphertext}
 			autoRunAllowed={false}

@@ -1,17 +1,23 @@
 <script lang="ts">
 	import { Switch } from '$lib/components/ui/switch';
-	import { cn } from '$lib/utils';
 	import {
-		recoverPlaintextWithOracle,
 		type AttackEvent,
 		type ByteRecoveredResult
-	} from '../../logic/paddingOracle';
-	import { settingsState } from '../../stores/settings.svelte';
+	} from '$lib/logic/paddingOracle/attackEvents';
+	import {
+		ATTACKABLE_PADDING_SCHEMES,
+		recoverPlaintextWithOracle,
+		type SupportedAttackablePaddingSchemes
+	} from '$lib/logic/paddingOracle/paddingOracleAttack';
+	import { cn } from '$lib/utils';
+
+	import { settingsState, type PaddingScheme } from '../../stores/settings.svelte';
 	import { displayByte } from '../../utils/compute';
 	import { createGate, autoRunGate, autoGate } from '../../utils/generic';
 	import { BLOCK_COLORS } from '../../utils/styling';
 	import Block from '../shared/Block.svelte';
-	import AutoRunButton, { AUTO_RUN_DELAY_DEFAULT, type AutoRunState } from './AutoRunButton.svelte';
+	import Card from '../shared/Card.svelte';
+	import AutoRunButton, { AUTO_RUN_DELAY_DEFAULT } from './AutoRunButton.svelte';
 
 	interface Props {
 		plaintextBlocks: Uint8Array[];
@@ -19,6 +25,7 @@
 		guessedOutputBlocks: (number | undefined)[][];
 		guessedPlaintextBlocks: (number | undefined)[][];
 		paddingOracle: (cBlocks: Uint8Array[]) => boolean;
+		paddingScheme: PaddingScheme;
 
 		resetCiphertext: () => void;
 		skipEdgeCheck?: boolean;
@@ -33,12 +40,13 @@
 		guessedOutputBlocks = $bindable(),
 		guessedPlaintextBlocks = $bindable(),
 		paddingOracle,
+		paddingScheme,
 		resetCiphertext,
 		skipEdgeCheck = false,
 		showEdgeCheckSwitch = false,
 
 		multipleBytes = false,
-		autoRunAllowed= true
+		autoRunAllowed = true
 	}: Props = $props();
 
 	// svelte-ignore state_referenced_locally
@@ -109,8 +117,11 @@
 
 		let guessGate = createGate();
 		stopAutoGuess = autoRunGate(guessGate, delayFunction);
-
-		await recoverPlaintextWithOracle(ciphertextBlocks, paddingOracle, {
+		const attackablePaddingScheme: SupportedAttackablePaddingSchemes =
+			ATTACKABLE_PADDING_SCHEMES.includes(paddingScheme as any)
+				? (paddingScheme as SupportedAttackablePaddingSchemes)
+				: 'PKCS#5/7';
+		await recoverPlaintextWithOracle(ciphertextBlocks, paddingOracle, attackablePaddingScheme, {
 			blockGate,
 			byteGate,
 			guessGate,
@@ -356,6 +367,22 @@
 {/snippet}
 
 <div class="flex flex-col gap-3">
+	<div class="border-warning border p-1.5">
+		{#if paddingScheme == 'ANSI X9.23 (random)'}
+			<p>
+				The padding validator only validates the last byte and not the random padding, so the oracle
+				would only reveal the possible valid values for the last byte (0x01 - blockSize).
+			</p>
+		{/if}
+
+		{#if !ATTACKABLE_PADDING_SCHEMES.includes(paddingScheme as any)}
+			<p>
+				The recovery algorithm based on PKCS#7 padding is used instead. You can observe where it
+				fails.
+			</p>
+		{/if}
+	</div>
+
 	{#if showEdgeCheckSwitch}
 		<label class="flex justify-between">
 			Check for edge cases

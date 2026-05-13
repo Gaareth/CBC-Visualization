@@ -1,7 +1,8 @@
 <script lang="ts">
 	import ExplainWrapper from '../shared/ExplainWrapper.svelte';
-	import { findPaddingLengthWithOracle, type PaddingOracle } from '../../logic/paddingOracle';
+	import { findPaddingLengthWithOracle } from '../../logic/paddingOracle/lengthRecovery';
 	import { createGate, autoRunGate } from '../../utils/generic';
+	import type { PaddingOracle } from '$lib/logic/paddingOracle';
 
 	interface Props {
 		paddingValidation:

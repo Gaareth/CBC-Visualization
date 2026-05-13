@@ -50,7 +50,7 @@
 	let dropdownOpen = $state(false);
 	const autoRunMaxDelay = 5000;
 
-	export type AutoRunState = 'slow' | 'medium' | 'fast' | 'instant';
+	type AutoRunState = 'slow' | 'medium' | 'fast' | 'instant';
 
 	let autoRunFunctions = $derived({
 		stopBlockAutoRun: () => {},
