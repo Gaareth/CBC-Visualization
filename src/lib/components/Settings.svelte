@@ -117,8 +117,8 @@
 			TEA (Tiny Encryption Algorithm) is a simple (~20LOC) Feistel cipher. Probably should not be
 			used for real applications.
 		{:else if settingsState.blockCipher === 'OTP'}
-			Simple XOR of the plaintext with a key. However, insecure when used here as a block cipher with key size equal to the block size and with
-			reused keys. Try breaking it!
+			Simple XOR of the plaintext with a key. However, insecure when used here as a block cipher
+			with key size equal to the block size and with reused keys. Try breaking it!
 		{/if}
 	</p>
 {/snippet}

@@ -36,7 +36,6 @@
 		ciphertextBlocks[blockIndex] = modifiedBlock;
 		ciphertextBlocks = [...ciphertextBlocks];
 	}
-
 </script>
 
 {#snippet explain()}

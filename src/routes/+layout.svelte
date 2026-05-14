@@ -42,8 +42,15 @@
 
 <noscript>
 	<div class="bg-dark p-4 text-center text-light">
-		<p class="text-lg font-bold">JavaScript is highly recommended, as the main content here are interactive examples.</p>
-		<p>You can read the raw explanations at <a href={resolve("/padding-oracle-attack/explain")} class="underline">/explain</a> although without JavaScript.</p>
+		<p class="text-lg font-bold">
+			JavaScript is highly recommended, as the main content here are interactive examples.
+		</p>
+		<p>
+			You can read the raw explanations at <a
+				href={resolve('/padding-oracle-attack/explain')}
+				class="underline">/explain</a
+			> although without JavaScript.
+		</p>
 	</div>
 </noscript>
 

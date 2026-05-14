@@ -64,7 +64,6 @@ export class ANSIX923RandomPadder extends ANSIX923Padder {
 		return this.random(paddingLength);
 	}
 
-	
 	protected validatePaddingFillValues(_input: Uint8Array, _paddingLength: number): number[] {
 		// For random padding, we can't validate the actual values, so we just return an empty array.
 		return [];

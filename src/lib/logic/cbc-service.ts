@@ -68,7 +68,7 @@ export function encryptCBCWithContext(
 		...cbcEncrypt(plaintext, key, new Uint8Array(iv), cipher.encrypt, padder, addIV),
 		key,
 		padder,
-		paddingScheme: settings.paddingScheme,
+		paddingScheme: settings.paddingScheme
 	};
 }
 

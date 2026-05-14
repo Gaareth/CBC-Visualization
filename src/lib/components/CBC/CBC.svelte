@@ -29,7 +29,6 @@
 		addInitPadding = false
 	}: Props = $props();
 
-
 	let targetRotation = $derived(encryptionMode ? 90 : 270);
 
 	export function rotateArrows() {
@@ -38,7 +37,6 @@
 
 	const isLastBlock = $derived((i: number) => i === plaintextBlocks.length - 1);
 </script>
-
 
 <div class={cn('flex justify-center')} style={`gap: ${getGapToNext()}px;`}>
 	{#each { length: plaintextBlocks.length } as _, i (i)}

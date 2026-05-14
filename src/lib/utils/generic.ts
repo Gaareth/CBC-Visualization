@@ -29,10 +29,7 @@ export const autoGate = {
 	wait: async () => {} // resolves immediately
 };
 
-export function autoRunGate(
-	gate: SteppableGate,
-	getDelay: (step: number) => number = () => 300
-) {
+export function autoRunGate(gate: SteppableGate, getDelay: (step: number) => number = () => 300) {
 	let step = 0;
 	let stopped = false;
 	let timeoutId: ReturnType<typeof setTimeout>;

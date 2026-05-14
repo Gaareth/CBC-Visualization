@@ -29,7 +29,7 @@
 	}
 </script>
 
-<Card title={"Question" + (title ? `: ${title}` : '')} className={cn('flex flex-col', className)}>
+<Card title={'Question' + (title ? `: ${title}` : '')} className={cn('flex flex-col', className)}>
 	{@render question()}
 
 	<Divider className="my-4" surfaceLevel={1} />

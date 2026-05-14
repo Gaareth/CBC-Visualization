@@ -46,7 +46,8 @@
 				href="https://www.nccgroup.com/research/cryptopals-exploiting-cbc-padding-oracles/"
 			>
 				this article
-			</a>, which actually explains everything really well and also inspired me for these visualizations.
+			</a>, which actually explains everything really well and also inspired me for these
+			visualizations.
 		</p>
 	</Card>
 

@@ -90,8 +90,7 @@
 		if (!storyWrapperEl || !contentEl || !ctxt) return;
 		ctxt.visualColumnWidth = storyWrapperEl.clientWidth - contentEl.clientWidth;
 
-		
-		const spaceOnTheLeft = (document.documentElement.clientWidth - storyWrapperEl.clientWidth)/2;
+		const spaceOnTheLeft = (document.documentElement.clientWidth - storyWrapperEl.clientWidth) / 2;
 		// console.log('space on the left:', spaceOnTheLeft);
 		if (spaceOnTheLeft < 240) {
 			forcedAtTop = true;
@@ -117,13 +116,15 @@
 	});
 </script>
 
-
 <div
 	class="relative mx-auto my-10 grid max-w-[1400px] grid-cols-1 gap-13 p-5 lg:grid-cols-2"
 	bind:this={storyWrapperEl}
 >
 	<aside
-		class={cn('static top-7 -left-5 h-full w-full col-span-full', !forcedAtTop ? `lg:absolute lg:-translate-x-full lg:w-60` : "")}
+		class={cn(
+			'static top-7 -left-5 col-span-full h-full w-full',
+			!forcedAtTop ? `lg:absolute lg:w-60 lg:-translate-x-full` : ''
+		)}
 		bind:this={tableOfContentsEl}
 	>
 		<div class="sticky top-7">

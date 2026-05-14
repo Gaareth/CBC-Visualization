@@ -3,7 +3,6 @@
 	import { getSectionContext } from '../../contexts/scrollStoryContext';
 	import { cn } from '$lib/utils';
 
-
 	interface Props {
 		title: string;
 		headingLevel?: number;

@@ -88,7 +88,12 @@
 					{arrowsRotated ? 'Back to Encryption View' : 'Switch to Decryption View'}
 				</button>
 				{#if arrowsRotated}
-					<a type="button" class="button-default input-layer-2" href={resolve('/decryption')} in:fade>
+					<a
+						type="button"
+						class="button-default input-layer-2"
+						href={resolve('/decryption')}
+						in:fade
+					>
 						Flip diagram to continue to decryption
 					</a>
 				{/if}

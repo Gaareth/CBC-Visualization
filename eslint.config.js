@@ -32,7 +32,6 @@ export default defineConfig(
 					caughtErrorsIgnorePattern: '^_'
 				}
 			]
-
 		}
 	},
 	{
@@ -45,7 +44,6 @@ export default defineConfig(
 				svelteConfig
 			}
 		}
-
 	},
 	{
 		files: ['**/ui/**/*.svelte'],
