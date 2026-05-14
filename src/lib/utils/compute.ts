@@ -26,7 +26,7 @@ export function getRandomInt(min: number, max: number): number {
 }
 
 export function getRandomByteExcept(exceptions: number[] = []): number {
-	let options = Array.from({ length: 256 }, (_, i) => i).filter((i) => !exceptions.includes(i));
+	const options = Array.from({ length: 256 }, (_, i) => i).filter((i) => !exceptions.includes(i));
 	return options[Math.floor(Math.random() * options.length)];
 }
 
@@ -40,9 +40,10 @@ export function displayByte(
 	}
 
 	switch (displayAs) {
-		case 'hex':
-			let hex = b.toString(16).toUpperCase().padStart(2, '0');
+		case 'hex': {
+			const hex = b.toString(16).toUpperCase().padStart(2, '0');
 			return prependHexPrefix ? `0x${hex}` : hex;
+		}
 		case 'ascii':
 			return String.fromCharCode(b);
 		case 'decimal':

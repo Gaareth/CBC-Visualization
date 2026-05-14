@@ -2,7 +2,7 @@
 	import { resolve } from '$app/paths';
 
 	import { goto } from '$app/navigation';
-	import { receive, send } from '$lib/crossfade';
+	import { receive } from '$lib/crossfade';
 	import Welcome from '$lib/Welcome.svelte';
 </script>
 

@@ -2,21 +2,20 @@
 	import { Switch } from '$lib/components/ui/switch';
 	import {
 		type AttackEvent,
-		type ByteRecoveredResult
+		type ByteRecoveredResult,
+		type OnByteRecovered
 	} from '$lib/logic/paddingOracle/attackEvents';
 	import {
-		ATTACKABLE_PADDING_SCHEMES,
-		recoverPlaintextWithOracle,
-		type SupportedAttackablePaddingSchemes
+		isAttackablePaddingScheme,
+		recoverPlaintextWithOracle
 	} from '$lib/logic/paddingOracle/paddingOracleAttack';
 	import { cn } from '$lib/utils';
 
 	import { settingsState, type PaddingScheme } from '../../stores/settings.svelte';
 	import { displayByte } from '../../utils/compute';
 	import { createGate, autoRunGate, autoGate } from '../../utils/generic';
-	import { BLOCK_COLORS } from '../../utils/styling';
+	import { BLOCK_COLORS, makeBorderMap } from '../../utils/styling';
 	import Block from '../shared/Block.svelte';
-	import Card from '../shared/Card.svelte';
 	import AutoRunButton, { AUTO_RUN_DELAY_DEFAULT } from './AutoRunButton.svelte';
 
 	interface Props {
@@ -49,7 +48,6 @@
 		autoRunAllowed = true
 	}: Props = $props();
 
-	// svelte-ignore state_referenced_locally
 	let originalPlaintext: Uint8Array[] | undefined = $state();
 
 	let checkEdgeCases = $derived(!skipEdgeCheck);
@@ -74,6 +72,7 @@
 	let stopAutoGuess: () => void = $state(() => () => {});
 
 	let byteRecoveredResult: ByteRecoveredResult['data'] | undefined = $state();
+	let onByteRecoveredData: OnByteRecovered['data'] | undefined = $state();
 
 	let guessSpeedSettings = $state({
 		type: 'exponential' as 'exponential' | 'constant',
@@ -99,8 +98,6 @@
 		};
 		const delayFunction = (i: number) => {
 			if (guessSpeedSettings.constantDelayValue == 0) {
-				// @ts-ignore
-				guessGate = autoGate;
 				return 0;
 			}
 
@@ -115,13 +112,18 @@
 			stopAutoGuess();
 		}
 
-		let guessGate = createGate();
-		stopAutoGuess = autoRunGate(guessGate, delayFunction);
-		
-		const attackablePaddingScheme: SupportedAttackablePaddingSchemes =
-			ATTACKABLE_PADDING_SCHEMES.includes(paddingScheme as any)
-				? (paddingScheme as SupportedAttackablePaddingSchemes)
-				: 'PKCS#5/7';
+		let guessGate;
+		if (guessSpeedSettings.constantDelayValue == 0) {
+			guessGate = autoGate;
+			stopAutoGuess = () => {};
+		} else {
+			guessGate = createGate();
+			stopAutoGuess = autoRunGate(guessGate, delayFunction);
+		}
+
+		const attackablePaddingScheme = isAttackablePaddingScheme(paddingScheme)
+			? paddingScheme
+			: 'PKCS#5/7';
 		await recoverPlaintextWithOracle(ciphertextBlocks, paddingOracle, attackablePaddingScheme, {
 			blockGate,
 			byteGate,
@@ -174,6 +176,7 @@
 					if (event.event == 'on-byte-recovered') {
 						isGuessing = false;
 						guessProgress = 1;
+						onByteRecoveredData = event.data;
 					}
 
 					if (event.event == 'byte-recovered-result') {
@@ -224,19 +227,10 @@
 		return displayByte(byte, settingsState.displayBytesAs, true);
 	}
 
-	let inputClassNames: Record<number, string> = $state({});
-
 	let blockSize = $derived(ciphertextBlocks[0].length);
-	$effect(() => {
-		// inputClassNames = {};
-		// inputClassNames[blockSize - currentByteIndex - 1] = `border-r-${BLOCK_COLORS.plaintext}!`;
-		// inputClassNames[blockSize - currentByteIndex] = `border-${BLOCK_COLORS.plaintext}!`;
-
-		inputClassNames = {
-			[blockSize - currentByteIndex - 1]: `border-r-${BLOCK_COLORS.plaintext}!`,
-			[blockSize - currentByteIndex]: `border-${BLOCK_COLORS.plaintext}!`
-		};
-	});
+	let inputClassNames: Record<number, string> = $derived(
+		makeBorderMap(blockSize - currentByteIndex, BLOCK_COLORS.plaintext)
+	);
 
 	function getMismatchErrorForBlock(index: number) {
 		if (originalPlaintext == undefined) {
@@ -284,10 +278,12 @@
 				? 'Padding valid! 0x01 found.'
 				: 'Invalid padding! Last byte cannot be 0x01, continuing bruteforce...'}
 		</p>
-	{:else if attackState?.event == 'on-byte-recovered'}
+	{:else if attackState?.event == 'on-byte-recovered' && onByteRecoveredData?.expectedPlaintextByte}
 		<p class="text-center">
 			<span class="text-red-500">DEC[-{currentByteIndex}]</span> =
-			<span class="text-blue-400"> {displayByteWrapper(currentByteIndex)} </span>
+			<span class="text-blue-400">
+				{displayByteWrapper(onByteRecoveredData!.expectedPlaintextByte)}
+			</span>
 			XOR
 			<span class="text-green-400">modifiedIV[-{currentByteIndex}]</span>
 		</p>
@@ -301,7 +297,9 @@
 	{:else if (attackState?.event == 'byte-recovered-result' || attackState?.event == 'on-byte-end') && byteRecoveredResult}
 		<p class="text-center">
 			<span class="text-red-500">{displayByteWrapper(byteRecoveredResult.decByte)}</span> =
-			<span class="text-blue-400"> {displayByteWrapper(currentByteIndex)} </span>
+			<span class="text-blue-400">
+				{displayByteWrapper(byteRecoveredResult.decByteXoredWith)}
+			</span>
 			XOR
 			<span class="text-green-400">{displayByteWrapper(byteRecoveredResult.guess)}</span>
 		</p>
@@ -368,7 +366,7 @@
 {/snippet}
 
 <div class="flex flex-col gap-3">
-	{#if !ATTACKABLE_PADDING_SCHEMES.includes(paddingScheme as any)}
+	{#if !isAttackablePaddingScheme(paddingScheme)}
 		<div class="border border-warning p-1.5">
 			{#if paddingScheme == 'ANSI X9.23 (random)'}
 				<p>
@@ -469,7 +467,7 @@
 		<div class="mx-auto w-fit">
 			<p>Recovered Plaintext:</p>
 			<div class={cn('flex gap-1', { 'lockin-animation': showResults })}>
-				{#each { length: guessedPlaintextBlocks.length - 1 } as _, index (index)}
+				{#each { length: guessedPlaintextBlocks.length - 1 } as i, index (i)}
 					<Block
 						bytes={guessedPlaintextBlocks[index + 1]}
 						success={showResults}

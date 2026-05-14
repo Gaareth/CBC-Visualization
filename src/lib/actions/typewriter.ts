@@ -9,7 +9,7 @@ export function typewriter(
 	let timeoutId: ReturnType<typeof setTimeout> | null = null;
 	let frameId: ReturnType<typeof setTimeout> | null = null;
 
-	let originalHeight = node.clientHeight;
+	const originalHeight = node.clientHeight;
 
 	node.textContent = '';
 	node.style.visibility = 'visible'; // unhide if you default to hidden
@@ -34,7 +34,7 @@ export function typewriter(
 	}
 
 	return {
-		update(newParams: { typingDelay?: number; initialDelay?: number }) {
+		update(_newParams: { typingDelay?: number; initialDelay?: number }) {
 			// If you want dynamic params, restart here
 		},
 		destroy() {

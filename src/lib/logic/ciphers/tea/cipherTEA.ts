@@ -1,4 +1,5 @@
 import { generateKeyFromString, toUint32 } from '../../crypto-utils';
+import type { Cipher } from '../ciphers';
 
 export class TeaCipher implements Cipher {
 	public keySizeBytes: number = 16;
@@ -26,7 +27,7 @@ export class TeaCipher implements Cipher {
 		this._validateInput(v, k);
 
 		let sum = toUint32(0);
-		let delta = toUint32(0x9e3779b9);
+		const delta = toUint32(0x9e3779b9);
 
 		for (let i = 0; i < this.numRounds; i++) {
 			sum = toUint32(sum + delta);
@@ -40,7 +41,7 @@ export class TeaCipher implements Cipher {
 	public _decrypt = (v: Uint32Array, k: Uint32Array): Uint32Array => {
 		this._validateInput(v, k);
 
-		let delta = toUint32(0x9e3779b9);
+		const delta = toUint32(0x9e3779b9);
 		let sum = toUint32((delta << 5) & 0xffffffff);
 
 		for (let i = 0; i < this.numRounds; i++) {

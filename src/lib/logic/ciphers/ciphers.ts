@@ -1,4 +1,4 @@
-interface Cipher {
+export interface Cipher {
     keySizeBytes?: number;
     blockSizeBytes?: number;
 

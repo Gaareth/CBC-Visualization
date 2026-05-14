@@ -68,7 +68,7 @@ describe('ANSIX932 padding', () => {
 	it('should not validate an invalid block', () => {
 		const padder = new ANSIX923ZeroPadder();
 
-		let invalidBlock = new Uint8Array([10, 1, 0xA, 0x02]);
+		const invalidBlock = new Uint8Array([10, 1, 0xA, 0x02]);
 
 		const validation = padder.validatePadding(invalidBlock);
 		expect(validation.valid).toBe(false);

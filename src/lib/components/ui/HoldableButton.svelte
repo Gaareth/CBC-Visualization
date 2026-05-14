@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { Snippet } from "svelte";
+
 	interface Props {
 		onClick?: () => void;
 		onHoldStart?: () => void;
@@ -7,8 +9,8 @@
 		holdDelay?: number;
 		repeat?: number;
 		disabled?: boolean;
-		children?: any;
-		[key: string]: any; // for any additional props like id, etc.
+		children?: Snippet;
+		[key: string]: unknown; // for any additional props like id, etc.
 	}
 
 	let {

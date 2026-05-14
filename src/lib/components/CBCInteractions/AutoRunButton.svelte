@@ -8,16 +8,16 @@
 	import { cn } from 'tailwind-variants';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 	import { inputLayer, type SurfaceLevel } from '$lib/utils/styling';
-	import { autoRunGate, delay, type Gate } from '$lib/utils/generic';
+	import { autoRunGate,  type SteppableGate } from '$lib/utils/generic';
 	import { Slider } from '$lib/components/ui/slider/index.js';
 	import Separator from '../ui/separator/separator.svelte';
 
 	interface Props {
 		surfaceLevel?: SurfaceLevel;
 
-		blockGate: Gate;
-		byteGate: Gate;
-		interactionGate: Gate;
+		blockGate: SteppableGate;
+		byteGate: SteppableGate;
+		interactionGate: SteppableGate;
 
 		isEnabled?: boolean;
 		isToggleable?: boolean;

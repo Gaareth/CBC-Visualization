@@ -8,8 +8,11 @@ type EdgeCaseCheckResult = {
     };
 };
 
-type OnByteRecovered = {
+export type OnByteRecovered = {
     event: 'on-byte-recovered';
+    data?: {
+        expectedPlaintextByte?: number;
+    };
 };
 
 export type ByteRecoveredResult = {
@@ -19,6 +22,7 @@ export type ByteRecoveredResult = {
         decByte: number;
         guess: number;
         originalIVByte: number;
+        decByteXoredWith: number;
     };
 };
 

@@ -69,7 +69,7 @@
 
 <button
 	type="button"
-	class={'spoiler'}
+	class="spoiler"
 	class:revealed
 	aria-expanded={revealed}
 	aria-label={revealed ? `Hide ${label}` : `Reveal ${label}`}

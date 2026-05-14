@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Block from '$lib/components/shared/Block.svelte';
 	import CBCBlock from '$lib/components/CBC/CBCBlock.svelte';
-	import {  stringToArray } from '$lib/logic/crypto-utils';
+	import { stringToArray } from '$lib/logic/crypto-utils';
 	import type { PaddingOracle } from '$lib/logic/paddingOracle';
 	import PaddingLengthFinder from '$lib/components/CBCInteractions/PaddingLengthFinder.svelte';
 	import StorySection from '$lib/components/shared/StorySection.svelte';
@@ -67,19 +67,17 @@
 </script>
 
 <StorySection title="Exploiting - Finding the padding length" headingLevel={3}>
-	{#snippet children()}
-		<PaddingLengthFinder
-			bind:showSuccess
-			{resetCiphertext}
-			{ciphertextBlocks}
-			{paddingOracle}
-			{blockSize}
-			{paddingValidation}
-			onCiphertextChange={() => {
-				ciphertextBlocks = [...ciphertextBlocks];
-			}}
-		/>
-	{/snippet}
+	<PaddingLengthFinder
+		bind:showSuccess
+		{resetCiphertext}
+		{ciphertextBlocks}
+		{paddingOracle}
+		{blockSize}
+		{paddingValidation}
+		onCiphertextChange={() => {
+			ciphertextBlocks = [...ciphertextBlocks];
+		}}
+	/>
 
 	{#snippet visualSnippet()}
 		<h2 class="mb-10 text-center text-2xl font-bold">Finding the Padding Length</h2>

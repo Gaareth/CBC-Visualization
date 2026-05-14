@@ -41,7 +41,7 @@
 
 
 <div class={cn('flex justify-center')} style={`gap: ${getGapToNext()}px;`}>
-	{#each { length: plaintextBlocks.length } as _, i}
+	{#each { length: plaintextBlocks.length } as _, i (i)}
 		<CBCBlock
 			{encryptionMode}
 			{targetRotation}

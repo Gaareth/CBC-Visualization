@@ -23,7 +23,8 @@
 	let {
 		paddingValidation,
 		blockSize,
-		showSuccess = $bindable(false),
+		// eslint-disable-next-line no-useless-assignment
+		showSuccess = $bindable(),
 		resetCiphertext,
 		paddingOracle,
 		ciphertextBlocks,

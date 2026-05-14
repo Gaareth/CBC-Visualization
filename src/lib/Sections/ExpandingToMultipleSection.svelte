@@ -1,6 +1,4 @@
 <script lang="ts">
-	import Block from '$lib/components/shared/Block.svelte';
-	import CBCBlock from '$lib/components/CBC/CBCBlock.svelte';
 	import { stringToArray } from '$lib/logic/crypto-utils';
 	import { type PaddingOracle } from '$lib/logic/paddingOracle';
 	import Question from '$lib/components/shared/Question.svelte';
@@ -12,7 +10,6 @@
 	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
 	import { encryptCBCWithContext, decryptCBCWithContext } from '$lib/logic/cbc-service';
 	import { settingsState } from '$lib/stores/settings.svelte';
-	import { uint8ArrayToUI } from '$lib/utils/arrayConversion';
 	import { resolve } from '$app/paths';
 	import PlaintextColor from '$lib/components/CBC/Colored/PlaintextColor.svelte';
 	import CiphertextColor from '$lib/components/CBC/Colored/CiphertextColor.svelte';
@@ -158,71 +155,69 @@
 {/snippet}
 
 <StorySection title="Exploiting - Recovering Bytes" headingLevel={3}>
-	{#snippet children()}
-		<!-- <h3>Exploitation - Recovering Bytes</h3> -->
-		<p class="my-0!">Some remaining questions:</p>
-		<ol class="my-0! list-disc">
-			<li>How do we now recover more than just a single byte?</li>
+	<!-- <h3>Exploitation - Recovering Bytes</h3> -->
+	<p class="my-0!">Some remaining questions:</p>
+	<ol class="my-0! list-disc">
+		<li>How do we now recover more than just a single byte?</li>
 
-			<li>
-				or to begin with: How can we use the padding oracle to recover information about the second
-				to last byte?
-			</li>
-		</ol>
+		<li>
+			or to begin with: How can we use the padding oracle to recover information about the second to
+			last byte?
+		</li>
+	</ol>
 
-		<p>
-			For the last byte, we simply "bruteforced" the
-			<CiphertextColor className="font-bold">last iv byte</CiphertextColor> until the padding was valid,
-			which then revealed that the last byte of the decrypted
-			<PlaintextColor>plaintext</PlaintextColor>
-			was 0x01.
-		</p>
+	<p>
+		For the last byte, we simply "bruteforced" the
+		<CiphertextColor className="font-bold">last iv byte</CiphertextColor> until the padding was valid,
+		which then revealed that the last byte of the decrypted
+		<PlaintextColor>plaintext</PlaintextColor>
+		was 0x01.
+	</p>
 
-		{@render QuestionHowNext()}
+	{@render QuestionHowNext()}
 
-		<p>
-			How to set the last <PlaintextColor>plaintext</PlaintextColor> byte to 0x02? Remember, we just recovered
-			<span class="text-red-500">DEC[-1]</span>, so we can calculate the required
-			<span class={`text-${BLOCK_COLORS.ciphertext}`}>iv</span> byte value to get a
-			<span class={`text-${BLOCK_COLORS.plaintext}`}>plaintext</span>
-			byte of 0x02, by transforming this cbc equation:
-		</p>
+	<p>
+		How to set the last <PlaintextColor>plaintext</PlaintextColor> byte to 0x02? Remember, we just recovered
+		<span class="text-red-500">DEC[-1]</span>, so we can calculate the required
+		<span class={`text-${BLOCK_COLORS.ciphertext}`}>iv</span> byte value to get a
+		<span class={`text-${BLOCK_COLORS.plaintext}`}>plaintext</span>
+		byte of 0x02, by transforming this cbc equation:
+	</p>
 
-		<p class="text-center">
-			<span class="text-blue-400">P[-1]</span> = <span class="text-green-400">IV[-1]</span>
-			XOR
-			<span class="text-red-500">DEC[-1]</span>
-		</p>
+	<p class="text-center">
+		<span class="text-blue-400">P[-1]</span> = <span class="text-green-400">IV[-1]</span>
+		XOR
+		<span class="text-red-500">DEC[-1]</span>
+	</p>
 
-		<p class="flex-center"><Equal /></p>
+	<p class="flex-center"><Equal /></p>
 
-		<p class="text-center">
-			<span class="text-green-400">IV[-1]</span> =
-			<span class="text-blue-400">0x02</span>
-			XOR
-			<span class="text-red-500">DEC[-1]</span>
-		</p>
+	<p class="text-center">
+		<span class="text-green-400">IV[-1]</span> =
+		<span class="text-blue-400">0x02</span>
+		XOR
+		<span class="text-red-500">DEC[-1]</span>
+	</p>
 
-		<ExplainWrapper title="Interactive Example - Full Recovery">
-			<div class="not-prose">
-				<ByteRecoverer
-					{plaintextBlocks}
-					bind:ciphertextBlocks
-					bind:guessedOutputBlocks
-					bind:guessedPlaintextBlocks
-					{paddingOracle}
-					{paddingScheme}
-					{resetCiphertext}
-					showEdgeCheckSwitch={false}
-					multipleBytes={true}
-				/>
-			</div>
-		</ExplainWrapper>
+	<ExplainWrapper title="Interactive Example - Full Recovery">
+		<div class="not-prose">
+			<ByteRecoverer
+				{plaintextBlocks}
+				bind:ciphertextBlocks
+				bind:guessedOutputBlocks
+				bind:guessedPlaintextBlocks
+				{paddingOracle}
+				{paddingScheme}
+				{resetCiphertext}
+				showEdgeCheckSwitch={false}
+				multipleBytes={true}
+			/>
+		</div>
+	</ExplainWrapper>
 
-		{@render MultipleBlocks()}
+	{@render MultipleBlocks()}
 
-		{@render FurtherActions()}
-	{/snippet}
+	{@render FurtherActions()}
 
 	{#snippet visualSnippet()}
 		<h2 class="mb-10 text-center text-2xl font-bold">Recovering Multiple Bytes</h2>

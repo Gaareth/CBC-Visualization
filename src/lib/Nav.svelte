@@ -1,12 +1,13 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
+	import { type ResolvedPathname } from '$app/types';
 	import { cn, hoverBgSurface, surfaceOutline, type SurfaceLevel } from './utils/styling';
 
 	let { className = '', surfaceLevel = 1 }: { className?: string; surfaceLevel?: SurfaceLevel } =
 		$props();
 </script>
 
-{#snippet dropdownNav(title: string, items: { label: string; href: string }[])}
+{#snippet dropdownNav(title: string, items: { label: string; href: ResolvedPathname }[])}
 	<div class="dropdown">
 		<button
 			type="button"

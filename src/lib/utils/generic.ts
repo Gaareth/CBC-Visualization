@@ -2,7 +2,8 @@ export async function delay(milliseconds: number = 1000) {
 	return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
-export type Gate = ReturnType<typeof createGate>;
+export type SteppableGate = ReturnType<typeof createGate>;
+export type AwaitableGate = { wait: () => Promise<void> };
 
 export function createGate() {
 	let resolver: (() => void) | null = null;
@@ -29,7 +30,7 @@ export const autoGate = {
 };
 
 export function autoRunGate(
-	gate: ReturnType<typeof createGate>,
+	gate: SteppableGate,
 	getDelay: (step: number) => number = () => 300
 ) {
 	let step = 0;

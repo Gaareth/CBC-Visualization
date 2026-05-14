@@ -75,26 +75,25 @@
 {/snippet}
 
 <StorySection title="What is a Padding Oracle?" headingLevel={2}>
-	{#snippet children()}
-		<p>
-			If you have a server, that answers you whether a given (and possibly modified) ciphertext has
-			invalid padding, you have a padding oracle. This can be exploited to recover the plaintext of
-			a ciphertext, without knowing the key.
-		</p>
+	<p>
+		If you have a server, that answers you whether a given (and possibly modified) ciphertext has
+		invalid padding, you have a padding oracle. This can be exploited to recover the plaintext of a
+		ciphertext, without knowing the key.
+	</p>
 
-		<details>
-			<summary class="cursor-pointer">Padding oracle model as code</summary>
-			This is roughly how the oracle is modeled for this visualization:
-			<pre class="mt-0!"><code>{@html paddingOracleHtml}</code></pre>
-		</details>
+	<details>
+		<summary class="cursor-pointer">Padding oracle model as code</summary>
+		This is roughly how the oracle is modeled for this visualization:
+		<!-- eslint-disable-next-line svelte/no-at-html-tags -->
+		<pre class="mt-0!"><code>{@html paddingOracleHtml}</code></pre>
+	</details>
 
-		<ExplainWrapper
-			title="Interactive Example - Simulating Padding Error"
-			wrapperClass="mt-4"
-			slidesWrapperClass="items-center"
-			slides={[example, simulateButton]}
-		></ExplainWrapper>
-	{/snippet}
+	<ExplainWrapper
+		title="Interactive Example - Simulating Padding Error"
+		wrapperClass="mt-4"
+		slidesWrapperClass="items-center"
+		slides={[example, simulateButton]}
+	></ExplainWrapper>
 
 	{#snippet visualSnippet()}
 		<h2 class="mb-10 text-center text-2xl font-bold">What is a Padding Oracle?</h2>

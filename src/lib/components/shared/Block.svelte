@@ -196,7 +196,7 @@
 	{/if}
 
 	<div class="flex">
-		{#each bytes as byte, i}
+		{#each bytes as _byte, i (i)}
 			<input
 				disabled={!allowEdit}
 				onkeydown={(e) => onkeypress(e, i)}

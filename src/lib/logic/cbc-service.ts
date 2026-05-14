@@ -1,5 +1,6 @@
 import { settingsState, type BlockCipher, type PaddingScheme } from '$lib/stores/settings.svelte';
 import { cbcDecrypt, cbcEncrypt } from './cbc';
+import type { Cipher } from './ciphers/ciphers';
 import { OTPCipher } from './ciphers/otp/cipherOTP';
 import { TeaCipher } from './ciphers/tea/cipherTEA';
 import { ANSIX923RandomPadder, ANSIX923ZeroPadder, PKCS7Padder } from './padding/padder';

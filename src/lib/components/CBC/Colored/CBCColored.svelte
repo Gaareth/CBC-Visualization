@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { uint8ArrayToUI, wrapOnChange } from '$lib/utils/arrayConversion';
-	import { BLOCK_COLORS } from '$lib/utils/styling';
+	import { BLOCK_COLORS, makeBorderMap } from '$lib/utils/styling';
 	import Block from '../../shared/Block.svelte';
 	import CBCBlock from '../CBCBlock.svelte';
 	import { type PaddingValidationResult } from '$lib/logic/padding/padding';
@@ -32,16 +32,9 @@
 
 	const blockSize = $derived(plaintextBlock.length);
 
-	function makeBorderMap(color: string) {
-		return {
-			[blockSize - 2]: `border-r-${color}!`,
-			[blockSize - 1]: `border-${color}!`
-		} satisfies Record<number, string>;
-	}
-
-	let inputClassNamesPL = $derived(makeBorderMap(BLOCK_COLORS.plaintext));
-	let inputClassNamesIV = $derived(makeBorderMap(BLOCK_COLORS.ciphertext));
-	let inputClassNamesFN = $derived(makeBorderMap(BLOCK_COLORS.fnOutput));
+	let inputClassNamesPL = $derived(makeBorderMap(blockSize - 1, BLOCK_COLORS.plaintext));
+	let inputClassNamesIV = $derived(makeBorderMap(blockSize - 1, BLOCK_COLORS.ciphertext));
+	let inputClassNamesFN = $derived(makeBorderMap(blockSize - 1, BLOCK_COLORS.fnOutput));
 
 	function extractPaddingError(result: PaddingValidationResult) {
 		if (result.valid) {
@@ -64,11 +57,11 @@
 	isLastBlock={true}
 	{onChangeCiphertext}
 >
-	{#snippet FnOutputBlock(index)}
+	{#snippet FnOutputBlock()}
 		<Block bytes={guessedOutputBlock} inputClassNames={inputClassNamesFN} />
 	{/snippet}
 
-	{#snippet IVBlock(index)}
+	{#snippet IVBlock()}
 		<Block
 			bytes={uint8ArrayToUI(initializationVector)}
 			onChange={wrapOnChange(onChangeIV)}

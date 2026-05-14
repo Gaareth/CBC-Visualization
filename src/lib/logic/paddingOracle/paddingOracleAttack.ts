@@ -14,6 +14,12 @@ export const ATTACKABLE_PADDING_SCHEMES = [
 ] as const satisfies readonly PaddingScheme[];
 export type SupportedAttackablePaddingSchemes = (typeof ATTACKABLE_PADDING_SCHEMES)[number];
 
+export function isAttackablePaddingScheme(
+	paddingScheme: PaddingScheme
+): paddingScheme is SupportedAttackablePaddingSchemes {
+	return ATTACKABLE_PADDING_SCHEMES.includes(paddingScheme as SupportedAttackablePaddingSchemes);
+}
+
 export async function recoverPlaintextWithOracle(
 	ciphertextBlocks: Uint8Array[],
 	paddingOracle: PaddingOracle,
@@ -60,7 +66,7 @@ export async function recoverSingleBlock(
 	const byteGate = opts.byteGate ?? autoGate;
 
 	const blockSize = ivBlock.length;
-	let originalIV = ivBlock.slice();
+	const originalIV = ivBlock.slice();
 
 	// instead of replace, mutate due to reactivity
 	// fillArray(ivBlock, 0);
@@ -135,11 +141,11 @@ export async function recoverSingleByte(
 	const { interactionGate, progress, skipEdgeCaseCheck } = normalizeShared(opts);
 	const outGuessedDecBlock = opts.outGuessedDecBlock ?? [];
 	const outGuessedPlaintextBlock = opts.outGuessedPlaintextBlock ?? [];
-	
+
 	const guessGate = opts.guessGate ?? autoGate;
 
 	const blockSize = ivBlock.length;
-	let originalIV = ivBlock.slice();
+	const originalIV = ivBlock.slice();
 
 	for (let guess = 0; guess < 256; guess++) {
 		// console.log(`guessing byte ${byte}: ${guess}`);
@@ -148,7 +154,7 @@ export async function recoverSingleByte(
 		ivBlock[blockSize - byte] = guess;
 		progress?.onCiphertextChange?.();
 
-		let valid = paddingOracle([ivBlock, ciphertextBlock]);
+		const valid = paddingOracle([ivBlock, ciphertextBlock]);
 
 		if (valid) {
 			// check edge case that byte is actually X .. X 0x01, and not X .. 0x2 0x02, which would also be valid padding
@@ -159,7 +165,7 @@ export async function recoverSingleByte(
 				// check if next byte is also padding.
 				// if it is not padding, then we know the padding is 0x01 and not 0x02 or more
 				ivBlock[blockSize - byte - 1] ^= 1;
-				let valid2 = paddingOracle([ivBlock, ciphertextBlock]);
+				const valid2 = paddingOracle([ivBlock, ciphertextBlock]);
 				progress?.onCiphertextChange?.();
 
 				progress?.onProgressUpdate?.({
@@ -178,14 +184,38 @@ export async function recoverSingleByte(
 				}
 			}
 
-			progress?.onProgressUpdate?.({ event: 'on-byte-recovered' });
+			let expectedPlaintextByte;
+			switch (paddingScheme) {
+				case 'PKCS#5/7': {
+					expectedPlaintextByte = byte;
+					break;
+				}
+
+				case 'ANSI X9.23 (zeros)': {
+					// ANSI X9.23: only last byte encodes padding length (0x01),
+					// all other padding bytes are 0x00
+					expectedPlaintextByte = byte === 1 ? 0x01 : 0x00;
+					break;
+				}
+
+				default: {
+					const _exhaustive: never = paddingScheme;
+					throw new Error(`Unsupported padding scheme: ${_exhaustive}`);
+				}
+			}
+
+			progress?.onProgressUpdate?.({ event: 'on-byte-recovered', data: { expectedPlaintextByte } });
 			await interactionGate.wait();
 
 			// e.g = 0x01 = tested iv byte xor unknown dec output byte
 			// byte = iv xor dec
-			const decByte = guess ^ byte;
-			const originalIVByte = originalIV[blockSize - byte];
-			const guessedByte = originalIVByte ^ decByte;
+			const { decByte, guessedByte, originalIVByte, decByteXoredWith } = recoverByte(
+				guess,
+				byte,
+				originalIV,
+				blockSize,
+				paddingScheme
+			);
 
 			outGuessedDecBlock[blockSize - byte] = decByte;
 			outGuessedPlaintextBlock[blockSize - byte] = guessedByte;
@@ -197,7 +227,8 @@ export async function recoverSingleByte(
 					guessedByte,
 					decByte,
 					guess,
-					originalIVByte
+					originalIVByte,
+					decByteXoredWith
 				}
 			});
 			// outGuessedDecBlock[0]
@@ -209,11 +240,58 @@ export async function recoverSingleByte(
 	}
 }
 
-function fillArray(arr: Uint8Array, newValue: number) {
-	for (let i = 0; i < arr.length; i++) {
-		arr[i] = newValue;
+function recoverByte(
+	guess: number,
+	byte: number,
+	originalIV: Uint8Array<ArrayBuffer>,
+	blockSize: number,
+	paddingScheme: SupportedAttackablePaddingSchemes
+) {
+	const originalIVByte = originalIV[blockSize - byte];
+
+	let decByte: number;
+	let decByteXoredWith: number;
+	switch (paddingScheme) {
+		case 'PKCS#5/7': {
+			// byte = padding value (e.g. 0x01)
+			// byte = IVguess xor DEC
+			// dec = IVguess xor byte
+			decByte = guess ^ byte;
+			decByteXoredWith = byte;
+			break;
+		}
+
+		case 'ANSI X9.23 (zeros)': {
+			if (byte === 1) {
+				// Edge case: last byte behaves like PKCS#7-style 0x01 padding
+				// byte = IVguess xor DEC
+				// dec = IVguess xor byte
+				decByte = guess ^ 0x01;
+				decByteXoredWith = 0x01;
+			} else {
+				// For byte > 1, padding byte is always 0x00
+				// dec = IVguess xor 0x00 = IVguess
+				decByte = guess;
+				decByteXoredWith = 0x00;
+			}
+			break;
+		}
+
+		default: {
+			const _exhaustive: never = paddingScheme;
+			throw new Error(`Unsupported padding scheme: ${_exhaustive}`);
+		}
 	}
+
+	const guessedByte = originalIVByte ^ decByte;
+	return { decByte, guessedByte, originalIVByte, decByteXoredWith };
 }
+
+// function fillArray(arr: Uint8Array, newValue: number) {
+// 	for (let i = 0; i < arr.length; i++) {
+// 		arr[i] = newValue;
+// 	}
+// }
 
 function setArray(arr: Uint8Array, newValues: Uint8Array) {
 	for (let i = 0; i < arr.length; i++) {

@@ -2,7 +2,6 @@
 	import { typewriter } from './actions/typewriter';
 	import ExplainWrapper from './components/shared/ExplainWrapper.svelte';
 	import Nav from './Nav.svelte';
-	import { receive, send } from './crossfade';
 	let { onstart } = $props();
 </script>
 
@@ -26,7 +25,8 @@
 			explanation and tool to demonstrate the padding oracle attack.
 
 			<br />
-			You can skip directly to the parts relevant for you (using the navigation above), or you can take the tour:
+			You can skip directly to the parts relevant for you (using the navigation above), or you can take
+			the tour:
 		</p>
 
 		<div class="mt-4 flex-center h-full">

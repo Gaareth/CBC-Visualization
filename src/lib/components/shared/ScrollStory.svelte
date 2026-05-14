@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 	import Card from './Card.svelte';
 	import {
 		setSectionContext,
@@ -9,7 +9,7 @@
 	import { cn } from '../../utils/styling';
 
 	interface Props {
-		children?: () => any;
+		children?: Snippet;
 		titles?: string[];
 	}
 

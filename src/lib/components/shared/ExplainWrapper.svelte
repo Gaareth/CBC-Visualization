@@ -71,7 +71,7 @@
 					)}
 					style="transform: translateX(-{index * 100}%);"
 				>
-					{#each slides as slide, i}
+					{#each slides as slide, _i (slide)}
 						<div class={cn('relative h-full w-full shrink-0', slideWrapperClass)}>
 							{@render slide()}
 						</div>

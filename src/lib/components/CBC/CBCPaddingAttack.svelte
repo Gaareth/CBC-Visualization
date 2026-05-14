@@ -125,7 +125,7 @@
 	</ExplainWrapper>
 
 	<div class={cn('flex justify-center')} style={`gap: ${getGapToNext()}px;`}>
-		{#each { length: decryptedplaintextBlocks.length } as _, i}
+		{#each { length: decryptedplaintextBlocks.length } as _, i (i)}
 			<CBCBlock
 				encryptionMode={false}
 				index={i}

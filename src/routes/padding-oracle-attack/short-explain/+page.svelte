@@ -1,5 +1,4 @@
 <script>
-	import Card from '$lib/components/shared/Card.svelte';
 	import { resolve } from '$app/paths';
 	import ExplainWrapper from '$lib/components/shared/ExplainWrapper.svelte';
 	import { goto } from '$app/navigation';

@@ -29,7 +29,7 @@
 		padder.validatePadding(plaintextBlocks[plaintextBlocks.length - 1])
 	);
 
-	const paddingOracle: PaddingOracle = (cBlocks) => {
+	const paddingOracle: PaddingOracle = (_cBlocks) => {
 		const decrypted = decryptCBCWithContext(ciphertextBlocks, key, settingsState);
 		const lastBlock = decrypted[decrypted.length - 1];
 
@@ -84,152 +84,150 @@
 {/snippet}
 
 <StorySection title="Exploiting - Recovering a single byte" headingLevel={3}>
-	{#snippet children()}
-		<p>
-			Even worse, a padding oracle can be used to gain information about the decrypted plaintext and
-			even further to completely recover it
+	<p>
+		Even worse, a padding oracle can be used to gain information about the decrypted plaintext and
+		even further to completely recover it
+	</p>
+
+	<Card title="Question" className="text-center">Can you think of a way to exploit this?</Card>
+
+	<!-- <p class="text-muted-foreground m-0!">First set the IV to zero</p> -->
+	<p>
+		You can make predictable changes to the
+		<span class={`text-${BLOCK_COLORS.plaintext}`}>last byte of the decrypted plaintext</span>
+		by modifying the last <span class={`text-${BLOCK_COLORS.ciphertext}`}>byte of the IV</span>. In
+		most cases, this will result in invalid padding. However, if you get valid padding, you can
+		deduce information about the
+		<span class={`text-${BLOCK_COLORS.plaintext}`}>decrypted plaintext</span>.
+	</p>
+
+	<Question id="valid-padding-plaintext">
+		{#snippet question()}
+			<p class="my-0! text-center">What does a valid padding result tell you?</p>
+		{/snippet}
+
+		{#snippet reveal()}
+			<p class="my-0!">
+				If you get no padding error, the
+				<span class={`text-${BLOCK_COLORS.plaintext}`}>last byte of the decrypted plaintext</span>
+				is likely (except for a few cases)
+				<span class={`text-${BLOCK_COLORS.plaintext} font-bold`}>0x01</span>. You can then try all
+				possible byte values (0-255) for the
+				<span class={`text-${BLOCK_COLORS.ciphertext}`}>last byte of the IV</span>, to find a
+				<span class={`text-${BLOCK_COLORS.plaintext}`}>plaintext</span> with valid padding. As you can
+				see on the right, this means the following:
+			</p>
+
+			<p class="text-center">
+				<span class={`text-${BLOCK_COLORS.plaintext}`}>0x01</span> =
+				<span class={`text-${BLOCK_COLORS.ciphertext}`}>IV[-1]</span>
+				XOR
+				<span class={`text-${BLOCK_COLORS.fnOutput}`}>DEC[-1]</span>
+			</p>
+		{/snippet}
+	</Question>
+
+	<div>
+		<p class="mb-0!">
+			With this knowledge, you can then rearrange this equation and first calculate the
+			<span class={`text-${BLOCK_COLORS.fnOutput}`}>
+				last byte of the output of the block cipher decryption function
+			</span>
+			(DEC):
 		</p>
 
-		<Card title="Question" className="text-center">Can you think of a way to exploit this?</Card>
-
-		<!-- <p class="text-muted-foreground m-0!">First set the IV to zero</p> -->
-		<p>
-			You can make predictable changes to the
-			<span class={`text-${BLOCK_COLORS.plaintext}`}>last byte of the decrypted plaintext</span>
-			by modifying the last <span class={`text-${BLOCK_COLORS.ciphertext}`}>byte of the IV</span>.
-			In most cases, this will result in invalid padding. However, if you get valid padding, you can
-			deduce information about the
-			<span class={`text-${BLOCK_COLORS.plaintext}`}>decrypted plaintext</span>.
+		<p class="text-center">
+			<span class="text-red-500">DEC[-1]</span> = <span class="text-blue-400">0x01</span>
+			XOR
+			<span class="text-green-400">IV[-1]</span>
 		</p>
 
-		<Question id="valid-padding-plaintext">
-			{#snippet question()}
-				<p class="my-0! text-center">What does a valid padding result tell you?</p>
-			{/snippet}
-
-			{#snippet reveal()}
-				<p class="my-0!">
-					If you get no padding error, the
-					<span class={`text-${BLOCK_COLORS.plaintext}`}>last byte of the decrypted plaintext</span>
-					is likely (except for a few cases)
-					<span class={`text-${BLOCK_COLORS.plaintext} font-bold`}>0x01</span>. You can then try all
-					possible byte values (0-255) for the
-					<span class={`text-${BLOCK_COLORS.ciphertext}`}>last byte of the IV</span>, to find a
-					<span class={`text-${BLOCK_COLORS.plaintext}`}>plaintext</span> with valid padding. As you can
-					see on the right, this means the following:
-				</p>
-
-				<p class="text-center">
-					<span class={`text-${BLOCK_COLORS.plaintext}`}>0x01</span> =
-					<span class={`text-${BLOCK_COLORS.ciphertext}`}>IV[-1]</span>
-					XOR
-					<span class={`text-${BLOCK_COLORS.fnOutput}`}>DEC[-1]</span>
-				</p>
-			{/snippet}
-		</Question>
-
-		<div>
-			<p class="mb-0!">
-				With this knowledge, you can then rearrange this equation and first calculate the
-				<span class={`text-${BLOCK_COLORS.fnOutput}`}>
-					last byte of the output of the block cipher decryption function
-				</span>
-				(DEC):
-			</p>
-
-			<p class="text-center">
-				<span class="text-red-500">DEC[-1]</span> = <span class="text-blue-400">0x01</span>
-				XOR
-				<span class="text-green-400">IV[-1]</span>
-			</p>
-
-			<p class="text-center">
-				<span class="text-red-500"
-					>{displayByte(
-						guessedOutputBlocks[1][guessedOutputBlocks[1].length - 1],
-						settingsState.displayBytesAs,
-						true
-					)}</span
-				>
-				= <span class="text-blue-400">0x01</span>
-				XOR
-				<span class="text-green-400"
-					>{displayByte(
-						ciphertextBlocks[0][ciphertextBlocks[0].length - 1],
-						settingsState.displayBytesAs,
-						true
-					)}</span
-				>
-			</p>
-		</div>
-
-		<div class="my-10">
-			<p class="mb-0!">
-				As you now know the confidential output of the decryption function, you only need to xor
-				<span class={`text-${BLOCK_COLORS.fnOutput}`}>it</span>
-				with the
-				<span class={`text-${BLOCK_COLORS.ciphertext}`}>
-					last byte of the <span class="font-bold">original</span> IV
-				</span>
-				to get the
-
-				<span class={`text-${BLOCK_COLORS.plaintext}`}
-					>last byte of the <span class="font-bold">original</span> plaintext</span
-				>:
-			</p>
-
-			<p class="text-center">
-				<span class="text-blue-400">P[-1]</span> = <span class="text-green-400">IV[-1]</span>
-				XOR
-				<span class="text-red-500">DEC[-1]</span>
-			</p>
-
-			<p class="text-center">
-				<span class="text-blue-400">
-					{displayByte(
-						guessedPlaintextBlocks[1][guessedPlaintextBlocks[1].length - 1],
-						settingsState.displayBytesAs,
-						true
-					)}
-				</span>
-				=
-				<span class="text-green-400">
-					{displayByte(
-						initializationVector[initializationVector.length - 1],
-						settingsState.displayBytesAs,
-						true
-					)}
-				</span>
-				XOR
-				<span class="text-red-500">
-					{displayByte(
-						guessedOutputBlocks[1][guessedOutputBlocks[1].length - 1],
-						settingsState.displayBytesAs,
-						true
-					)}
-				</span>
-			</p>
-		</div>
-
-		<p class="mb-10!">Now put your knowledge to the test and recover your first byte:</p>
-
-		<ExplainWrapper slides={[example]} title="Interactive Example - Recovering a Byte"
-		></ExplainWrapper>
-
-		<Card
-			className="text-center font-semibold mt-5 border-primary-1! dark:text-primary-5"
-			surfaceLevel={1}
-		>
-			Congratulations! You've successfully recovered your first byte of the plaintext.
-		</Card>
-
-		<p>
-			Learn about edge cases and <a
-				href="#Exploiting - Recovering Bytes"
-				class="no-underline hover:underline">recovering the full plaintext</a
-			> in the next sections.
+		<p class="text-center">
+			<span class="text-red-500"
+				>{displayByte(
+					guessedOutputBlocks[1][guessedOutputBlocks[1].length - 1],
+					settingsState.displayBytesAs,
+					true
+				)}</span
+			>
+			= <span class="text-blue-400">0x01</span>
+			XOR
+			<span class="text-green-400"
+				>{displayByte(
+					ciphertextBlocks[0][ciphertextBlocks[0].length - 1],
+					settingsState.displayBytesAs,
+					true
+				)}</span
+			>
 		</p>
-	{/snippet}
+	</div>
+
+	<div class="my-10">
+		<p class="mb-0!">
+			As you now know the confidential output of the decryption function, you only need to xor
+			<span class={`text-${BLOCK_COLORS.fnOutput}`}>it</span>
+			with the
+			<span class={`text-${BLOCK_COLORS.ciphertext}`}>
+				last byte of the <span class="font-bold">original</span> IV
+			</span>
+			to get the
+
+			<span class={`text-${BLOCK_COLORS.plaintext}`}
+				>last byte of the <span class="font-bold">original</span> plaintext</span
+			>:
+		</p>
+
+		<p class="text-center">
+			<span class="text-blue-400">P[-1]</span> = <span class="text-green-400">IV[-1]</span>
+			XOR
+			<span class="text-red-500">DEC[-1]</span>
+		</p>
+
+		<p class="text-center">
+			<span class="text-blue-400">
+				{displayByte(
+					guessedPlaintextBlocks[1][guessedPlaintextBlocks[1].length - 1],
+					settingsState.displayBytesAs,
+					true
+				)}
+			</span>
+			=
+			<span class="text-green-400">
+				{displayByte(
+					initializationVector[initializationVector.length - 1],
+					settingsState.displayBytesAs,
+					true
+				)}
+			</span>
+			XOR
+			<span class="text-red-500">
+				{displayByte(
+					guessedOutputBlocks[1][guessedOutputBlocks[1].length - 1],
+					settingsState.displayBytesAs,
+					true
+				)}
+			</span>
+		</p>
+	</div>
+
+	<p class="mb-10!">Now put your knowledge to the test and recover your first byte:</p>
+
+	<ExplainWrapper slides={[example]} title="Interactive Example - Recovering a Byte"
+	></ExplainWrapper>
+
+	<Card
+		className="text-center font-semibold mt-5 border-primary-1! dark:text-primary-5"
+		surfaceLevel={1}
+	>
+		Congratulations! You've successfully recovered your first byte of the plaintext.
+	</Card>
+
+	<p>
+		Learn about edge cases and <a
+			href="#Exploiting - Recovering Bytes"
+			class="no-underline hover:underline">recovering the full plaintext</a
+		> in the next sections.
+	</p>
 
 	{#snippet visualSnippet()}
 		<h2 class="mb-10 text-center text-2xl font-bold">Recovering a Single Byte</h2>

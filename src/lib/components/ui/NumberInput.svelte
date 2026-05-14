@@ -10,7 +10,7 @@
 		className?: string;
 		onChange?: (value: number) => void;
 		surfaceLevel?: SurfaceLevel;
-		[key: string]: any; // for any additional props like id, etc.
+		[key: string]: unknown; // for any additional props like id, etc.
 	}
 
 	let {

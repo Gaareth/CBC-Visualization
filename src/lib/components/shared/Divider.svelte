@@ -1,10 +1,11 @@
 <script lang="ts">
-	import { borderLayer, cn, type BgSurfaceLevel, type SurfaceLevel } from '../../utils/styling';
+	import type { Snippet } from 'svelte';
+	import { borderLayer, cn, type BgSurfaceLevel } from '../../utils/styling';
 
 	interface Props {
 		text?: string;
 		className?: string;
-		children?: () => any;
+		children?: Snippet;
 		hideText?: boolean;
 		surfaceLevel?: BgSurfaceLevel; // surface level of the background the divider is on
 	}

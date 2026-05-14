@@ -15,15 +15,15 @@ export async function findPaddingLengthWithOracle(
 	}
 
 	const blockSize = ciphertextBlocks[0].length;
-	let secondLastCipherBlock = ciphertextBlocks[ciphertextBlocks.length - 2];
+	const secondLastCipherBlock = ciphertextBlocks[ciphertextBlocks.length - 2];
 
 	for (let i = 0; i < blockSize; i++) {
-		let originalByte = secondLastCipherBlock[i];
+		const originalByte = secondLastCipherBlock[i];
 		secondLastCipherBlock[i] = (originalByte + 1) % 256;
 		onCiphertextChange?.();
 
 		await byteGate.wait();
-		let valid = paddingOracle(ciphertextBlocks);
+		const valid = paddingOracle(ciphertextBlocks);
 
 		if (!valid) {
 			// i is the index of the first byte that results in invalid padding,

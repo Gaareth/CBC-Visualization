@@ -1,9 +1,8 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, type Snippet } from 'svelte';
 	import { getSectionContext } from '../../contexts/scrollStoryContext';
 	import { cn } from '$lib/utils';
 
-	type Snippet = () => any;
 
 	interface Props {
 		title: string;

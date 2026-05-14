@@ -72,7 +72,8 @@
 
 	// let targetRotation = $derived(encryptionMode ? 90 : 270);
 
-	// svelte-ignore state_referenced_locally. Seem to work? Wrapping in derived, means animation no work
+	// Seem to work? Wrapping in derived, means animation no work
+	// svelte-ignore state_referenced_locally 
 	let verticalArrowRotationTween = new Tween(targetRotation, { duration: 400 });
 
 	let verticalArrowRotation = $derived(verticalArrowRotationTween.current);

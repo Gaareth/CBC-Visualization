@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { cn, inputLayer, surfaceOutline, type SurfaceLevel } from '../../utils/styling';
+	import { cn, inputLayer, type SurfaceLevel } from '../../utils/styling';
 
 	interface Props {
 		value: string;

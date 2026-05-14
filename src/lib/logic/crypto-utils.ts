@@ -19,7 +19,7 @@ export function toUint32(n: number): number {
 
 export function generateKeyFromString(s: string, keySizeBytes?: number): Uint8Array {
 	const arr = [];
-	for (let char of s) {
+	for (const char of s) {
 		arr.push(char.charCodeAt(0));
 	}
 	const arrTyped = new Uint8Array(arr);

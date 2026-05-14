@@ -52,49 +52,47 @@
 </script>
 
 <StorySection {title}>
-	{#snippet children()}
-		<p>
-			Block ciphers operate on fixed-size blocks. When the plaintext doesn't fit perfectly into
-			blocks, we need to add some extra bytes to fill the last block. This process is called
-			padding. One common padding scheme is PKCS#7, which adds bytes with a value equal to the
-			number of padding bytes added.
-		</p>
+	<p>
+		Block ciphers operate on fixed-size blocks. When the plaintext doesn't fit perfectly into
+		blocks, we need to add some extra bytes to fill the last block. This process is called padding.
+		One common padding scheme is PKCS#7, which adds bytes with a value equal to the number of
+		padding bytes added.
+	</p>
 
-		<p>
-			However, if the message requires no padding, a complete block fully filled with padding bytes
-			is added. This is necessary to ensure that the decryption process can always unambiguously
-			determine the padding length and remove it correctly.
-		</p>
+	<p>
+		However, if the message requires no padding, a complete block fully filled with padding bytes is
+		added. This is necessary to ensure that the decryption process can always unambiguously
+		determine the padding length and remove it correctly.
+	</p>
 
-		<Card title="Interactive Example - Understanding Padding">
-			<div class="not-prose flex w-full flex-col gap-1">
-				<p>Try it out!</p>
-				<div class="flex w-full gap-1">
-					<NumberInput
-						surfaceLevel={2}
-						value={plaintext.length}
-						min={1}
-						max={defaultPlaintext.length}
-						onChange={(value) => {
-							plaintext = defaultPlaintext.slice(0, value);
-						}}
-						className="w-1/2"
-					/>
+	<Card title="Interactive Example - Understanding Padding">
+		<div class="not-prose flex w-full flex-col gap-1">
+			<p>Try it out!</p>
+			<div class="flex w-full gap-1">
+				<NumberInput
+					surfaceLevel={2}
+					value={plaintext.length}
+					min={1}
+					max={defaultPlaintext.length}
+					onChange={(value) => {
+						plaintext = defaultPlaintext.slice(0, value);
+					}}
+					className="w-1/2"
+				/>
 
-					<FloatingInput
-						label="Plaintext"
-						value={plaintext}
-						{oninput}
-						className="input-layer-2!"
-						wrapperClass="w-1/2"
-					/>
-				</div>
-				<p class="text-sm text-muted-foreground">
-					Change the plaintext length to see how padding works! Or choose a different plaintext.
-				</p>
+				<FloatingInput
+					label="Plaintext"
+					value={plaintext}
+					{oninput}
+					className="input-layer-2!"
+					wrapperClass="w-1/2"
+				/>
 			</div>
-		</Card>
-	{/snippet}
+			<p class="text-sm text-muted-foreground">
+				Change the plaintext length to see how padding works! Or choose a different plaintext.
+			</p>
+		</div>
+	</Card>
 
 	{#snippet visualSnippet()}
 		<h2 class="mb-10 text-center text-2xl font-bold">What is Padding?</h2>
@@ -102,7 +100,11 @@
 		<div
 			class={cn('not-prose flex w-fit justify-end', ctxt.ctxt?.shouldWrap ? 'justify-center' : '')}
 		>
-			<CBC bind:plaintextBlocks {ciphertextBlocks} encryptionMode={true} addInitPadding={true} 
+			<CBC
+				bind:plaintextBlocks
+				{ciphertextBlocks}
+				encryptionMode={true}
+				addInitPadding={true}
 				onChangeIV={(bytes) => {
 					initializationVector = bytes;
 				}}

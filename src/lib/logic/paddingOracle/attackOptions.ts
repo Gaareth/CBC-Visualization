@@ -1,5 +1,5 @@
 import type { UIBlock } from '$lib/utils/arrayConversion';
-import { autoGate, type Gate } from '$lib/utils/generic';
+import { autoGate, type AwaitableGate } from '$lib/utils/generic';
 import type { AttackEvent } from './attackEvents';
 
 type AttackProgress = {
@@ -16,8 +16,8 @@ type AttackProgress = {
 };
 
 type AttackSharedOptions = {
-	interactionGate?: Gate;
-	guessGate?: Gate;
+	interactionGate?: AwaitableGate;
+	guessGate?: AwaitableGate;
 
 	skipEdgeCaseCheck?: boolean;
 	progress?: AttackProgress;
@@ -34,7 +34,7 @@ type OutBlocks = {
 };
 
 type AttackBlockGates = {
-	byteGate?: { wait: () => Promise<void> };
+	byteGate?: AwaitableGate;
 };
 
 // exports
@@ -45,7 +45,7 @@ export type AttackBlockOptions = AttackByteOptions & AttackBlockGates;
 export type AttackOptions = AttackSharedOptions &
 	AttackBlockGates &
 	OutBlocks & {
-		blockGate?: { wait: () => Promise<void> };
+		blockGate?: AwaitableGate;
 	};
 
 export function normalizeShared(opts: AttackSharedOptions) {

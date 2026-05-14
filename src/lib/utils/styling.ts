@@ -64,3 +64,10 @@ export const BLOCK_COLORS = {
 	ciphertext: 'green-400',
 	plaintext: 'blue-400'
 };
+
+export function makeBorderMap(index: number, color: string) {
+	return {
+		[index - 1]: `border-r-${color}!`,
+		[index]: `border-${color}!`
+	} satisfies Record<number, string>;
+}

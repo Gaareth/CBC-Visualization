@@ -123,65 +123,61 @@
 {/snippet}
 
 <StorySection title="Edge cases" headingLevel={3}>
-	{#snippet children()}
-		<p>
-			A valid padding result probably indicates that you set the last byte of the decrypted
-			plaintext to
-			<PlaintextColor>0x01</PlaintextColor>. However, there are some edge cases to consider.
-		</p>
+	<p>
+		A valid padding result probably indicates that you set the last byte of the decrypted plaintext
+		to
+		<PlaintextColor>0x01</PlaintextColor>. However, there are some edge cases to consider.
+	</p>
 
-		<Question
-			id="valid-padding-plaintext-edge-cases"
-			className="mb-8"
-			title="Can you think of an exception?"
-		>
-			{#snippet question()}
-				<p class="text-center">
-					Can you think of exceptions, where the padding oracle result is valid but the last byte of
-					the decrypted plaintext is not <PlaintextColor>0x01</PlaintextColor>?
-				</p>
-				<ul class="not-prose list-disc px-4">
-					<li>
-						<Spoiler surfaceLevel={2} remember={true}
-							>What if the last byte of the decrypted plaintext is set to 0x01?
-						</Spoiler>
-					</li>
-					<li>
-						<Spoiler surfaceLevel={2}>
-							What if the last byte of the decrypted plaintext is set to 0x02?
-						</Spoiler>
-					</li>
-					<li>
-						<Spoiler surfaceLevel={2}>
-							In which cases would this still lead to valid padding?
-						</Spoiler>
-					</li>
-					<li>
-						<Spoiler surfaceLevel={2}>How do other validly padded plaintext blocks look?</Spoiler>
-					</li>
-				</ul>
-			{/snippet}
+	<Question
+		id="valid-padding-plaintext-edge-cases"
+		className="mb-8"
+		title="Can you think of an exception?"
+	>
+		{#snippet question()}
+			<p class="text-center">
+				Can you think of exceptions, where the padding oracle result is valid but the last byte of
+				the decrypted plaintext is not <PlaintextColor>0x01</PlaintextColor>?
+			</p>
+			<ul class="not-prose list-disc px-4">
+				<li>
+					<Spoiler surfaceLevel={2} remember={true}
+						>What if the last byte of the decrypted plaintext is set to 0x01?
+					</Spoiler>
+				</li>
+				<li>
+					<Spoiler surfaceLevel={2}>
+						What if the last byte of the decrypted plaintext is set to 0x02?
+					</Spoiler>
+				</li>
+				<li>
+					<Spoiler surfaceLevel={2}>In which cases would this still lead to valid padding?</Spoiler>
+				</li>
+				<li>
+					<Spoiler surfaceLevel={2}>How do other validly padded plaintext blocks look?</Spoiler>
+				</li>
+			</ul>
+		{/snippet}
 
-			{#snippet reveal()}
-				<p class="mt-0!">
-					Suppose the <span class="font-bold">penultimate</span> byte of the decrypted plaintext is
-					<PlaintextColor>0x02</PlaintextColor>. You will then get a valid padding result if you set
-					the last byte of the decrypted plaintext to
-					<PlaintextColor className="font-bold">0x02</PlaintextColor> or
-					<PlaintextColor>0x01</PlaintextColor>.
-				</p>
+		{#snippet reveal()}
+			<p class="mt-0!">
+				Suppose the <span class="font-bold">penultimate</span> byte of the decrypted plaintext is
+				<PlaintextColor>0x02</PlaintextColor>. You will then get a valid padding result if you set
+				the last byte of the decrypted plaintext to
+				<PlaintextColor className="font-bold">0x02</PlaintextColor> or
+				<PlaintextColor>0x01</PlaintextColor>.
+			</p>
 
-				<p>
-					In general, if the last n bytes of the decrypted
-					<PlaintextColor>plaintext</PlaintextColor> block are all set to n (e.g. 0x02 0x02, or 0x03 0x03
-					0x03), you would get valid padding by setting the last byte to n or 0x01.
-				</p>
-			{/snippet}
-		</Question>
+			<p>
+				In general, if the last n bytes of the decrypted
+				<PlaintextColor>plaintext</PlaintextColor> block are all set to n (e.g. 0x02 0x02, or 0x03 0x03
+				0x03), you would get valid padding by setting the last byte to n or 0x01.
+			</p>
+		{/snippet}
+	</Question>
 
-		<ExplainWrapper slides={[exampleEdgeCase]} title="Interactive Example - Edge Cases"
-		></ExplainWrapper>
-	{/snippet}
+	<ExplainWrapper slides={[exampleEdgeCase]} title="Interactive Example - Edge Cases"
+	></ExplainWrapper>
 
 	{#snippet visualSnippet()}
 		<h2 class="mb-10 text-center text-2xl font-bold">Edge case simulation</h2>
