@@ -1,4 +1,5 @@
 import { generateKeyFromString, oneTimePad } from '$lib/logic/crypto-utils';
+import type { Cipher } from '../ciphers';
 
 export class OTPCipher implements Cipher {
 	public keySizeBytes = undefined; // OTP can use any key size, but we'll set this to undefined to indicate that
