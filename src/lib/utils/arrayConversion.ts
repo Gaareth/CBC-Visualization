@@ -9,6 +9,13 @@ export function uint8ArrayToUI(input: Uint8Array): UIBlock {
 }
 
 /**
+ * Converts an Array of Uint8Array back into the format your UI components expect.
+ */
+export function uint8ArraysToUI(input: Uint8Array[]): UIBlock[] {
+	return input.map(uint8ArrayToUI);
+}
+
+/**
  *  Wraps an onChange handler to convert the UI's (number | undefined)[] back into a Uint8Array for your logic to consume.
  */
 export function wrapOnChange(handler?: (bytes: Uint8Array) => void) {

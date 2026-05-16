@@ -15,6 +15,7 @@
 
 ```bash
 pnpm install
+pnpm prek install # install pre-commit/push hooks (see prek.toml)
 pnpm run dev
 ```
 

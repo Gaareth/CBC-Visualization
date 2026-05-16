@@ -20,6 +20,13 @@ export function isAttackablePaddingScheme(
 	return ATTACKABLE_PADDING_SCHEMES.includes(paddingScheme as SupportedAttackablePaddingSchemes);
 }
 
+/**
+ * Recovers plaintext blocks from ciphertext blocks using a padding oracle.
+ * @param ciphertextBlocks the array of ciphertext blocks, including the IV as the first block (i.e. [IV, C1, C2, ...])
+ * @param paddingOracle the padding oracle function that takes an array of blocks (e.g. [IV, C1]) and returns whether the padding is valid
+ * @param paddingScheme the padding scheme, which the oracle is based on (e.g. PKCS#7, ANSI X9.23, etc.)
+ * @param opts options for the attack, such as gates for synchronization, callbacks for progress updates, and output arrays for the guessed intermediate decrypted blocks and plaintext blocks
+ */
 export async function recoverPlaintextWithOracle(
 	ciphertextBlocks: Uint8Array[],
 	paddingOracle: PaddingOracle,
@@ -184,25 +191,7 @@ export async function recoverSingleByte(
 				}
 			}
 
-			let expectedPlaintextByte;
-			switch (paddingScheme) {
-				case 'PKCS#5/7': {
-					expectedPlaintextByte = byte;
-					break;
-				}
-
-				case 'ANSI X9.23 (zeros)': {
-					// ANSI X9.23: only last byte encodes padding length (0x01),
-					// all other padding bytes are 0x00
-					expectedPlaintextByte = byte === 1 ? 0x01 : 0x00;
-					break;
-				}
-
-				default: {
-					const _exhaustive: never = paddingScheme;
-					throw new Error(`Unsupported padding scheme: ${_exhaustive}`);
-				}
-			}
+			const expectedPlaintextByte = getExpectedPlaintextByte(paddingScheme, byte);
 
 			progress?.onProgressUpdate?.({ event: 'on-byte-recovered', data: { expectedPlaintextByte } });
 			await interactionGate.wait();
@@ -240,6 +229,28 @@ export async function recoverSingleByte(
 	}
 }
 
+/// Returns the expected plaintext byte, when the padding oracle returns valid for a given guess
+function getExpectedPlaintextByte(paddingScheme: SupportedAttackablePaddingSchemes, byte: number) {
+	switch (paddingScheme) {
+		case 'PKCS#5/7': {
+			// PKCS#5/7: all padding bytes have the same value as the number of padding bytes (e.g. 0x03 0x03 0x03)
+			return byte;
+		}
+
+		case 'ANSI X9.23 (zeros)': {
+			// ANSI X9.23: only the last byte encodes padding length (0x01), so for byte == we expect 0x01
+			// and for all other padding bytes we expect 0x00
+			return byte === 1 ? 0x01 : 0x00;
+		}
+
+		default: {
+			const _exhaustive: never = paddingScheme;
+			throw new Error(`Unsupported padding scheme: ${_exhaustive}`);
+		}
+	}
+}
+
+/// Recovers the original  plaintext byte value
 function recoverByte(
 	guess: number,
 	byte: number,
@@ -248,43 +259,19 @@ function recoverByte(
 	paddingScheme: SupportedAttackablePaddingSchemes
 ) {
 	const originalIVByte = originalIV[blockSize - byte];
+	// P = IV xor DEC
 
-	let decByte: number;
-	let decByteXoredWith: number;
-	switch (paddingScheme) {
-		case 'PKCS#5/7': {
-			// byte = padding value (e.g. 0x01)
-			// byte = IVguess xor DEC
-			// dec = IVguess xor byte
-			decByte = guess ^ byte;
-			decByteXoredWith = byte;
-			break;
-		}
+	// get P (through the info leak using the padding oracle)
+	const expectedPlaintextByte = getExpectedPlaintextByte(paddingScheme, byte);
+	// For P holds: expectedPlaintextByte = IVguess xor DEC
 
-		case 'ANSI X9.23 (zeros)': {
-			if (byte === 1) {
-				// Edge case: last byte behaves like PKCS#7-style 0x01 padding
-				// byte = IVguess xor DEC
-				// dec = IVguess xor byte
-				decByte = guess ^ 0x01;
-				decByteXoredWith = 0x01;
-			} else {
-				// For byte > 1, padding byte is always 0x00
-				// dec = IVguess xor 0x00 = IVguess
-				decByte = guess;
-				decByteXoredWith = 0x00;
-			}
-			break;
-		}
+	// Rearrange: DEC = IVguess xor expectedPlaintextByte
+	const decByte = guess ^ expectedPlaintextByte;
 
-		default: {
-			const _exhaustive: never = paddingScheme;
-			throw new Error(`Unsupported padding scheme: ${_exhaustive}`);
-		}
-	}
-
+	// Now get the *original* plaintext byte using the *original* IV: P = IVoriginal xor DEC
 	const guessedByte = originalIVByte ^ decByte;
-	return { decByte, guessedByte, originalIVByte, decByteXoredWith };
+
+	return { decByte, guessedByte, originalIVByte, decByteXoredWith: expectedPlaintextByte };
 }
 
 // function fillArray(arr: Uint8Array, newValue: number) {

@@ -2,23 +2,37 @@ import { xorBlocks } from './crypto-utils';
 import { PKCS7Padder } from './padding/padder';
 import type { Padder } from './padding/padding';
 
-export function cbcEncryptBlocks(
+export function _cbcEncryptBlocks(
 	plaintextBlocks: Uint8Array[],
 	key: Uint8Array,
 	iv: Uint8Array,
 	blockCipherFn: (plaintext: Uint8Array, key: Uint8Array) => Uint8Array
 ) {
 	const ciphertextBlocks: Uint8Array[] = [iv];
+	const blockCipherEncInput: Uint8Array[] = [];
+
 	let previousBlock = iv;
 
 	for (const plaintextBlock of plaintextBlocks) {
 		const xored_block = xorBlocks(new Uint8Array(plaintextBlock), previousBlock);
+		blockCipherEncInput.push(new Uint8Array(xored_block));
+
 		const encrypted_block = blockCipherFn(xored_block, key);
 		ciphertextBlocks.push(encrypted_block);
+
 		previousBlock = encrypted_block;
 	}
 
-	return ciphertextBlocks;
+	return { ciphertextBlocks, blockCipherEncInput };
+}
+
+export function cbcEncryptBlocks(
+	plaintextBlocks: Uint8Array[],
+	key: Uint8Array,
+	iv: Uint8Array,
+	blockCipherFn: (plaintext: Uint8Array, key: Uint8Array) => Uint8Array
+) {
+	return _cbcEncryptBlocks(plaintextBlocks, key, iv, blockCipherFn).ciphertextBlocks;
 }
 
 export function cbcEncrypt(
